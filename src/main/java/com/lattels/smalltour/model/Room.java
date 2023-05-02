@@ -6,31 +6,44 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Data
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "item")
-public class item {
+@Table(name = "room")
+public class Room {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // DB에서 자동증가
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
-    @Column(name = "image_path")
-    private String imagePath;
+    @Column(name = "hotel_id")
+    private int hotelId;
+
+    @Column(name = "name")
+    private String name;
 
     @Column(name = "price")
     private int price;
-
-    @Column(name = "period")
-    private LocalDateTime period;
  
-    @Column(name = "type")
-    private int type;
+    @Column(name = "min_people")
+    private int minPeople;
+
+    @Column(name = "max_people")
+    private int maxPeople;
+
+    @Column(name = "description")
+    private String description;
+
+
+    @Column(name = "image")
+    private String image;
+
+
+    @Column(name = "add_price")
+    private int addPrice;
 
 }

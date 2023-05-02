@@ -12,38 +12,30 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "room")
-public class room {
+@Table(name = "hotel")
+public class Hotel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // DB에서 자동증가
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
-    @Column(name = "hotel_id")
-    private int hotelId;
-
     @Column(name = "name")
     private String name;
 
-    @Column(name = "price")
-    private int price;
- 
-    @Column(name = "min_people")
-    private int minPeople;
+    @Column(name = "address")
+    private String address;
 
-    @Column(name = "max_people")
-    private int maxPeople;
+    @Column(name = "hotel_tel")
+    private String hotelTel;
 
     @Column(name = "description")
     private String description;
 
+    @Column(name = "hotel_location_x")
+    private double hotelLocationX;
 
-    @Column(name = "image")
-    private String image;
-
-
-    @Column(name = "add_price")
-    private int addPrice;
+    @Column(name = "hotel_location_y")
+    private double hotelLocationY;
 
 }

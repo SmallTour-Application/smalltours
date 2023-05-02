@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -14,8 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "upper_payment")
-public class upperPayment {
+@Table(name = "banner_payment")
+public class BannerPayment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // DB에서 자동증가
@@ -28,14 +27,10 @@ public class upperPayment {
     @Column(name = "guide_id")
     private int guideId;
 
-    @Column(name = "tour_id")
-    private int tourId;
-
     @Column(name = "image_path")
     private String imagePath;
-
+ 
     @Column(name = "pay_day")
     private LocalDateTime payDay;
-
 
 }
