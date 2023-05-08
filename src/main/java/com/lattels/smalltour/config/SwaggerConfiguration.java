@@ -27,7 +27,7 @@ public class SwaggerConfiguration {
         return new Docket(DocumentationType.SWAGGER_2)
 //                .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.latteis.eumcoding"))
+                .apis(RequestHandlerSelectors.basePackage("com.lattels.smalltour"))
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(apiInfo())

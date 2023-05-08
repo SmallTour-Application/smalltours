@@ -38,11 +38,6 @@ public class MemberDTO {
 
     }
 
-    @Getter
-    @NoArgsConstructor
-    public static class UpdateAddress{
-        private String address;
-    }
 
     @Getter
     @NoArgsConstructor
@@ -99,8 +94,6 @@ public class MemberDTO {
 
         private int gender;
 
-        private String address;
-
         private int role; // 0:학생, 1:선생, 2:관리자
 
         private String profile; // 프로필 이미지가 들어있는 경로
@@ -129,9 +122,6 @@ public class MemberDTO {
         private String lectureId;
         private String lectureName;
     }
-
-
-
 
     private String token;
 
