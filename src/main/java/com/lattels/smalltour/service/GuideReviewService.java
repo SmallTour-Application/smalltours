@@ -1,6 +1,7 @@
 package com.lattels.smalltour.service;
 
 import com.google.common.base.Preconditions;
+import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.guidereview.GuideReviewDTO;
 import com.lattels.smalltour.dto.guidereview.GuideReviewDeleteDto;
 import com.lattels.smalltour.dto.guidereview.GuideReviewUpdateDto;
@@ -55,16 +56,16 @@ public class GuideReviewService {
 
         // 리뷰 작성자 회원 존재 여부 체크
         Member reviewer = memberRepository.findByMemberId(reviewerId);
-        Preconditions.checkNotNull(reviewer, "회원을 찾을 수 없습니다. (회원 ID: %d)", reviewerId);
+        Preconditions.checkNotNull(reviewer, "회원을 찾을 수 없습니다. (회원 ID: %s)", reviewerId);
 
         // 가이드 회원 존재 여부 체크
         int guideId = guideReviewWriteDto.getGuideId();
         Member guide = memberRepository.findByMemberId(guideId);
-        Preconditions.checkNotNull(guide, "회원을 찾을 수 없습니다. (회원 ID: %d)", guideId);
+        Preconditions.checkNotNull(guide, "회원을 찾을 수 없습니다. (회원 ID: %s)", guideId);
 
         // 이미 작성한 리뷰 존재 여부 체크
         boolean reviewAlreadyExists = guideReviewRepository.existsByReviewerIdAndGuideId(reviewerId, guideId);
-        Preconditions.checkState(!reviewAlreadyExists, "이미 해당 회원이 해당 가이드에게 작성한 리뷰가 존재합니다. (회원 ID: %d, 가이드 ID: %d)", reviewerId, guideId);
+        Preconditions.checkArgument(!reviewAlreadyExists, "이미 해당 회원이 해당 가이드에게 작성한 리뷰가 존재합니다. (회원 ID: %s, 가이드 ID: %s)", reviewerId, guideId);
 
         // 리뷰 정보 저장
         GuideReview guideReview = GuideReview.builder()
@@ -80,17 +81,18 @@ public class GuideReviewService {
 
     /**
      * 가이드 리뷰를 수정합니다.
+     * 리뷰 작성자 본인만 수정할 수 있습니다.
      * @param authentication 로그인 정보
      * @param guideReviewUpdateDto 가이드 수정 DTO
      */
     public void updateGuideReview(Authentication authentication, GuideReviewUpdateDto guideReviewUpdateDto) {
         // 리뷰 불러오기
         GuideReview guideReview = guideReviewRepository.findById(guideReviewUpdateDto.getId()).orElse(null);
-        Preconditions.checkNotNull(guideReview, "가이드 리뷰를 찾을 수 없습니다. (리뷰 ID: %d)", guideReview.getId());
+        Preconditions.checkNotNull(guideReview, "가이드 리뷰를 찾을 수 없습니다. (리뷰 ID: %s)", guideReview.getId());
 
         // 리뷰 작성자 맞는지 체크
         int reviewerId = Integer.parseInt(authentication.getPrincipal().toString());
-        Preconditions.checkArgument(reviewerId == guideReview.getReviewer().getId(), "해당 리뷰의 작성자가 아닙니다. (리뷰 ID: %d, 실제 작성자 ID: %d, 새로운 작성자 ID: %d)", guideReview.getId(), guideReview.getReviewer().getId(), reviewerId);
+        Preconditions.checkArgument(reviewerId == guideReview.getReviewer().getId(), "해당 리뷰의 작성자가 아닙니다. (리뷰 ID: %s, 실제 작성자 ID: %s, 새로운 작성자 ID: %s)", guideReview.getId(), guideReview.getReviewer().getId(), reviewerId);
 
         // 리뷰 저장
         guideReview.setRating(guideReview.getRating());
@@ -101,13 +103,25 @@ public class GuideReviewService {
 
     /**
      * 가이드 리뷰를 삭제합니다.
+     * 리뷰 작성자 본인과 관리자만 삭제할 수 있습니다.
      * @param authentication 로그인 정보
      * @param guideReviewDeleteDto 가이드 삭제 DTO
      */
     public void deleteGuideReview(Authentication authentication, GuideReviewDeleteDto guideReviewDeleteDto) {
+        int reviewId = guideReviewDeleteDto.getId();
+
         // 리뷰 존재 여부 체크
-        boolean exists = guideReviewRepository.existsById(guideReviewDeleteDto.getId());
-        Preconditions.checkState(exists, "가이드 리뷰를 찾을 수 없습니다. (리뷰 ID: %d)", guideReviewDeleteDto.getId());
+        GuideReview guideReview = guideReviewRepository.findById(guideReviewDeleteDto.getId()).orElse(null);
+        Preconditions.checkNotNull(guideReview, "가이드 리뷰를 찾을 수 없습니다. (리뷰 ID: %s)", guideReview.getId());
+
+        // 회원 존재 여부 체크
+        int memberId = Integer.parseInt(authentication.getPrincipal().toString());
+        Member member = memberRepository.findByMemberId(memberId);
+        Preconditions.checkNotNull(member, "회원을 찾을 수 없습니다. (회원 ID: %s)", memberId);
+
+        // 리뷰 작성자거나 관리자인지 체크
+        int reviewerId = guideReview.getReviewer().getId();
+        Preconditions.checkArgument(memberId == reviewerId || member.getState() == MemberDTO.MemberRole.ADMIN, "해당 리뷰의 작성자가 아닙니다. (리뷰 ID: %s, 리뷰 작성자 ID: %s, 현재 회원 ID: %s)", reviewId, reviewerId, memberId);
 
         // 리뷰 삭제
         guideReviewRepository.deleteById(guideReviewDeleteDto.getId());

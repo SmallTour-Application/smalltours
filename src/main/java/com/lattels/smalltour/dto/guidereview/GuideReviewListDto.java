@@ -18,7 +18,7 @@ public class GuideReviewListDto {
     @ApiParam("가이드 ID")
     private int guideId;
 
-    @ApiParam("조회할 페이지")
+    @ApiParam("조회할 페이지 (1부터 시작)")
     private int page;
 
 }

@@ -39,7 +39,7 @@ public class GuideReviewController {
     @GetMapping("/list")
     public ResponseEntity<?> getGuideReviewList(GuideReviewListDto guideReviewListDto) {
         try {
-            Pageable pageable = PageRequest.of(guideReviewListDto.getPage(), NUMBER_OF_REVIEW_PER_PAGE);
+            Pageable pageable = PageRequest.of(guideReviewListDto.getPage() - 1, NUMBER_OF_REVIEW_PER_PAGE);
             List<GuideReviewDTO> guideReviewDtoList = guideReviewService.getGuideReviews(guideReviewListDto.getGuideId(), pageable);
 
             return ResponseEntity.ok(guideReviewDtoList);
