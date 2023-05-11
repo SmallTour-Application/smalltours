@@ -6,28 +6,39 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.io.Serializable;
 
 @Data
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@IdClass(PaymentSchedule.PaymentScheduleID.class)
 @Table(name = "payment_schedule")
-public class Payment_Schedule {
+public class PaymentSchedule {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // DB에서 자동증가
-    @Column(name = "id")
-    private int id; // 사용자에게 고유하게 부여되는 값
-
     @Column(name = "payment_id")
     private int paymentId;
 
+    @Id
     @Column(name = "schedule_item_id")
     private int scheduleItemId;
 
-    @Column(name = "price")  
+    @Column(name = "price")
     private int price;
+
+
+    @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PaymentScheduleID implements Serializable {
+
+        private Integer paymentId;
+
+        private Integer scheduleItemId;
+
+    }
 
 }

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -69,4 +70,6 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 
     //멤버 권한 1번 강사
     Member findByIdAndRole(int memberId, int i);
+
+    List<Member> findByNameAndRole(String name, int role);
 }

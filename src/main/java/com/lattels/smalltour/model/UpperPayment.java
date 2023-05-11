@@ -35,6 +35,4 @@ public class UpperPayment {
 
     @Column(name = "pay_day")
     private LocalDateTime payDay;
-
-
 }

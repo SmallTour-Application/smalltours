@@ -17,10 +17,6 @@ import java.time.LocalDate;
 public class GuideLock {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // DB에서 자동증가
-    @Column(name = "id")
-    private int id; // 사용자에게 고유하게 부여되는 값
-
     @Column(name = "guide_id")
     private int guideId;
 

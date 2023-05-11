@@ -6,24 +6,35 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Data
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@IdClass(FavoriteGuide.FavoriteGuideID.class)
 @Table(name = "favorite_guide")
 public class FavoriteGuide {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // DB에서 자동증가
-    @Column(name = "id")
-    private int id; // 사용자에게 고유하게 부여되는 값
+    @Column(name = "member_id")
+    private int memberId;
 
+    @Id
     @Column(name = "guide_id")
     private int guideId;
 
-    @Column(name = "member_id")
-    private int memberId;
+    @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FavoriteGuideID implements Serializable {
+
+        private Integer memberId;
+
+        private Integer guideId;
+
+    }
 
 }
