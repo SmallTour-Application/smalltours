@@ -70,5 +70,5 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 
 
     //멤버 권한 1번 강사
-    List<Member> findByNameAndRole(String name, int role);
+    List<Member> findByRole(int role);
 }

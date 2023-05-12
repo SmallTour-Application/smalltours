@@ -9,6 +9,7 @@ import com.lattels.smalltour.service.EmailTokenService;
 import com.lattels.smalltour.service.MainService;
 import com.lattels.smalltour.service.UnauthMemberService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +31,12 @@ public class MainController {
     private final MainService mainService;
 
 
-    @GetMapping("/search")
-    public ResponseEntity<GuideSearchDTO.GuideSearchResult> searchGuideByName(@RequestParam String guideName){
-        return ResponseEntity.ok(mainService.searchGuideByName(guideName));
+    // 평점이 높은 가이드 3명 검색하기
+
+    @GetMapping("/top-ratings")
+    @ApiOperation(value = "평점이 높은 가이드 3명 검색하기")
+    public ResponseEntity<?> getTopRatedGuides(){
+        return ResponseEntity.ok(mainService.getTopRatedGuides());
     }
 
 }

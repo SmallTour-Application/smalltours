@@ -17,11 +17,9 @@ public class GuideSearchDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class GuideSearchResult {
+    public static class GuidePopularResult {
         private int count;
         private List<ReviewInfo> content;
-
-
     }
 
     @Data

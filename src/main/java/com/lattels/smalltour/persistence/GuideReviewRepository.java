@@ -19,9 +19,9 @@ public interface GuideReviewRepository extends JpaRepository<GuideReview, Intege
     boolean existsByReviewerIdAndGuideId(int reviewerId, int guideId);
 
 
-    //Member를 두 번 참조하면 JPA는 자동으로 두 개의 외래 키 관계를 설정
-    //reviewer_id를 member에 id랑 조인할 필요가 없다는 소리
-    @Query("SELECT gr FROM GuideReview gr JOIN gr.guide m WHERE m.id = :guideId")
-    List<GuideReview> findByGuideId(@Param("guideId") int guideId); //커밋좀
+    //가이드리뷰 테이블에 가이드id 랑 member 테이블 id랑 조인, role = 1 이어야함
+    @Query("SELECT gr FROM GuideReview gr JOIN gr.guide m WHERE m.id = :guideId AND m.role = 1")
+    List<GuideReview> findGuideReviewsByGuideIdAndRole(@Param("guideId") int guideId);
+
 
 }
