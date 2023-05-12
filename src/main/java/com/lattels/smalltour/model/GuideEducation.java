@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.io.Serializable;
 import java.time.LocalTime;
 
 @Data
@@ -14,17 +14,15 @@ import java.time.LocalTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@IdClass(GuideEducation.GuideEducationID.class)
 @Table(name = "guide_education")
 public class GuideEducation {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // DB에서 자동증가
-    @Column(name = "id")
-    private int id; // 사용자에게 고유하게 부여되는 값
-
     @Column(name = "education_id")
     private String educationId;
 
+    @Id
     @Column(name = "guide_id")
     private int guideId;
 
@@ -33,5 +31,18 @@ public class GuideEducation {
 
     @Column(name = "is_finish")
     private int isFinish;
+
+
+    @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GuideEducationID implements Serializable {
+
+        private Integer educationId;
+
+        private Integer guideId;
+
+    }
 
 }

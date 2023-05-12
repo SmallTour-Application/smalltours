@@ -21,8 +21,8 @@ public class GuideProfile {
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
-    @Column(name = "guide_id")
-    private int guideId;
+    @Column(name = "member_id")
+    private int memberId;
 
     @Column(name = "resume") //이력서 경로
     private String resume;
