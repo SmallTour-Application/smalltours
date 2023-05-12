@@ -108,21 +108,6 @@ public class MemberDTO {
 
     }
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class StudentProfileDTO{
-        private int memberId;
-        private String nickname;
-        private String profileImage;
-        private String  grade;
-        //badge 배지 경로, 수료한 해당 강의
-        private String url;
-        private String lectureId;
-        private String lectureName;
-    }
-
     private String token;
 
     private int id; // 사용자에게 고유하게 부여되는 값
@@ -178,6 +163,25 @@ public class MemberDTO {
     // 파일 null 체크
     public boolean checkProfileImgRequestNull() {
         return this.profileImgRequest != null;
+    }
+
+    /**
+     * 회원 역할
+     */
+    public static class MemberRole {
+
+        // 일반 회원 (여행자)
+        public static final int TRAVELER = 0;
+
+        // 미등록 가이드
+        public static final int UNREGISTERED_GUIDE = 1;
+
+        // 가이드
+        public static final int GUIDE = 2;
+
+        // 관리자
+        public static final int ADMIN = 3;
+
     }
 
 }
