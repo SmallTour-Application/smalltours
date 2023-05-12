@@ -61,35 +61,42 @@ public class UnauthMember {
     @PostMapping("/signin")
     public ResponseEntity<?> signin(@RequestBody MemberDTO.loginDTO loginDTO) {
 
-        // 로그인 성공 시에만 MemberEntity 가져옴
-        MemberDTO successMemberDTO = unauthMemberService.getByCredentials(
-                loginDTO.getEmail(),
-                loginDTO.getPassword(),
-                passwordEncoder
-        );
+        try{
+
+            // 로그인 성공 시에만 MemberEntity 가져옴
+            MemberDTO successMemberDTO = unauthMemberService.getByCredentials(
+                    loginDTO.getEmail(),
+                    loginDTO.getPassword(),
+                    passwordEncoder
+            );
 
 
-        // MemberEntity 가져오기 성공 시
-        if (successMemberDTO != null) {
+            // MemberEntity 가져오기 성공 시
+            if (successMemberDTO != null) {
 
-            // TokenProvider 클래스를 이용해 토큰을 생성한 후 MemberDTO에 넣어서 반환
-            final String token = tokenProvider.create(successMemberDTO);
-            MemberDTO responseMemberDTO = MemberDTO.builder()
-                    .email(successMemberDTO.getEmail())
-                    .id(successMemberDTO.getId())
-                    .token(token)
-                    .role(successMemberDTO.getRole())//멤버 타입
-                    .nickname(successMemberDTO.getNickname())
-                    .build();
-            return ResponseEntity.ok().body(responseMemberDTO);
+                // TokenProvider 클래스를 이용해 토큰을 생성한 후 MemberDTO에 넣어서 반환
+                final String token = tokenProvider.create(successMemberDTO);
+                MemberDTO responseMemberDTO = MemberDTO.builder()
+                        .email(successMemberDTO.getEmail())
+                        .id(successMemberDTO.getId())
+                        .token(token)
+                        .role(successMemberDTO.getRole())//멤버 타입
+                        .nickname(successMemberDTO.getNickname())
+                        .build();
+                return ResponseEntity.ok().body(responseMemberDTO);
 
-        } else {
-            // MemberEntity 가져오기 실패 시 -> 로그인 실패
+            } else {
+                // MemberEntity 가져오기 실패 시 -> 로그인 실패
+                ResponseDTO responseDTO = ResponseDTO.builder()
+                        .error("로그인 실패").build();
+                return ResponseEntity.badRequest().body(responseDTO);
+            }
+        } catch (RuntimeException e){
+            //예외발생->이메일 인증 실패,
             ResponseDTO responseDTO = ResponseDTO.builder()
-                    .error("login failed").build();
+                    .error(e.getMessage()).build();
             return ResponseEntity.badRequest().body(responseDTO);
         }
-
     }
 
 

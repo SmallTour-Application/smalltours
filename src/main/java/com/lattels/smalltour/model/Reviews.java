@@ -21,11 +21,13 @@ public class Reviews {
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
-    @Column(name = "member_id")
-    private int memberId;
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
-    @Column(name = "tour_id")
-    private int tourId;
+    @ManyToOne
+    @JoinColumn(name = "tour_id")
+    private Tours tours;
 
     @Column(name = "rating")
     private int rating;
