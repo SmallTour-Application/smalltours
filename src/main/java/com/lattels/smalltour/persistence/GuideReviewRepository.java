@@ -23,5 +23,5 @@ public interface GuideReviewRepository extends JpaRepository<GuideReview, Intege
     //reviewer_id를 member에 id랑 조인할 필요가 없다는 소리
     @Query("SELECT gr FROM GuideReview gr JOIN gr.guide m WHERE m.id = :guideId")
     List<GuideReview> findByGuideId(@Param("guideId") int guideId);
- 
+
 }
