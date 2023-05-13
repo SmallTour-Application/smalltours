@@ -21,8 +21,9 @@ public class Locations {
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
-    @Column(name = "tour_id")
-    private int tourId;
+    @ManyToOne
+    @JoinColumn(name = "tour_id")
+    private Tours tours;
     
     @Column(name = "location_name")
     private String locationName;

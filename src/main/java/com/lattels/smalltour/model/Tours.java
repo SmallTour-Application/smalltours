@@ -66,4 +66,6 @@ public class Tours {
     @Column(name = "thumb")
     private String thumb;
 
+
+
 }
