@@ -42,13 +42,4 @@ public class Flight {
     @Column(name = "price")
     private int price;
 
-    @Column(name = "status")
-    private String status;
-
-    @Column(name = "available_seat")
-    private int availableSeat;
-
-    @Column(name = "total_seat")
-    private int totalSeat;
-
 }

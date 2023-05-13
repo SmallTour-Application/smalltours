@@ -63,12 +63,6 @@ public class Tours {
     @Column(name = "default_price")
     private int defaultPrice;
 
-    @Column(name = "location_x")
-    private double locationX;
-
-    @Column(name = "location_y")
-    private double locationY;
-
     @Column(name = "thumb")
     private String thumb;
 

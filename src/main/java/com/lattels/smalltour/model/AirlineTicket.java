@@ -6,28 +6,29 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 
 @Data
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "payment_schedule")
-public class Payment_Schedule {
+@Table(name = "airline_ticket")
+public class AirlineTicket {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // DB에서 자동증가
     @Column(name = "id")
-    private int id; // 사용자에게 고유하게 부여되는 값
+    private int id;
 
-    @Column(name = "payment_id")
-    private int paymentId;
+    @ManyToOne
+    @JoinColumn(name = "airline_id")
+    private Airline airline;
 
-    @Column(name = "schedule_item_id")
-    private int scheduleItemId;
+    @ManyToOne
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
 
-    @Column(name = "price")  
-    private int price;
+    @Column(name = "reservation_number")
+    private int reservationNumber;
 
 }

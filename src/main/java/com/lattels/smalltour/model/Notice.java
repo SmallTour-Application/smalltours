@@ -36,6 +36,6 @@ public class Notice {
     @Column(name = "created_day")
     private LocalDateTime createdDay;
 
-    @Column(name = "views")
-    private int views; // 조회수
+    @Column(name = "view")
+    private int view; // 조회수
 }
