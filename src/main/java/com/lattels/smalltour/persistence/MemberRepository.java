@@ -1,6 +1,8 @@
 package com.lattels.smalltour.persistence;
 
 import com.lattels.smalltour.model.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -71,4 +73,11 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 
     //멤버 권한 1번 강사
     List<Member> findByRole(int role);
+
+    //가이드 검색
+    @Query("SELECT m FROM Member m WHERE m.role = 1 AND m.name LIKE %:keyword%")
+    Page<Member> findGuidesByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }
+
+
+
