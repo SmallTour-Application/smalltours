@@ -26,6 +26,7 @@ import java.util.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+//unauth/search/package , guide 관련 Service
 public class SearchService {
     private final MemberRepository memberRepository;
     private final ToursRepository toursRepository;
@@ -74,7 +75,7 @@ public class SearchService {
 
             for (Tours tour : tours) {
                 Member guide = memberRepository.findById(tour.getGuide().getId()).orElseThrow(() -> new RuntimeException("Guide not found"));
-                if (guide.getId() == tour.getGuide().getId() && guide.getRole() == 1) {
+                if (guide.getId() == tour.getGuide().getId() && guide.getRole() == 2) {
                     Float rating = reviewsRepository.findAverageRatingByTourId(tour.getId());
                     if (rating == null) rating = 0f;
                     response.getContent().add(
@@ -93,12 +94,15 @@ public class SearchService {
         response.setCount(response.getContent().size());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
+    
+    
+    //가이드로 검색할 경우.
+    //SearchPackageDTO에 List<ContentGuide>contentGuide
     public ResponseEntity<SearchPackageDTO> searchGuide(String keyword, int sort, int page) {
 
         int size = 10;
         SearchPackageDTO response = SearchPackageDTO.builder()
-                .content(new ArrayList<>())
+                .contentGuides(new ArrayList<>())
                 .build();
 
         Sort sortDirection = Sort.by("name");
@@ -118,20 +122,20 @@ public class SearchService {
         }
 
         for (Member guide : guides) {
-            if (guide.getRole() == 1) {
+            if (guide.getRole() == 2) {
                 Float rating = reviewsRepository.findAverageRatingByGuideId(guide.getId());
                 if (rating == null) rating = 0f;
-                response.getContent().add(
-                        SearchPackageDTO.Content.builder()
-                                .guideProfileImg(guide.getProfile())
-                                .guideName(guide.getName())
+                response.getContentGuides().add(
+                        SearchPackageDTO.ContentGuide.builder()
+                                .guideProfileImg(guide.getProfile() != null ? guide.getProfile() : "")
+                                .guideName(guide.getName() != null ? guide.getName() : "")
                                 .rating(rating)
                                 .build()
                 );
             }
         }
         // 검색 결과 개수 설정
-        response.setCount(response.getContent().size());
+        response.setCount(response.getContentGuides().size());
         // 검색 결과 반환
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
