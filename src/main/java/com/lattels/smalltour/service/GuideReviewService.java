@@ -47,7 +47,7 @@ public class GuideReviewService {
     }
 
     /**
-     * 해당 가이드에 맞는 가이드 리뷰 목록을 불러옵니다.
+     * 해당 가이드에 맞는 최근 가이드 리뷰 목록을 불러옵니다.
      * @param guideId 가이드 ID
      * @param pageable 페이지
      * @return 가이드 리뷰 목록
@@ -60,7 +60,7 @@ public class GuideReviewService {
         int reviewCount = Long.valueOf(getGuideReviewCount(guideId)).intValue();
 
         // 페이지에 맞는 가이드 리뷰 불러오기
-        Page<GuideReview> guideReviews = guideReviewRepository.findAllByGuideId(guideId, pageable);
+        Page<GuideReview> guideReviews = guideReviewRepository.findAllByGuideIdOrderByCreatedDayDesc(guideId, pageable);
         List<GuideReviewDTO> guideReviewDTOS = guideReviews.stream()
                 .map(guideReview -> new GuideReviewDTO(guideReview))
                 .collect(Collectors.toList());

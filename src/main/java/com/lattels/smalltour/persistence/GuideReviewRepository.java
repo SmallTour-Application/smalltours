@@ -15,9 +15,9 @@ import java.util.List;
 public interface GuideReviewRepository extends JpaRepository<GuideReview, Integer> {
 
     /**
-     * 가이드와 페이지에 맞는 가이드 리뷰를 불러옵니다.
+     * 가이드와 페이지에 맞는 최근 가이드 리뷰를 불러옵니다.
      */
-    Page<GuideReview> findAllByGuideId(int guideId, Pageable pageable);
+    Page<GuideReview> findAllByGuideIdOrderByCreatedDayDesc(int guideId, Pageable pageable);
 
     /**
      * 가이드의 평균 평점을 불러옵니다.

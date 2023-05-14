@@ -38,6 +38,7 @@ public class WebSecurityConfig {
                         "/partners/member/**",
                         "/nonmember/**",
                         "/notice/unauth/**",
+                        "/package/question/unauth/**",
                         "/images/menu/**",
                         "/images/**",
                         "/error",
