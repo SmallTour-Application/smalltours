@@ -27,7 +27,7 @@ public class AirlineController {
 
     // 항공사 등록
     @PostMapping(value = "/add")
-    @ApiOperation(value = "항공사 수정")
+    @ApiOperation(value = "항공사 등록")
     public ResponseEntity<Object> addAirline(@ApiIgnore Authentication authentication, @Valid @RequestBody AirlineDTO.AddRequestDTO addRequestDTO) {
 
         try {
