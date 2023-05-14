@@ -21,12 +21,6 @@ public class GuideReview {
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
-//    @Column(name = "guide_id") //가이드아이디
-//    private int guideId;
-//
-//    @Column(name = "reviewer_id") //memberId랑 동일,작성자
-//    private int reviewerId;
-
     @ManyToOne
     @JoinColumn(name = "guide_id")
     private Member guide;
