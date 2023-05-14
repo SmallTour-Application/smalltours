@@ -1,7 +1,8 @@
-package com.lattels.smalltour.dto.question;
+package com.lattels.smalltour.dto.question.answer;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.lattels.smalltour.model.Answer;
 import com.lattels.smalltour.model.Question;
 import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
@@ -12,13 +13,13 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * 질문 DTO
+ * 질문 답변 DTO
  */
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuestionDTO {
+public class QuestionAnswerDTO {
 
     @ApiParam("질문 ID")
     private int questionId;
@@ -61,7 +62,9 @@ public class QuestionDTO {
     @ApiParam("이미지 경로")
     private String image;
 
-    public QuestionDTO(Question question) {
+    public QuestionAnswerDTO(Answer answer) {
+        Question question = answer.getQuestion();
+
         this.questionId = question.getId();
         this.tourId = question.getTours().getId();
         this.tourName = question.getTours().getTitle();

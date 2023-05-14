@@ -21,8 +21,9 @@ public class Answer {
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
-    @Column(name = "question_id")
-    private int questionId;
+    @ManyToOne
+    @JoinColumn(name = "question_id")
+    private Question question;
 
     @Column(name = "member_id")
     private int memberId;
@@ -34,6 +35,6 @@ public class Answer {
     private LocalDateTime createdDay;
 
     @Column(name = "updated_day")
-    private LocalDateTime UpdateDay;
+    private LocalDateTime updateDay;
 
 }

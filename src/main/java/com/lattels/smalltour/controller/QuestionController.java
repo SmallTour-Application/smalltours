@@ -52,7 +52,7 @@ public class QuestionController {
     }
 
     @ApiOperation("내 질문 목록 조회")
-    @PostMapping("/list")
+    @PostMapping("/mylist")
     public ResponseEntity<QuestionListDTO> getMyQuestionList(@ApiIgnore Authentication authentication, int page) {
         QuestionListDTO questionListDTO = questionService.getMyQuestionList(authentication, page - 1, NUMBER_OF_QUESTION_PER_PAGE);
 

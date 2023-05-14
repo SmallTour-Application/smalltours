@@ -41,7 +41,7 @@ public class Question {
     private LocalDateTime createdDay;
 
     @Column(name = "updated_day")
-    private LocalDateTime UpdateDay;
+    private LocalDateTime updateDay;
 
     @Column(name = "image")
     private String image; // 프로필 이미지가 들어있는 경로

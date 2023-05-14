@@ -8,13 +8,11 @@ import com.lattels.smalltour.dto.question.QuestionWriteRequestDTO;
 import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.model.Question;
 import com.lattels.smalltour.model.Tours;
-import com.lattels.smalltour.persistence.AnswerRepository;
 import com.lattels.smalltour.persistence.MemberRepository;
 import com.lattels.smalltour.persistence.QuestionRepository;
 import com.lattels.smalltour.persistence.ToursRepository;
 import com.lattels.smalltour.util.MultipartUtils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,13 +29,11 @@ import java.util.stream.Collectors;
 /**
  * 패키지 질문 Service
  */
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
-    private final AnswerRepository answerRepository;
 
     private final MemberRepository memberRepository;
     private final ToursRepository toursRepository;
@@ -55,7 +51,7 @@ public class QuestionService {
     /**
      * 질문 목록을 반환합니다.
      * memberId가 null이 아닐 경우 해당 회원이 작성한 질문은 공개 처리한 뒤 반환합니다.
-     * @param authentication 로그인 정보
+     * @param memberId 회원 ID
      * @param page 페이지
      * @param countPerPage 페이지당 질문 개수
      * @return 내 질문 목록
@@ -98,7 +94,6 @@ public class QuestionService {
 
     /**
      * 내 질문 목록을 반환합니다.
-     * 내가 작성한 질문은 공개 처리한 후 반환합니다.
      * @param authentication 로그인 정보
      * @param page 페이지
      * @param countPerPage 페이지당 질문 개수
@@ -119,14 +114,6 @@ public class QuestionService {
         List<QuestionDTO> questionDTOS = questions.stream()
                 .map(question -> new QuestionDTO(question))
                 .collect(Collectors.toList());
-
-        // 비공개 질문 내용 비우기
-        questionDTOS.stream()
-                .filter(questionDTO -> !questionDTO.isPublic())
-                .forEach(questionDTO -> {
-                    questionDTO.setContent(null);
-                    questionDTO.setAnswer(null);
-                });
 
         // DTO 반환
         return QuestionListDTO.builder()
@@ -201,7 +188,10 @@ public class QuestionService {
         // 질문 불러오기
         int questionId = questionUpdateRequestDTO.getQuestionId();
         Question oldQuestion = questionRepository.findById(questionId).orElse(null);
-        Preconditions.checkNotNull(member, "질문을 찾을 수 없습니다. (질문 ID: %s)", questionId);
+        Preconditions.checkNotNull(oldQuestion, "질문을 찾을 수 없습니다. (질문 ID: %s)", questionId);
+
+        // 본인 체크
+        Preconditions.checkArgument(memberId == oldQuestion.getMember().getId(), "본인의 질문만 수정할 수 있습니다. (답변 ID: %s, 회원 ID: %s)", oldQuestion.getMember().getId(), memberId);
 
         // 질문 데이터 갱신
         Question question = Question.builder()
@@ -212,7 +202,8 @@ public class QuestionService {
                 .content(questionUpdateRequestDTO.getContent())
                 .isPublic(questionUpdateRequestDTO.isPublic())
                 .image(oldQuestion.getImage())
-                .createdDay(LocalDateTime.now())
+                .createdDay(oldQuestion.getCreatedDay())
+                .updateDay(LocalDateTime.now())
                 .build();
 
         // 이미지가 있을 경우 저장
@@ -244,7 +235,10 @@ public class QuestionService {
 
         // 질문 불러오기
         Question question = questionRepository.findById(questionId).orElse(null);
-        Preconditions.checkNotNull(member, "질문을 찾을 수 없습니다. (질문 ID: %s)", questionId);
+        Preconditions.checkNotNull(question, "질문을 찾을 수 없습니다. (질문 ID: %s)", questionId);
+
+        // 본인 체크
+        Preconditions.checkArgument(memberId == question.getMember().getId(), "본인의 질문만 삭제할 수 있습니다. (답변 ID: %s, 회원 ID: %s)", question.getMember().getId(), memberId);
 
         // 기존 이미지 삭제
         deleteQuestionImage(question);
