@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GuideReviewMemberDto {
+public class GuideReviewMemberDTO {
 
     // 닉네임
     private String nickname;
@@ -18,7 +18,7 @@ public class GuideReviewMemberDto {
     // 프로필 이미지 경로
     private String profile;
 
-    public GuideReviewMemberDto(MemberDTO memberDTO) {
+    public GuideReviewMemberDTO(MemberDTO memberDTO) {
         this.nickname = memberDTO.getNickname();
         this.profile = memberDTO.getProfile();
     }

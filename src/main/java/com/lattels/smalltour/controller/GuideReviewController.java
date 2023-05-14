@@ -32,33 +32,33 @@ public class GuideReviewController {
 
     @ApiOperation("가이드에 맞는 리뷰 목록 조회")
     @GetMapping("/list")
-    public ResponseEntity<List<GuideReviewDTO>> getGuideReviewList(GuideReviewListDto guideReviewListDto) {
-        Pageable pageable = PageRequest.of(guideReviewListDto.getPage() - 1, NUMBER_OF_REVIEW_PER_PAGE);
-        List<GuideReviewDTO> guideReviewDtoList = guideReviewService.getGuideReviews(guideReviewListDto.getGuideId(), pageable);
+    public ResponseEntity<List<GuideReviewDTO>> getGuideReviewList(GuideReviewListDTO guideReviewListDTO) {
+        Pageable pageable = PageRequest.of(guideReviewListDTO.getPage() - 1, NUMBER_OF_REVIEW_PER_PAGE);
+        List<GuideReviewDTO> guideReviewDtoList = guideReviewService.getGuideReviews(guideReviewListDTO.getGuideId(), pageable);
 
         return ResponseEntity.ok(guideReviewDtoList);
     }
 
     @ApiOperation("가이드 리뷰 수정")
     @PostMapping("/update")
-    public ResponseEntity<?> reviewUpdate(@ApiIgnore Authentication authentication, GuideReviewUpdateDto guideReviewUpdateDto) {
-        guideReviewService.updateGuideReview(authentication, guideReviewUpdateDto);
+    public ResponseEntity<?> reviewUpdate(@ApiIgnore Authentication authentication, GuideReviewUpdateDTO guideReviewUpdateDTO) {
+        guideReviewService.updateGuideReview(authentication, guideReviewUpdateDTO);
 
         return ResponseEntity.ok().build();
     }
 
     @ApiOperation("가이드 리뷰 작성")
     @PostMapping("/write")
-    public ResponseEntity<?> reviewWrite(@ApiIgnore Authentication authentication, GuideReviewWriteDto guideReviewWriteDto) {
-        guideReviewService.writeGuideReview(authentication, guideReviewWriteDto);
+    public ResponseEntity<?> reviewWrite(@ApiIgnore Authentication authentication, GuideReviewWriteDTO guideReviewWriteDTO) {
+        guideReviewService.writeGuideReview(authentication, guideReviewWriteDTO);
 
         return ResponseEntity.ok().build();
     }
 
     @ApiOperation("가이드 리뷰 삭제")
     @PostMapping("/delete")
-    public ResponseEntity<?> reviewDelete(@ApiIgnore Authentication authentication, GuideReviewDeleteDto guideReviewDeleteDto) {
-        guideReviewService.deleteGuideReview(authentication, guideReviewDeleteDto);
+    public ResponseEntity<?> reviewDelete(@ApiIgnore Authentication authentication, GuideReviewDeleteDTO guideReviewDeleteDTO) {
+        guideReviewService.deleteGuideReview(authentication, guideReviewDeleteDTO);
 
         return ResponseEntity.ok().build();
     }

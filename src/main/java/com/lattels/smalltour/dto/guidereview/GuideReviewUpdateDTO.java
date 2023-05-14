@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GuideReviewUpdateDto {
+public class GuideReviewUpdateDTO {
 
     @ApiParam("리뷰 ID")
     private int id;

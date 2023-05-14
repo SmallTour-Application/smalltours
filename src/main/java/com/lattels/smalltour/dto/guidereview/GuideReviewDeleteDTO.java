@@ -13,12 +13,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GuideReviewListDto {
+public class GuideReviewDeleteDTO {
 
-    @ApiParam("가이드 ID")
-    private int guideId;
-
-    @ApiParam("조회할 페이지 (1부터 시작)")
-    private int page;
+    @ApiParam("리뷰 ID")
+    private int id;
 
 }

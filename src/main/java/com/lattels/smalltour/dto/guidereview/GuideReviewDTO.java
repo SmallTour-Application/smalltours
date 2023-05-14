@@ -23,10 +23,10 @@ public class GuideReviewDTO {
     private long id;
 
     // 리뷰 대상 가이드
-    private GuideReviewMemberDto guide;
+    private GuideReviewMemberDTO guide;
 
     // 리뷰한 회원
-    private GuideReviewMemberDto reviewer;
+    private GuideReviewMemberDTO reviewer;
 
     // 평점
     private int rating;
@@ -40,8 +40,8 @@ public class GuideReviewDTO {
 
     public GuideReviewDTO(GuideReview guideReview) {
         this.id = guideReview.getId();
-        this.guide = new GuideReviewMemberDto(new MemberDTO(guideReview.getGuide()));
-        this.reviewer = new GuideReviewMemberDto(new MemberDTO(guideReview.getReviewer()));
+        this.guide = new GuideReviewMemberDTO(new MemberDTO(guideReview.getGuide()));
+        this.reviewer = new GuideReviewMemberDTO(new MemberDTO(guideReview.getReviewer()));
         this.rating = guideReview.getRating();
         this.content = guideReview.getContent();
         this.createdDay = guideReview.getCreatedDay();
