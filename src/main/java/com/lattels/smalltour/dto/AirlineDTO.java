@@ -7,10 +7,10 @@ import lombok.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
+@AllArgsConstructor
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+//@NoArgsConstructor
 public class AirlineDTO {
 
     @Getter

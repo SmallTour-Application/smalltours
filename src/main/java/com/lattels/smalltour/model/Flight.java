@@ -21,8 +21,9 @@ public class Flight {
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
-    @Column(name = "airline_id")
-    private int airlineId;
+    @ManyToOne
+    @JoinColumn(name = "airline_id")
+    private Airline airline;
 
     @Column(name = "depart_datetime")
     private LocalDateTime departDateTime;
@@ -33,13 +34,19 @@ public class Flight {
     @Column(name = "depart_city")
     private String departCity;
 
-    @Column(name = "arrival_city")
-    private String arrivalCity;
+    @Column(name = "arrival_airport")
+    private String arrivalAirport;
 
     @Column(name = "duration")
     private int duration;
 
     @Column(name = "price")
     private int price;
+
+    @Column(name = "flight_name")
+    private String flightName;
+
+    @Column(name = "seat_type")
+    private String seatType;
 
 }

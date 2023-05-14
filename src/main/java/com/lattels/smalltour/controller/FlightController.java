@@ -1,7 +1,7 @@
 package com.lattels.smalltour.controller;
 
-import com.lattels.smalltour.dto.AirlineDTO;
-import com.lattels.smalltour.service.AirlineService;
+import com.lattels.smalltour.dto.FlightDTO;
+import com.lattels.smalltour.service.FlightService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -19,19 +19,19 @@ import javax.validation.Valid;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/package/airline")
-@Api(tags = "Airline Controller", description = "항공사 컨트롤러")
-public class AirlineController {
+@RequestMapping("/package/airline/flight")
+@Api(tags = "Flight Controller", description = "비행기 컨트롤러")
+public class FlightController {
 
-    private final AirlineService airlineService;
+    private final FlightService flightService;
 
     // 항공사 등록
     @PostMapping(value = "/add")
-    @ApiOperation(value = "항공사 등록")
-    public ResponseEntity<Object> addAirline(@ApiIgnore Authentication authentication, @Valid @RequestBody AirlineDTO.AddRequestDTO addRequestDTO) {
+    @ApiOperation(value = "비행기 정보 등록")
+    public ResponseEntity<Object> addFlight(@ApiIgnore Authentication authentication, @Valid @RequestBody FlightDTO.AddRequestDTO addRequestDTO) {
 
         try {
-            airlineService.addAirline(Integer.parseInt(authentication.getPrincipal().toString()), addRequestDTO);
+            flightService.addFlight(Integer.parseInt(authentication.getPrincipal().toString()), addRequestDTO);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -41,11 +41,11 @@ public class AirlineController {
 
     // 항공사 수정
     @PostMapping(value = "/update")
-    @ApiOperation(value = "항공사 수정")
-    public ResponseEntity<Object> updateAirline(@ApiIgnore Authentication authentication, @Valid @RequestBody AirlineDTO.UpdateRequestDTO updateRequestDTO) {
+    @ApiOperation(value = "비행기 정보 수정")
+    public ResponseEntity<Object> updateFlight(@ApiIgnore Authentication authentication, @Valid @RequestBody FlightDTO.UpdateRequestDTO updateRequestDTO) {
 
         try {
-            airlineService.updateAirline(Integer.parseInt(authentication.getPrincipal().toString()), updateRequestDTO);
+            flightService.updateFlight(Integer.parseInt(authentication.getPrincipal().toString()), updateRequestDTO);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -55,15 +55,16 @@ public class AirlineController {
 
     // 항공사 삭제
     @PostMapping(value = "/delete")
-    @ApiOperation(value = "항공사 삭제")
-    public ResponseEntity<Object> deleteAirline(@ApiIgnore Authentication authentication, @Valid @RequestBody AirlineDTO.IdRequestDTO idRequestDTO) {
+    @ApiOperation(value = "비행기 정보 삭제")
+    public ResponseEntity<Object> deleteFlight(@ApiIgnore Authentication authentication, @Valid @RequestBody FlightDTO.IdRequestDTO idRequestDTO) {
 
         try {
-            airlineService.deleteAirline(Integer.parseInt(authentication.getPrincipal().toString()), idRequestDTO);
+            flightService.deleteFlight(Integer.parseInt(authentication.getPrincipal().toString()), idRequestDTO);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
     }
+
 }
