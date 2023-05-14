@@ -1,3 +1,4 @@
+/*
 package com.lattels.smalltour.model;
 
 import lombok.AllArgsConstructor;
@@ -42,4 +43,4 @@ public class GuideEducation {
 
     }
 
-}
+}*/

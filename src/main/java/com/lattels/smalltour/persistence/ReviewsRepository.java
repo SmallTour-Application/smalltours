@@ -16,5 +16,6 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
     //가이드에 대한 평점
     @Query("SELECT AVG(r.rating) FROM GuideReview r JOIN r.guide g WHERE g.id = :guideId AND g.role = 2")
     Float findAverageRatingByGuideId(@Param("guideId") Integer guideId);
- 
+
+
 }

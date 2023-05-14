@@ -22,4 +22,10 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     Page<Tours> findToursBySearchParameters(@Param("location") String location, @Param("people") int people, @Param("start") LocalDate start, @Param("end") LocalDate end, Pageable pageable);
 
 
+
+
+    // guideId와 role 2에 해당하는 가이드가 진행하는 모든 투어(Tours)를 찾기
+    @Query("SELECT t FROM Tours t JOIN t.guide m WHERE m.id = :guideId AND m.role = 2")
+    List<Tours> findAllByGuideId(@Param("guideId") int guideId);
+
 }
