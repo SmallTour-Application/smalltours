@@ -19,6 +19,7 @@ import java.util.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+//unauth/main/tour, guide 관련 Service
 public class MainService {
 
     //PopularTOP3Guide
@@ -31,8 +32,8 @@ public class MainService {
 
     //가이드인 사람들 role이 1임, 메인화면에서 TOP3 가이드를 나타내기 위한 부분,GuideReview에 Rating기준으로 높은 점수순으로.
     public PopularGuideDTO getTopRatedGuides(){
-        //member테이블에 role이 1인 사람 = 가이드
-        List<Member> guides = memberRepository.findByRole(1);
+        //member테이블에 role이 2인 사람 = 가이드
+        List<Member> guides = memberRepository.findByRole(2);
 
         //평점에 따라 가이드를 정렬하는 우선순위 큐 생성
         //일반적인 큐의 구조 FIFO(First In First Out)를 가지면서, 데이터가 들어온 순서대로 데이터가 나가는 것이 아닌 우선순위를 먼저 결정하고
