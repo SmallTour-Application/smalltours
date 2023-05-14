@@ -52,10 +52,10 @@ public class Tours {
     private int minGroupSize;
 
     @Column(name = "created_day")
-    private LocalDate createdDay;
+    private LocalDateTime createdDay;
 
     @Column(name = "update_day")
-    private LocalDate updateDay;
+    private LocalDateTime updateDay;
 
     @Column(name = "approvals")
     private int approvals;
