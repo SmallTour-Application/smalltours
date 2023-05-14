@@ -2,6 +2,7 @@ package com.lattels.smalltour.controller;
 
 
 import com.lattels.smalltour.dto.GuideProfileViewDTO;
+import com.lattels.smalltour.dto.GuideTourReviewDTO;
 import com.lattels.smalltour.service.MainService;
 import com.lattels.smalltour.service.ProfileService;
 import io.swagger.annotations.Api;
@@ -23,10 +24,20 @@ public class ProfileController {
 
     private final ProfileService profileService;
 
+    @ApiOperation(value = "가이드 프로필 정보 (비회원접근가능)")
     @GetMapping("/{guideId}")
     public ResponseEntity<GuideProfileViewDTO> getGuideProfile(@PathVariable int guideId) {
         GuideProfileViewDTO guideProfile = profileService.searchGuide(guideId);
         return ResponseEntity.ok(guideProfile);
     }
+
+
+    @ApiOperation(value = "가이드의 투어 리뷰 가져오기")
+    @GetMapping("/{guideId}/reviews/{page}")
+    public ResponseEntity<GuideTourReviewDTO> getGuideTourReview(@PathVariable int guideId, @PathVariable int page) {
+        GuideTourReviewDTO guideTourReview = profileService.getGuideTourReview(guideId, page);
+        return ResponseEntity.ok(guideTourReview);
+    }
+
 
 }

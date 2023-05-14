@@ -31,6 +31,7 @@ public class SearchService {
     private final MemberRepository memberRepository;
     private final ToursRepository toursRepository;
     private final ReviewsRepository reviewsRepository;
+    private final GuideReviewRepository guideReviewRepository;
 
     
     //type을 패키지로 해놓고 검색창에 패키지 이름으로 검색할 경우
@@ -123,7 +124,7 @@ public class SearchService {
 
         for (Member guide : guides) {
             if (guide.getRole() == 2) {
-                Float rating = reviewsRepository.findAverageRatingByGuideId(guide.getId());
+                Float rating = guideReviewRepository.findAverageRatingByGuideId(guide.getId());
                 if (rating == null) rating = 0f;
                 response.getContentGuides().add(
                         SearchPackageDTO.ContentGuide.builder()

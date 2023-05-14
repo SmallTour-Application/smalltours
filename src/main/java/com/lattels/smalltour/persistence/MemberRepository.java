@@ -32,7 +32,6 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 
 
 
-
     @Query(value = "SELECT * FROM member where id = :id", nativeQuery = true)
     Member findByMemberId(@Param("id") int id);
 
