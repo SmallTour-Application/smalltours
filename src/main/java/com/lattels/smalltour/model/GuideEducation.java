@@ -18,6 +18,9 @@ import java.time.LocalTime;
 @Table(name = "guide_education")
 public class GuideEducation {
 
+    @Id
+    @Column(name = "education_id")
+    private int educationId;
 
     @Id
     @Column(name = "guide_id")

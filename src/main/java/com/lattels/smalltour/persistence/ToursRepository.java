@@ -37,5 +37,9 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     @Query("SELECT t FROM Tours t, Locations l WHERE t.id = l.tours.id AND (l.locationName LIKE %:location% OR l.country LIKE %:location% OR l.region LIKE %:location%) AND t.minGroupSize <= :people AND t.maxGroupSize >= :people AND t.createdDay BETWEEN :start AND :end")
     Page<Tours> findToursBySearchParameters(@Param("location") String location, @Param("people") int people, @Param("start") LocalDate start, @Param("end") LocalDate end, Pageable pageable);
 
+    // id로 tours Entity 가져오기
+    Tours findById(int id);
+
+    Tours findByIdAndGuideId(int id, int guideId);
 
 }
