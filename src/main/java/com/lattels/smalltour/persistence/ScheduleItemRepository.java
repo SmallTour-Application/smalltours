@@ -7,5 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ScheduleItemRepository extends JpaRepository<ScheduleItem, Integer> {
 
+    ScheduleItem findById(int id);
  
 }

@@ -21,8 +21,9 @@ public class ScheduleItem {
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
-    @Column(name = "schedule_id")
-    private int scheduleId;
+    @ManyToOne
+    @JoinColumn(name = "schedule_id")
+    private Schedule schedule;
     
     @Column(name = "title")
     private String title;
