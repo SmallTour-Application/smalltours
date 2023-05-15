@@ -1,4 +1,4 @@
-package com.lattels.smalltour.dto.guidereview;
+package com.lattels.smalltour.dto.packagereview;
 
 import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
@@ -7,21 +7,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 가이드 리뷰 수정 DTO
+ * 패키지 리뷰 작성 요청 DTO
  */
-@Data
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GuideReviewUpdateDto {
+public class PackageReviewWriteRequestDTO {
 
-    @ApiParam("리뷰 ID")
-    private int id;
-
-    @ApiParam("리뷰 평점")
-    private int rating;
+    @ApiParam("패키지 ID")
+    private int packageId;
 
     @ApiParam("리뷰 내용")
     private String content;
+
+    @ApiParam("평점")
+    private int rating;
 
 }

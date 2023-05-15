@@ -19,8 +19,8 @@ public class Education {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // DB에서 자동증가
-    @Column(name = "guide_education_id")
-    private int guide_education_id; // 사용자에게 고유하게 부여되는 값
+    @Column(name = "id")
+    private int id; // 사용자에게 고유하게 부여되는 값
 
     @Column(name = "video_path")
     private String videoPath;

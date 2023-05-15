@@ -6,8 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -23,11 +23,13 @@ public class Question {
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
-    @Column(name = "tour_id")
-    private int tourId;
+    @ManyToOne
+    @JoinColumn(name = "tour_id")
+    private Tours tours;
 
-    @Column(name = "member_id")
-    private int memberId;
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Column(name = "title")
     private String title;
@@ -39,9 +41,16 @@ public class Question {
     private LocalDateTime createdDay;
 
     @Column(name = "updated_day")
-    private LocalDateTime UpdateDay;
+    private LocalDateTime updateDay;
 
     @Column(name = "image")
     private String image; // 프로필 이미지가 들어있는 경로
+
+    @Column(name = "public")
+    private boolean isPublic;
+
+    @OneToMany
+    @JoinColumn(name = "question_id")
+    private List<Answer> answer;
 
 }

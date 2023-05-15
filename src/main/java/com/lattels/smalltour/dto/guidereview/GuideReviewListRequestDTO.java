@@ -7,21 +7,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 가이드 리뷰 수정 DTO
+ * 가이드 리뷰 목록 요청 DTO
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GuideReviewWriteDto {
+public class GuideReviewListRequestDTO {
 
-    @ApiParam("리뷰 대상 가이드 ID")
+    @ApiParam("가이드 ID")
     private int guideId;
 
-    @ApiParam("리뷰 평점")
-    private int rating;
-
-    @ApiParam("리뷰 내용")
-    private String content;
+    @ApiParam("조회할 페이지 (1부터 시작)")
+    private int page;
 
 }

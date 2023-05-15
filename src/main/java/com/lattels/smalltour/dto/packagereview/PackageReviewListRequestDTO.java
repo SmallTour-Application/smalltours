@@ -1,4 +1,4 @@
-package com.lattels.smalltour.dto.guidereview;
+package com.lattels.smalltour.dto.packagereview;
 
 import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
@@ -7,18 +7,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 가이드 리뷰 삭제 DTO
+ * 패키지 리뷰 목록 DTO
  */
-@Data
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GuideReviewListDto {
+public class PackageReviewListRequestDTO {
 
-    @ApiParam("가이드 ID")
-    private int guideId;
+    @ApiParam("패키지 ID")
+    private int packageId;
 
-    @ApiParam("조회할 페이지 (1부터 시작)")
+    @ApiParam("페이지")
     private int page;
+
 
 }

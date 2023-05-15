@@ -14,8 +14,25 @@ import java.util.List;
 
 public interface GuideReviewRepository extends JpaRepository<GuideReview, Integer> {
 
-    Page<GuideReview> findAllByGuideId(int guideId, Pageable pageable);
+    /**
+     * 가이드와 페이지에 맞는 최근 가이드 리뷰를 불러옵니다.
+     */
+    Page<GuideReview> findAllByGuideIdOrderByCreatedDayDesc(int guideId, Pageable pageable);
 
+    /**
+     * 가이드의 평균 평점을 불러옵니다.
+     */
+    @Query("SELECT AVG(g.rating) FROM GuideReview g WHERE g.guide.id = :guideId")
+    float averageOfRatingsByGuideId(int guideId);
+
+    /**
+     * 가이드의 가이드 리뷰 개수를 불러옵니다.
+     */
+    long countAllByGuideId(int guideId);
+
+    /**
+     * 리뷰 작성자가 가이드에게 댓글을 작성했는지 여부를 반환합니다.
+     */
     boolean existsByReviewerIdAndGuideId(int reviewerId, int guideId);
 
 

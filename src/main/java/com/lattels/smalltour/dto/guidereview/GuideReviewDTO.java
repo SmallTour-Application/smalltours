@@ -3,6 +3,8 @@ package com.lattels.smalltour.dto.guidereview;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.model.GuideReview;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,29 +21,21 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class GuideReviewDTO {
 
-    // 리뷰 ID
-    private long id;
+    @ApiParam("닉네임")
+    private String nickname;
 
-    // 리뷰 대상 가이드
-    private GuideReviewMemberDto guide;
-
-    // 리뷰한 회원
-    private GuideReviewMemberDto reviewer;
-
-    // 평점
+    @ApiParam("평점")
     private int rating;
 
-    // 리뷰 내용
+    @ApiParam("리뷰 내용")
     private String content;
 
-    // 리뷰 생성일
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
+    @ApiParam("작성일시")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdDay;
 
     public GuideReviewDTO(GuideReview guideReview) {
-        this.id = guideReview.getId();
-        this.guide = new GuideReviewMemberDto(new MemberDTO(guideReview.getGuide()));
-        this.reviewer = new GuideReviewMemberDto(new MemberDTO(guideReview.getReviewer()));
+        this.nickname = guideReview.getReviewer().getNickname();
         this.rating = guideReview.getRating();
         this.content = guideReview.getContent();
         this.createdDay = guideReview.getCreatedDay();
