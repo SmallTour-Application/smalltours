@@ -2,10 +2,7 @@ package com.lattels.smalltour.service;
 
 import com.google.common.base.Preconditions;
 import com.lattels.smalltour.dto.MemberDTO;
-import com.lattels.smalltour.dto.guidereview.GuideReviewDTO;
-import com.lattels.smalltour.dto.guidereview.GuideReviewDeleteDTO;
-import com.lattels.smalltour.dto.guidereview.GuideReviewUpdateDTO;
-import com.lattels.smalltour.dto.guidereview.GuideReviewWriteDTO;
+import com.lattels.smalltour.dto.guidereview.*;
 import com.lattels.smalltour.model.GuideReview;
 import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.persistence.GuideReviewRepository;
@@ -33,17 +30,47 @@ public class GuideReviewService {
     private MemberRepository memberRepository;
 
     /**
-     * 해당 가이드에 맞는 가이드 리뷰 목록을 불러옵니다.
+     * 해당 가이드의 평균 평점을 불러옵니다.
+     * @param guideId 가이드 ID
+     */
+    public float getGuideAverageRating(int guideId) {
+        return guideReviewRepository.averageOfRatingsByGuideId(guideId);
+    }
+
+    /**
+     * 해당 가이드의 가이드 리뷰 개수를 불러옵니다.
+     * @param guideId 가이드 ID
+     * @return 가이드 리뷰 개수
+     */
+    public long getGuideReviewCount(int guideId) {
+        return guideReviewRepository.countAllByGuideId(guideId);
+    }
+
+    /**
+     * 해당 가이드에 맞는 최근 가이드 리뷰 목록을 불러옵니다.
      * @param guideId 가이드 ID
      * @param pageable 페이지
      * @return 가이드 리뷰 목록
      */
-    public List<GuideReviewDTO> getGuideReviews(int guideId, Pageable pageable) {
-        Page<GuideReview> guideReviews = guideReviewRepository.findAllByGuideId(guideId, pageable);
+    public GuideReviewListDTO getGuideReviews(int guideId, Pageable pageable) {
+        // 가이드 평균 평점 불러오기
+        float averageRating = getGuideAverageRating(guideId);
 
-        return guideReviews.stream()
+        // 가이드 리뷰 개수 불러오기
+        int reviewCount = Long.valueOf(getGuideReviewCount(guideId)).intValue();
+
+        // 페이지에 맞는 가이드 리뷰 불러오기
+        Page<GuideReview> guideReviews = guideReviewRepository.findAllByGuideIdOrderByCreatedDayDesc(guideId, pageable);
+        List<GuideReviewDTO> guideReviewDTOS = guideReviews.stream()
                 .map(guideReview -> new GuideReviewDTO(guideReview))
                 .collect(Collectors.toList());
+
+        // DTO 반환
+        return GuideReviewListDTO.builder()
+                .avgRating(averageRating)
+                .count(reviewCount)
+                .reviews(guideReviewDTOS)
+                .build();
     }
 
     /**
@@ -121,7 +148,7 @@ public class GuideReviewService {
 
         // 리뷰 작성자거나 관리자인지 체크
         int reviewerId = guideReview.getReviewer().getId();
-        Preconditions.checkArgument(memberId == reviewerId || member.getState() == MemberDTO.MemberRole.ADMIN, "해당 리뷰의 작성자가 아닙니다. (리뷰 ID: %s, 리뷰 작성자 ID: %s, 현재 회원 ID: %s)", reviewId, reviewerId, memberId);
+        Preconditions.checkArgument(memberId == reviewerId || member.getRole() == MemberDTO.MemberRole.ADMIN, "해당 리뷰의 작성자가 아닙니다. (리뷰 ID: %s, 리뷰 작성자 ID: %s, 현재 회원 ID: %s)", reviewId, reviewerId, memberId);
 
         // 리뷰 삭제
         guideReviewRepository.deleteById(guideReviewDeleteDTO.getId());

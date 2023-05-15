@@ -6,8 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
- * 가이드 리뷰 삭제 DTO
+ * 가이드 리뷰 조회 DTO
  */
 @Data
 @Builder
@@ -15,10 +17,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GuideReviewListDTO {
 
-    @ApiParam("가이드 ID")
-    private int guideId;
+    @ApiParam("전체 평점 평균")
+    private float avgRating;
 
-    @ApiParam("조회할 페이지 (1부터 시작)")
-    private int page;
+    @ApiParam("리뷰 개수")
+    private int count;
+
+    @ApiParam("리뷰들")
+    private List<GuideReviewDTO> reviews;
 
 }

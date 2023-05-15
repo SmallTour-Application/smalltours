@@ -13,7 +13,23 @@ import java.util.List;
 
 
 public interface ToursRepository extends JpaRepository<Tours, Integer> {
+
     List<Tours> findAll();
+
+    /**
+     * 해당 페이지에 맞는 가이드의 패키지 목록을 최신순으로 불러옵니다.
+     */
+    Page<Tours> findAllByGuideIdOrderByCreatedDayDesc(int guideId, Pageable pageable);
+
+    /**
+     * 해당 페이지에 맞는 가이드의 패키지 목록을 등록여부순으로 불러옵니다.
+     */
+    Page<Tours> findAllByGuideIdOrderByApprovalsDesc(int guideId, Pageable pageable);
+
+    /**
+     * 가이드의 패키지 개수를 불러옵니다.
+     */
+    long countAllByGuideId(int guideId);
 
     // 지역명(도시,지역,나라)이(가) 포함된 투어 검색(location테이블이랑 조인)
     //+ 그룹 사이즈가 요청된 사람 수 내에 있는 투어 찾음

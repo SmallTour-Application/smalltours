@@ -30,15 +30,6 @@ public class GuideReviewController {
     @Autowired
     private GuideReviewService guideReviewService;
 
-    @ApiOperation("가이드에 맞는 리뷰 목록 조회")
-    @GetMapping("/list")
-    public ResponseEntity<List<GuideReviewDTO>> getGuideReviewList(GuideReviewListDTO guideReviewListDTO) {
-        Pageable pageable = PageRequest.of(guideReviewListDTO.getPage() - 1, NUMBER_OF_REVIEW_PER_PAGE);
-        List<GuideReviewDTO> guideReviewDtoList = guideReviewService.getGuideReviews(guideReviewListDTO.getGuideId(), pageable);
-
-        return ResponseEntity.ok(guideReviewDtoList);
-    }
-
     @ApiOperation("가이드 리뷰 수정")
     @PostMapping("/update")
     public ResponseEntity<?> reviewUpdate(@ApiIgnore Authentication authentication, GuideReviewUpdateDTO guideReviewUpdateDTO) {
