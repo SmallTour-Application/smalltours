@@ -1,5 +1,6 @@
 package com.lattels.smalltour.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -36,9 +37,11 @@ public class ScheduleDTO {
         @ApiModelProperty(value = "일정 날짜 (1 : 1일차)", example = "1")
         private int tourDay;
 
+        @JsonFormat(pattern = "kk:mm", shape = JsonFormat.Shape.STRING)
         @ApiModelProperty(value = "일정 시작 시간", example = "23:30")
         private LocalTime startTime;
 
+        @JsonFormat(pattern = "kk:mm", shape = JsonFormat.Shape.STRING)
         @ApiModelProperty(value = "일정 종료 시간", example = "23:30")
         private LocalTime endTime;
 

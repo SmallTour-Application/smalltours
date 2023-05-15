@@ -38,6 +38,13 @@ public class ScheduleService {
         Tours tours = toursRepository.findByIdAndGuideId(addRequestDTO.getTourId(), memberId);
         Preconditions.checkNotNull(tours, "해당 유저와 패키지가 등록인이 다릅니다. (회원 ID : %s, 패키지 ID : %s)", memberId, addRequestDTO.getTourId());
 
+        // 시간이 겹치는 일정이 있는지 검사
+        Schedule scheduleTimeChk = scheduleRepository.checkTime(addRequestDTO.getTourId(), addRequestDTO.getTourDay(), addRequestDTO.getStartTime(), addRequestDTO.getEndTime());
+        log.info("체크"+scheduleTimeChk);
+        boolean chk = false;
+        if (scheduleTimeChk == null) chk = true;
+        Preconditions.checkArgument(chk, "시간이 겹치는 일정이 있습니다.");
+
         Schedule schedule = Schedule.builder()
                 .tours(tours)
                 .tourDay(addRequestDTO.getTourDay())
@@ -58,6 +65,13 @@ public class ScheduleService {
 
         // 일정 등록인이 맞는지 검사
         Preconditions.checkArgument(memberId == schedule.getTours().getGuide().getId(), "해당 유저와 등록인이 일치하지 않습니다. (수정 요청 회원 ID : %s, 기존 등록 회원 ID : %s)", memberId, schedule.getTours().getGuide().getId());
+
+        // 시간이 겹치는 일정이 있는지 검사
+        Schedule scheduleTimeChk = scheduleRepository.checkTime(schedule.getTours().getId(), updateRequestDTO.getTourDay(), updateRequestDTO.getStartTime(), updateRequestDTO.getEndTime());
+        log.info("체크"+scheduleTimeChk);
+        boolean chk = false;
+        if (scheduleTimeChk == null) chk = true;
+        Preconditions.checkArgument(chk, "시간이 겹치는 일정이 있습니다.");
 
         schedule.setTourDay(updateRequestDTO.getTourDay());
         schedule.setStartTime(updateRequestDTO.getStartTime());
