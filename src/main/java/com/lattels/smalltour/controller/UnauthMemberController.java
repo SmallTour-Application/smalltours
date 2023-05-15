@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/unauth/member")
 @Api(tags = "UnauthMember", description = "비회원 API 컨트롤러")
-public class UnauthMember {
+public class UnauthMemberController {
 
     private final EmailTokenService emailTokenService;
 

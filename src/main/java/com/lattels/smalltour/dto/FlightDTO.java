@@ -1,5 +1,6 @@
 package com.lattels.smalltour.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -34,10 +35,10 @@ public class FlightDTO {
         @ApiModelProperty(value = "항공사 ID", example = "1")
         private int airlineId;
 
-        @ApiModelProperty(value = "출발 일자, 시간", example = "2023-03-03 09:23:00.000")
+        @ApiModelProperty(value = "출발 일자, 시간", example = "2023-03-03T09:23:00.000")
         private LocalDateTime departDateTime;
 
-        @ApiModelProperty(value = "도착 일자, 시간", example = "2023-03-03 09:23:00.000")
+        @ApiModelProperty(value = "도착 일자, 시간", example = "2023-03-03T09:23:00.000")
         private LocalDateTime arrivalDateTime;
 
         @NotBlank(message = "필수 입력 값입니다.")
@@ -75,10 +76,10 @@ public class FlightDTO {
         @ApiModelProperty(value = "비행기 ID", example = "1")
         private int id;
 
-        @ApiModelProperty(value = "출발 일자, 시간", example = "2023-03-03 09:23:00.000")
+        @ApiModelProperty(value = "출발 일자, 시간", example = "2023-03-03T09:23:00.000")
         private LocalDateTime departDateTime;
 
-        @ApiModelProperty(value = "도착 일자, 시간", example = "2023-03-03 09:23:00.000")
+        @ApiModelProperty(value = "도착 일자, 시간", example = "2023-03-03T09:23:00.000")
         private LocalDateTime arrivalDateTime;
 
         @NotBlank(message = "필수 입력 값입니다.")

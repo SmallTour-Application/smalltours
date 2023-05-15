@@ -30,12 +30,8 @@ public class FlightController {
     @ApiOperation(value = "비행기 정보 등록")
     public ResponseEntity<Object> addFlight(@ApiIgnore Authentication authentication, @Valid @RequestBody FlightDTO.AddRequestDTO addRequestDTO) {
 
-        try {
-            flightService.addFlight(Integer.parseInt(authentication.getPrincipal().toString()), addRequestDTO);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        flightService.addFlight(Integer.parseInt(authentication.getPrincipal().toString()), addRequestDTO);
+        return ResponseEntity.ok().build();
 
     }
 
@@ -44,12 +40,8 @@ public class FlightController {
     @ApiOperation(value = "비행기 정보 수정")
     public ResponseEntity<Object> updateFlight(@ApiIgnore Authentication authentication, @Valid @RequestBody FlightDTO.UpdateRequestDTO updateRequestDTO) {
 
-        try {
-            flightService.updateFlight(Integer.parseInt(authentication.getPrincipal().toString()), updateRequestDTO);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        flightService.updateFlight(Integer.parseInt(authentication.getPrincipal().toString()), updateRequestDTO);
+        return ResponseEntity.ok().build();
 
     }
 
@@ -58,12 +50,8 @@ public class FlightController {
     @ApiOperation(value = "비행기 정보 삭제")
     public ResponseEntity<Object> deleteFlight(@ApiIgnore Authentication authentication, @Valid @RequestBody FlightDTO.IdRequestDTO idRequestDTO) {
 
-        try {
-            flightService.deleteFlight(Integer.parseInt(authentication.getPrincipal().toString()), idRequestDTO);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        flightService.deleteFlight(Integer.parseInt(authentication.getPrincipal().toString()), idRequestDTO);
+        return ResponseEntity.ok().build();
 
     }
 

@@ -30,12 +30,8 @@ public class AirlineController {
     @ApiOperation(value = "항공사 등록")
     public ResponseEntity<Object> addAirline(@ApiIgnore Authentication authentication, @Valid @RequestBody AirlineDTO.AddRequestDTO addRequestDTO) {
 
-        try {
-            airlineService.addAirline(Integer.parseInt(authentication.getPrincipal().toString()), addRequestDTO);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        airlineService.addAirline(Integer.parseInt(authentication.getPrincipal().toString()), addRequestDTO);
+        return ResponseEntity.ok().build();
 
     }
 
@@ -44,12 +40,8 @@ public class AirlineController {
     @ApiOperation(value = "항공사 수정")
     public ResponseEntity<Object> updateAirline(@ApiIgnore Authentication authentication, @Valid @RequestBody AirlineDTO.UpdateRequestDTO updateRequestDTO) {
 
-        try {
-            airlineService.updateAirline(Integer.parseInt(authentication.getPrincipal().toString()), updateRequestDTO);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        airlineService.updateAirline(Integer.parseInt(authentication.getPrincipal().toString()), updateRequestDTO);
+        return ResponseEntity.ok().build();
 
     }
 
@@ -58,12 +50,8 @@ public class AirlineController {
     @ApiOperation(value = "항공사 삭제")
     public ResponseEntity<Object> deleteAirline(@ApiIgnore Authentication authentication, @Valid @RequestBody AirlineDTO.IdRequestDTO idRequestDTO) {
 
-        try {
-            airlineService.deleteAirline(Integer.parseInt(authentication.getPrincipal().toString()), idRequestDTO);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        airlineService.deleteAirline(Integer.parseInt(authentication.getPrincipal().toString()), idRequestDTO);
+        return ResponseEntity.ok().build();
 
     }
 }
