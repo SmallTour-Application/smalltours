@@ -148,7 +148,7 @@ public class GuideReviewService {
 
         // 리뷰 작성자거나 관리자인지 체크
         int reviewerId = guideReview.getReviewer().getId();
-        Preconditions.checkArgument(memberId == reviewerId || member.getState() == MemberDTO.MemberRole.ADMIN, "해당 리뷰의 작성자가 아닙니다. (리뷰 ID: %s, 리뷰 작성자 ID: %s, 현재 회원 ID: %s)", reviewId, reviewerId, memberId);
+        Preconditions.checkArgument(memberId == reviewerId || member.getRole() == MemberDTO.MemberRole.ADMIN, "해당 리뷰의 작성자가 아닙니다. (리뷰 ID: %s, 리뷰 작성자 ID: %s, 현재 회원 ID: %s)", reviewId, reviewerId, memberId);
 
         // 리뷰 삭제
         guideReviewRepository.deleteById(guideReviewDeleteDTO.getId());

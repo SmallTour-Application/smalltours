@@ -1,6 +1,7 @@
 package com.lattels.smalltour.service;
 
 import com.google.common.base.Preconditions;
+import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.question.QuestionDTO;
 import com.lattels.smalltour.dto.question.QuestionListDTO;
 import com.lattels.smalltour.dto.question.QuestionUpdateRequestDTO;
@@ -238,7 +239,8 @@ public class QuestionService {
         Preconditions.checkNotNull(question, "질문을 찾을 수 없습니다. (질문 ID: %s)", questionId);
 
         // 본인 체크
-        Preconditions.checkArgument(memberId == question.getMember().getId(), "본인의 질문만 삭제할 수 있습니다. (답변 ID: %s, 회원 ID: %s)", question.getMember().getId(), memberId);
+        int questionWriterId = question.getMember().getId();
+        Preconditions.checkArgument(memberId == questionWriterId || member.getRole() == MemberDTO.MemberRole.ADMIN, "해당 질문의 작성자가 아닙니다. (질문 ID: %s, 질문 작성자 ID: %s, 현재 회원 ID: %s)", questionId, questionWriterId, memberId);
 
         // 기존 이미지 삭제
         deleteQuestionImage(question);

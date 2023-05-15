@@ -1,6 +1,7 @@
 package com.lattels.smalltour.service;
 
 import com.google.common.base.Preconditions;
+import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.question.answer.QuestionAnswerDTO;
 import com.lattels.smalltour.dto.question.answer.QuestionAnswerListDTO;
 import com.lattels.smalltour.dto.question.answer.QuestionAnswerUpdateRequestDTO;
@@ -148,7 +149,8 @@ public class QuestionAnswerService {
         Preconditions.checkNotNull(answer, "답변 찾을 수 없습니다. (답변 ID: %s)", answerId);
 
         // 본인 체크
-        Preconditions.checkArgument(memberId == answer.getMemberId(), "본인의 답변만 삭제할 수 있습니다. (답변 ID: %s, 회원 ID: %s)", answer.getMemberId(), memberId);
+        int answerWriterId = answer.getMemberId();
+        Preconditions.checkArgument(memberId == answerWriterId || member.getRole() == MemberDTO.MemberRole.ADMIN, "해당 답변의 작성자가 아닙니다. (답변 ID: %s, 답변 작성자 ID: %s, 현재 회원 ID: %s)", answerId, answerWriterId, memberId);
 
         // 삭제
         answerRepository.delete(answer);
