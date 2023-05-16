@@ -98,7 +98,6 @@ public class MemberDTO {
 
         private String profile; // 프로필 이미지가 들어있는 경로
 
-
         private List<MultipartFile> profileImgRequest;
 
         public boolean checkProfileImgRequestNull() {

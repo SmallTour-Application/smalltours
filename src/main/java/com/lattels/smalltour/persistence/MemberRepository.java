@@ -26,6 +26,10 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
     // 아이디로 찾기
     Optional<Member> findById(int id);
 
+    // 가이드 아이디로 찾기
+    @Query("SELECT m FROM Member m WHERE m.id = :guideId AND m.role = 2")
+    Optional<Member> findByGuideId(@Param("guideId") int guideId);
+
 
 
     @Query(value = "SELECT * FROM member where id = :id", nativeQuery = true)
@@ -71,7 +75,7 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
     String findNickNameByMemberId(@Param("id") int id);
 
 
-    //멤버 권한 1번 강사
+    //멤버 권한 2번 가이드
     List<Member> findByRole(int role);
 
     //가이드 검색

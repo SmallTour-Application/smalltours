@@ -123,7 +123,7 @@ public class ToursService {
     public void deleteTours(int memberId, ToursDTO.IdRequestDTO idRequestDTO) {
 
         // 투어 정보 가져오기
-        Tours tours = toursRepository.findById(idRequestDTO.getId());
+        Tours tours = toursRepository.findByToursId(idRequestDTO.getId());
         Preconditions.checkNotNull(tours, "등록된 투어가 없습니다. (투어 ID : %s)", idRequestDTO.getId());
 
         // 등록된 회원인지 검사

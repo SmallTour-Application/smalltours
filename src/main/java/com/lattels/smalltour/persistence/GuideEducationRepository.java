@@ -9,3 +9,4 @@ public interface GuideEducationRepository extends JpaRepository<GuideEducation, 
 
 
 }
+

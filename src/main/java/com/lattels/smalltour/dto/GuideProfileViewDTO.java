@@ -1,4 +1,4 @@
-/*
+
 package com.lattels.smalltour.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -16,8 +16,31 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GuideProfileViewDTO {
+    private String name;
+    private String tel;
+    private String introduce;// 자기 소개
+    private LocalDateTime joinDay;
+    private int gender;
+    private String profileImg;
+    private List<TourDTO> tours;// 해당 가이드의 투어들
+    private int favoriteCount; // 가이드 좋아요 갯수
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TourDTO {
+        private String thumb;// 썸네일 이미지 경로
+        private String title;
+        private String guideName;
+        private String guideProfileImg;// 가이드 썸네일 이미지
+        private float rating;// 여행평점
+        private int price;
+    }
+
+
 
 
 
 }
-*/
+

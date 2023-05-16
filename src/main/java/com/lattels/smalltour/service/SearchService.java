@@ -31,6 +31,7 @@ public class SearchService {
     private final MemberRepository memberRepository;
     private final ToursRepository toursRepository;
     private final ReviewsRepository reviewsRepository;
+    private final GuideReviewRepository guideReviewRepository;
 
     
     //type을 패키지로 해놓고 검색창에 패키지 이름으로 검색할 경우
@@ -57,7 +58,7 @@ public class SearchService {
                 .content(new ArrayList<>())
                 .build();
 
-        Sort sortDirection = Sort.by("createdDay");
+        Sort sortDirection = Sort.by("created_day");
         if (sort == 0) {
             sortDirection = sortDirection.descending(); // 내림차순
         } else if (sort == 1) {
@@ -70,11 +71,11 @@ public class SearchService {
         if (type == 0) { // 패키지를 검색하는 경우
             Page<Tours> tours = toursRepository.findToursBySearchParameters(location, people, start, end, PageRequest.of(page, size,sortDirection));
             if (tours.isEmpty()) {
-                throw new IllegalArgumentException("해당 상품이 없습니다.");
+                throw new IllegalArgumentException("해당 기간에 상품이 없습니다.");
             }
 
             for (Tours tour : tours) {
-                Member guide = memberRepository.findById(tour.getGuide().getId()).orElseThrow(() -> new RuntimeException("Guide not found"));
+                Member guide = memberRepository.findById(tour.getGuide().getId()).orElseThrow(() -> new RuntimeException("가이드가 없습니다."));
                 if (guide.getId() == tour.getGuide().getId() && guide.getRole() == 2) {
                     Float rating = reviewsRepository.findAverageRatingByTourId(tour.getId());
                     if (rating == null) rating = 0f;
@@ -123,7 +124,7 @@ public class SearchService {
 
         for (Member guide : guides) {
             if (guide.getRole() == 2) {
-                Float rating = reviewsRepository.findAverageRatingByGuideId(guide.getId());
+                Float rating = guideReviewRepository.findAverageRatingByGuideId(guide.getId());
                 if (rating == null) rating = 0f;
                 response.getContentGuides().add(
                         SearchPackageDTO.ContentGuide.builder()

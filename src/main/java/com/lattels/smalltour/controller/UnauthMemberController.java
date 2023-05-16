@@ -35,10 +35,10 @@ public class UnauthMemberController {
     //swagger에서 테스트하려면 매개변수에 집어넣어야함
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerMember(MemberDTO.Sign memberDTO,@RequestParam("profileImgRequest") MultipartFile profileImgRequest ) {
+    public ResponseEntity<?> registerMember(MemberDTO.Sign memberDTO) {
 
         try {
-            MemberDTO registeredMember = unauthMemberService.add(memberDTO,profileImgRequest);
+            MemberDTO registeredMember = unauthMemberService.add(memberDTO);
             MemberDTO responseMemberDTO = MemberDTO.builder()
                     .email(registeredMember.getEmail())
                     .nickname(registeredMember.getNickname())

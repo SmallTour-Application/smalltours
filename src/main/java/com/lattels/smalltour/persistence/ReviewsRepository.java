@@ -1,6 +1,8 @@
 package com.lattels.smalltour.persistence;
 
 import com.lattels.smalltour.model.Reviews;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,9 +13,18 @@ import java.util.List;
 
 public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
 
-    // 해당 투어에 대해 결제를 한 회원의 평점가져오기
-    @Query("SELECT AVG(r.rating) FROM Reviews r JOIN r.member m WHERE r.tours.id = :tourId AND m.role = 0 AND EXISTS (SELECT p FROM Payment p WHERE p.member.id = m.id AND p.tours.id = :tourId)")
+    // 해당 투어에 대해 회원들의 평점가져오기
+    // 해당 상품에 결제한 이력이 있어야함
+    //Reviews, payment, Member, Tours
+    //Member는 회원이니까 role이 0, payment는 결제가 완료되어야하니까 state 1
+    @Query("SELECT AVG(r.rating) FROM Reviews r JOIN r.tours t JOIN r.member m JOIN Payment p ON p.tours.id = t.id AND p.member.id = m.id WHERE t.id = :tourId AND m.role = 0 AND p.state = '1'")
     Float findAverageRatingByTourId(@Param("tourId") int tourId);
+
+
+
+    @Query("SELECT r FROM Reviews r WHERE r.tours.guide.id = :guideId AND r.tours.guide.role = 2")
+    List<Reviews> findAllByGuideId(@Param("guideId") int guideId, Pageable pageable);
+
 
     //가이드에 대한 평점
     @Query("SELECT AVG(r.rating) FROM GuideReview r JOIN r.guide g WHERE g.id = :guideId AND g.role = 2")

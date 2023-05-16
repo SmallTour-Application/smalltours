@@ -1,5 +1,6 @@
 package com.lattels.smalltour.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
 @Entity
@@ -40,6 +42,7 @@ public class Member {
     private LocalDate birthDay;
 
     @Column(name = "join_day")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime joinDay;
 
     @Column(name = "gender")
@@ -52,6 +55,7 @@ public class Member {
 
     @Column(name = "state")
     private int state;
+
 
     public void changePassword(String password){
         this.password = password;

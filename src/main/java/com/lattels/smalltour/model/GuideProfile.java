@@ -17,12 +17,8 @@ import java.time.LocalDateTime;
 public class GuideProfile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // DB에서 자동증가
-    @Column(name = "id")
-    private int id; // 사용자에게 고유하게 부여되는 값
-
-    @Column(name = "member_id")
-    private int memberId;
+    @Column(name = "guide_id")
+    private int guide_id;
 
     @Column(name = "resume") //이력서 경로
     private String resume;
