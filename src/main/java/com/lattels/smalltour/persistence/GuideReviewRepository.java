@@ -3,6 +3,7 @@ package com.lattels.smalltour.persistence;
 
 import com.lattels.smalltour.model.GuideReview;
 
+import com.lattels.smalltour.model.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,9 +37,22 @@ public interface GuideReviewRepository extends JpaRepository<GuideReview, Intege
     boolean existsByReviewerIdAndGuideId(@Param("reviewerId") int reviewerId, @Param("guideId") int guideId);
 
 
-    //가이드리뷰 테이블에 가이드id 랑 member 테이블 id랑 조인, role = 2 이어야함
-    @Query("SELECT gr FROM GuideReview gr JOIN gr.guide m WHERE m.id = :guideId AND m.role = 2")
+    //
+    @Query("SELECT gr FROM GuideReview gr JOIN gr.guide m WHERE m.id = :guideId")
     List<GuideReview> findGuideReviewsByGuideIdAndRole(@Param("guideId") int guideId);
+
+
+
+
+
+
+
+/*    @Query("SELECT gr FROM GuideReview gr JOIN gr.guide m1 JOIN gr.reviewer m2 WHERE m1.id = :guideId AND m1.role = 2 AND m2.role = 0")
+    List<GuideReview> findGuideReviewsByGuideId(@Param("guideId") int guideId);*/
+
+
+
+
 
 
     //가이드에 대한 평점

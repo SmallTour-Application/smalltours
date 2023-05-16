@@ -33,7 +33,7 @@ public class UnauthMemberService {
     // 새 계정 생성 - 이메일 중복 검사
     //@RequestParam("profileImgRequest") MultipartFile profileImgRequest 
     //swagger에서 테스트 하려면 add매개변수에 집어넣어야함 위에 값을
-    public MemberDTO add(MemberDTO.Sign memberDTO, @RequestParam("profileImgRequest") MultipartFile profileImgRequest ){
+    public MemberDTO add(MemberDTO.Sign memberDTO){
         if(memberDTO == null || memberDTO.getEmail() == null){
             log.warn("MemberService.add() : memberEntity에 email이 없습니다.");
             throw new RuntimeException("MemberService.add() : member에 email이 없습니다.");
@@ -67,7 +67,7 @@ public class UnauthMemberService {
             int memberId = memberRepository.save(member).getId();
 
             // 이미지가 있는 경우
-         if (memberDTO.checkProfileImgRequestNull()) {
+         if (memberDTO.checkProfileImgRequestNull() && !memberDTO.getProfileImgRequest().isEmpty()) {
 
                 MultipartFile multipartFile = memberDTO.getProfileImgRequest().get(0);
 

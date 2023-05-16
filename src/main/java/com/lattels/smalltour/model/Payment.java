@@ -32,8 +32,8 @@ public class Payment {
     @Column(name = "price")
     private int price;
 
-    @Column(name = "payment_date")
-    private LocalDate paymentDate;
+    @Column(name = "payment_day")
+    private LocalDate paymentDay;
 
     @Column(name = "state")
     private String state;

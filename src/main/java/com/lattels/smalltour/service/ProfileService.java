@@ -31,6 +31,8 @@ public class ProfileService {
 
     private final MemberRepository memberRepository;
 
+    private final FavoriteGuideRepository favoriteGuideRepository;
+
 
     // unauth/profile/guide 부분
     //가이드 클릭시 해당 정보들 나오는 메서드
@@ -68,7 +70,8 @@ public class ProfileService {
             tourDTOs.add(tourDTO);
         }
 
-
+        // 가이드의 좋아요 수를 세기
+        long favoriteCount = favoriteGuideRepository.countByGuideId(guideId);
 
         GuideProfileViewDTO guideProfileViewDTO = GuideProfileViewDTO.builder()
                 .name(member.getName())
@@ -78,7 +81,7 @@ public class ProfileService {
                 .gender(member.getGender())
                 .profileImg(member.getProfile())
                 .tours(tourDTOs)
-                .favoriteCount(0) //일단은 0으로
+                .favoriteCount((int)favoriteCount) //일단은 0으로
                 .build();
 
         return guideProfileViewDTO;

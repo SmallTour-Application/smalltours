@@ -1,4 +1,3 @@
-/*
 package com.lattels.smalltour.persistence;
 
 
@@ -10,4 +9,4 @@ public interface GuideEducationRepository extends JpaRepository<GuideEducation, 
 
 
 }
-*/
+

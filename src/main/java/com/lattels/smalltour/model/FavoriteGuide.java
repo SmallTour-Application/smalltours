@@ -16,14 +16,15 @@ import java.io.Serializable;
 @IdClass(FavoriteGuide.FavoriteGuideID.class)
 @Table(name = "favorite_guide")
 public class FavoriteGuide {
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Id
-    @Column(name = "member_id")
-    private int memberId;
-
-    @Id
-    @Column(name = "guide_id")
-    private int guideId;
+    @ManyToOne
+    @JoinColumn(name = "guide_id")
+    private Member guide;
 
 
     @Builder
@@ -32,9 +33,9 @@ public class FavoriteGuide {
     @AllArgsConstructor
     public static class FavoriteGuideID implements Serializable {
 
-        private Integer memberId;
+        private Member member;
 
-        private Integer guideId;
+        private Member guide;
 
     }
 
