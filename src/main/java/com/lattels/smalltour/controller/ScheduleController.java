@@ -1,0 +1,59 @@
+package com.lattels.smalltour.controller;
+
+import com.lattels.smalltour.dto.ScheduleDTO;
+import com.lattels.smalltour.dto.ToursDTO;
+import com.lattels.smalltour.service.ScheduleService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
+
+import javax.validation.Valid;
+
+@Slf4j
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/package/schedule")
+@Api(tags = "Schedule Controller", description = "여행 일정 컨트롤러")
+public class ScheduleController {
+
+    private final ScheduleService scheduleService;
+
+    // 여행 일정 등록
+    @PostMapping(value = "/add")
+    @ApiOperation(value = "여행 일정 등록")
+    public ResponseEntity<Object> addSchedule(@ApiIgnore Authentication authentication, @Valid @RequestBody ScheduleDTO.AddRequestDTO addRequestDTO) {
+
+        scheduleService.addSchedule(Integer.parseInt(authentication.getPrincipal().toString()), addRequestDTO);
+        return ResponseEntity.ok().build();
+
+    }
+
+    // 여행 일정 수정
+    @PostMapping(value = "/update")
+    @ApiOperation(value = "여행 일정 수정")
+    public ResponseEntity<Object> updateSchedule(@ApiIgnore Authentication authentication, @Valid @RequestBody ScheduleDTO.UpdateRequestDTO updateRequestDTO) {
+
+        scheduleService.updateSchedule(Integer.parseInt(authentication.getPrincipal().toString()), updateRequestDTO);
+        return ResponseEntity.ok().build();
+
+    }
+
+    // 여행 일정 삭제
+    @PostMapping(value = "/delete")
+    @ApiOperation(value = "여행 일정 삭제")
+    public ResponseEntity<Object> deleteSchedule(@ApiIgnore Authentication authentication, @Valid @RequestBody ScheduleDTO.IdRequestDTO idRequestDTO) {
+
+        scheduleService.deleteSchedule(Integer.parseInt(authentication.getPrincipal().toString()), idRequestDTO);
+        return ResponseEntity.ok().build();
+
+    }
+
+}
