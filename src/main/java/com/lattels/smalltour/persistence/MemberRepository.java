@@ -75,7 +75,7 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
     String findNickNameByMemberId(@Param("id") int id);
 
 
-    //멤버 권한 1번 강사
+    //멤버 권한 2번 가이드
     List<Member> findByRole(int role);
 
     //가이드 검색

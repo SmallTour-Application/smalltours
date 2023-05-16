@@ -70,19 +70,16 @@ public class UnauthMemberService {
          if (memberDTO.checkProfileImgRequestNull()) {
 
                 MultipartFile multipartFile = memberDTO.getProfileImgRequest().get(0);
-                String current_date = null;
+
 
                 if (!multipartFile.isEmpty()) {
                     LocalDateTime now = LocalDateTime.now();
                     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-                    current_date = now.format(dateTimeFormatter);
+                    String current_date = now.format(dateTimeFormatter);
 
 
                     //String absolutePath = filePath +File.separator + "member";
                     String absolutePath = "C:" +File.separator + "smallTour" + File.separator + "member";
-
-
-
                     String path = absolutePath;
                     File file = new File(path);
 

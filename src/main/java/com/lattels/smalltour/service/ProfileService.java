@@ -93,8 +93,17 @@ public class ProfileService {
         Member guide = memberRepository.findByGuideId(guideId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 가이드는 없습니다."));
 
+        // 해당 가이드의 role이 2인지 확인
+        if(guide.getRole() != 2) {
+            throw new IllegalArgumentException("해당 사용자는 가이드가 아닙니다.");
+        }
+
 
         Float avgRating = guideReviewRepository.findAverageRatingByGuideId(guideId);
+        if (avgRating == null) {
+            throw new IllegalArgumentException("해당 가이드에 대한 평가는 없습니다.");
+        }
+
         int count = guideReviewRepository.findGuideReviewsByGuideIdAndRole(guideId).size();
         List<Reviews> reviewsList = reviewsRepository.findAllByGuideId(guideId, PageRequest.of(page - 1, 10));
 

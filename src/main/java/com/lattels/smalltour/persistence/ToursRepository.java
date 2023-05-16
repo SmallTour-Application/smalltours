@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 
 public interface ToursRepository extends JpaRepository<Tours, Integer> {
@@ -33,12 +34,14 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
 
     // 지역명(도시,지역,나라)이(가) 포함된 투어 검색(location테이블이랑 조인)
     //+ 그룹 사이즈가 요청된 사람 수 내에 있는 투어 찾음
-    //+ 투어 생성일이 요청된 시작일과 종료일 사이에 있는 투어를 찾음
-    @Query("SELECT t FROM Tours t, Locations l WHERE t.id = l.tours.id AND (l.locationName LIKE %:location% OR l.country LIKE %:location% OR l.region LIKE %:location%) AND t.minGroupSize <= :people AND t.maxGroupSize >= :people AND t.createdDay BETWEEN :start AND :end")
+    //+ guide_lock 에 start_day, end_day 에 적혀있는 날짜 외인경우에만 검색가능
+    @Query(value = "SELECT t.* FROM Tours t JOIN Locations l ON t.id = l.tour_id JOIN Guide_Lock g ON t.guide_id = g.guide_id WHERE (l.location_name LIKE %:location% OR l.country LIKE %:location% OR l.region LIKE %:location%) AND t.min_group_size <= :people AND t.max_group_size >= :people AND (:start NOT BETWEEN g.start_day AND g.end_day AND :end NOT BETWEEN g.start_day AND g.end_day) AND t.approvals = 1", nativeQuery = true)
     Page<Tours> findToursBySearchParameters(@Param("location") String location, @Param("people") int people, @Param("start") LocalDate start, @Param("end") LocalDate end, Pageable pageable);
 
+
     // id로 tours Entity 가져오기
-    Tours findById(int id);
+    @Query(value = "SELECT * FROM tours WHERE id = :id", nativeQuery = true)
+    Tours findByToursId(@Param("id") int id);
 
     Tours findByIdAndGuideId(int id, int guideId);
 
