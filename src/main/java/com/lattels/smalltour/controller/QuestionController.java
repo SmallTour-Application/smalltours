@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
+import java.util.List;
 
 @Api(description = "패키지 질문 API 컨트롤러")
 @Slf4j
@@ -64,9 +64,9 @@ public class QuestionController {
     public ResponseEntity<Integer> writeQuestion(
             @ApiIgnore Authentication authentication,
             QuestionWriteRequestDTO questionWriteRequestDTO,
-            @RequestPart(value = "image", required = false) MultipartFile imageFiles
+            @RequestPart(value = "image", required = false) List<MultipartFile> imageFiles
     ) {
-        int questionId = questionService.writeQuestion(authentication, questionWriteRequestDTO, Arrays.asList(imageFiles));
+        int questionId = questionService.writeQuestion(authentication, questionWriteRequestDTO, imageFiles);
 
         return ResponseEntity.ok(questionId);
     }
@@ -76,9 +76,9 @@ public class QuestionController {
     public ResponseEntity<?> updateQuestion(
             @ApiIgnore Authentication authentication,
             QuestionUpdateRequestDTO questionUpdateRequestDTO,
-            @RequestPart(value = "image", required = false) MultipartFile imageFiles
+            @RequestPart(value = "image", required = false) List<MultipartFile> imageFiles
     ) {
-        questionService.updateQuestion(authentication, questionUpdateRequestDTO, Arrays.asList(imageFiles));
+        questionService.updateQuestion(authentication, questionUpdateRequestDTO, imageFiles);
 
         return ResponseEntity.ok().build();
     }
