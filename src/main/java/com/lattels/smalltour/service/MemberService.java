@@ -2,11 +2,16 @@ package com.lattels.smalltour.service;
 
 
 import com.lattels.smalltour.dto.MemberDTO;
+import com.lattels.smalltour.dto.favoriteGuideDTO;
+import com.lattels.smalltour.model.FavoriteGuide;
 import com.lattels.smalltour.model.Member;
+import com.lattels.smalltour.persistence.FavoriteGuideRepository;
 import com.lattels.smalltour.persistence.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,14 +21,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberService {
 
+    private final FavoriteGuideRepository favoriteGuideRepository;
     private final MemberRepository memberRepository;
-
     private final PasswordEncoder passwordEncoder;
 
     @Value("${file.path}")
@@ -262,4 +269,38 @@ public class MemberService {
             throw new RuntimeException("MemberService.updateContact() : 에러 발생.");
         }
     }
+
+
+
+    //좋아요 누른 가이드 가져오기
+    @Transactional(readOnly = true)
+    public List<favoriteGuideDTO> getFavoriteGuides(int memberId, int page, int size) {
+        List<favoriteGuideDTO> favoriteGuideDTOList = new ArrayList<>();
+
+
+        Member member = memberRepository.findByIdAndRole(memberId, 0)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 사용자가 아닙니다. 가이드 혹은 관리자 계정입니다."));
+
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        //현재 페이지의 내용을 목록으로 가져오기
+        //전체 100개의 데이터 항목 중에서 3번째 페이지(데이터 항목 21-30)를 가져왔다면,
+        // getContent()를 호출하면 그 3번째 페이지에 포함된 데이터 항목 21부터 30까지만 List로 반환
+        List<FavoriteGuide> favoriteGuides = favoriteGuideRepository.findByMemberAndGuideRole(member, pageable).getContent();
+
+        for (FavoriteGuide favoriteGuide : favoriteGuides) {
+            Member guide = favoriteGuide.getGuide();
+
+            favoriteGuideDTO guideDTO = favoriteGuideDTO.builder()
+                    .guideId(guide.getId())
+                    .guideName(guide.getName())
+                    .guideImg(guide.getProfile())
+                    .build();
+
+            favoriteGuideDTOList.add(guideDTO);
+        }
+
+        return favoriteGuideDTOList;
+    }
+
 }

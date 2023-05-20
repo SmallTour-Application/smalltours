@@ -81,6 +81,8 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
     //가이드 검색
     @Query("SELECT m FROM Member m WHERE m.role = 2 AND m.name LIKE %:keyword%")
     Page<Member> findGuidesByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    Optional<Member> findByIdAndRole(int id, int role);
 }
 
 
