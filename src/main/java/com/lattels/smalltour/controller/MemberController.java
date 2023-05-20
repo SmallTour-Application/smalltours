@@ -3,6 +3,7 @@ package com.lattels.smalltour.controller;
 
 import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.ResponseDTO;
+import com.lattels.smalltour.dto.favoriteGuideDTO;
 import com.lattels.smalltour.persistence.MemberRepository;
 import com.lattels.smalltour.security.TokenProvider;
 import com.lattels.smalltour.service.MemberService;
@@ -10,6 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,6 +35,8 @@ public class MemberController {
     private final TokenProvider tokenProvider;
 
     private final MemberRepository memberRepository;
+
+
 
     // 로그인한 정보
     @PostMapping("/info")
@@ -144,5 +149,14 @@ public class MemberController {
             return ResponseEntity.badRequest().body(responseDTO);
         }
     }*/
+
+    @ApiOperation(value = "Get favorite guides")
+    @GetMapping("/member/favoriteguide/{page}")
+    public ResponseEntity<List<favoriteGuideDTO>> getFavoriteGuides(@ApiIgnore Authentication authentication,
+                                                                    @PathVariable int page) {
+        int memberId = Integer.parseInt(authentication.getPrincipal().toString());
+        int size = 10;
+        return ResponseEntity.ok(memberService.getFavoriteGuides(memberId, page, size));
+    }
 
 }
