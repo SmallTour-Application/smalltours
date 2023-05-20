@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -33,17 +34,15 @@ public class Payment {
     private int price;
 
     @Column(name = "payment_day")
-    private LocalDate paymentDay;
+    private LocalDateTime paymentDay;
 
     @Column(name = "state")
-    private int state;
+    private int state; // 0: 미결제, 1: 결제
 
     @Column(name = "departure_day")
     private LocalDate departureDay;
 
     @Column(name = "people")
     private int people;
-
-  
 
 }

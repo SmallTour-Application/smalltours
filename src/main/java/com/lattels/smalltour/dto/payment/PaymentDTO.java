@@ -60,7 +60,7 @@ public class PaymentDTO {
         this.price = payment.getPrice();
         this.people = payment.getPeople();
         this.departureDay = payment.getDepartureDay();
-        this.state = Integer.parseInt(payment.getState());
+        this.state = payment.getState();
         this.payDay = payment.getPaymentDay();
         this.memberNickname = payment.getMember().getNickname();
         this.memberTel = payment.getMember().getTel();
