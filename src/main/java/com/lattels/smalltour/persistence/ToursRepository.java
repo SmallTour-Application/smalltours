@@ -1,5 +1,6 @@
 package com.lattels.smalltour.persistence;
 
+import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.model.Tours;
 
 import org.springframework.data.domain.Page;
@@ -35,7 +36,7 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     // 지역명(도시,지역,나라)이(가) 포함된 투어 검색(location테이블이랑 조인)
     //+ 그룹 사이즈가 요청된 사람 수 내에 있는 투어 찾음
     //+ guide_lock 에 start_day, end_day 에 적혀있는 날짜 외인경우에만 검색가능
-    @Query(value = "SELECT t.* FROM Tours t JOIN Locations l ON t.id = l.tour_id JOIN Guide_Lock g ON t.guide_id = g.guide_id WHERE (l.location_name LIKE %:location% OR l.country LIKE %:location% OR l.region LIKE %:location%) AND t.min_group_size <= :people AND t.max_group_size >= :people AND (:start NOT BETWEEN g.start_day AND g.end_day AND :end NOT BETWEEN g.start_day AND g.end_day) AND t.approvals = 1", nativeQuery = true)
+    @Query(value = "SELECT t.* FROM Tours t JOIN Locations l ON t.id = l.tour_id JOIN Guide_Lock g ON t.guide_id = g.guide_id WHERE (l.location_name LIKE %:location% OR l.country LIKE %:location% OR l.region LIKE %:location%) AND t.min_group_size <= :people AND t.max_group_size >= :people AND (:start BETWEEN g.start_day AND g.end_day AND :end BETWEEN g.start_day AND g.end_day) AND t.approvals = 1", nativeQuery = true)
     Page<Tours> findToursBySearchParameters(@Param("location") String location, @Param("people") int people, @Param("start") LocalDate start, @Param("end") LocalDate end, Pageable pageable);
 
 
@@ -50,5 +51,8 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     // guideId와 role 2에 해당하는 가이드가 진행하는 모든 투어(Tours)를 찾기
     @Query("SELECT t FROM Tours t JOIN t.guide m WHERE m.id = :guideId AND m.role = 2")
     List<Tours> findAllByGuideId(@Param("guideId") int guideId);
+
+    @Query("SELECT t FROM Tours t WHERE t.guide = :guide")
+    List<Tours> findByGuide(@Param("guide") Member guide);
 
 }

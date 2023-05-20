@@ -36,7 +36,7 @@ public class Payment {
     private LocalDate paymentDay;
 
     @Column(name = "state")
-    private String state;
+    private int state;
 
     @Column(name = "departure_day")
     private LocalDate departureDay;
