@@ -20,6 +20,10 @@ public class Hotel {
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
+    @ManyToOne
+    @JoinColumn(name = "tour_id")
+    private Tours tours;
+
     @Column(name = "name")
     private String name;
 
