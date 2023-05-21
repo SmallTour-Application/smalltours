@@ -81,7 +81,7 @@ public class AirlineService {
         Preconditions.checkNotNull(member, "등록된 회원이 아닙니다. (회원 ID : %s)", memberId);
 
         // 정보 등록인이거나 관리자인지 검사
-        Preconditions.checkArgument(memberId == airline.getTours().getGuide().getId() || member.getRole() == MemberDTO.MemberRole.ADMIN);
+        Preconditions.checkArgument(memberId == airline.getTours().getGuide().getId() || member.getRole() == MemberDTO.MemberRole.ADMIN, "해당 항공사 정보 등록자가 아닙니다. (항공사 정보 ID : %s, 삭제 요청 회원 ID : %s)", idRequestDTO.getId(), memberId);
 
         airlineRepository.delete(airline);
 
