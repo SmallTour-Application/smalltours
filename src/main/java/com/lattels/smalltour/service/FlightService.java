@@ -1,13 +1,11 @@
 package com.lattels.smalltour.service;
 
 import com.google.common.base.Preconditions;
-import com.lattels.smalltour.dto.AirlineDTO;
 import com.lattels.smalltour.dto.FlightDTO;
 import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.model.Airline;
 import com.lattels.smalltour.model.Flight;
 import com.lattels.smalltour.model.Member;
-import com.lattels.smalltour.model.Tours;
 import com.lattels.smalltour.persistence.AirlineRepository;
 import com.lattels.smalltour.persistence.FlightRepository;
 import com.lattels.smalltour.persistence.MemberRepository;
@@ -91,7 +89,7 @@ public class FlightService {
         Preconditions.checkNotNull(member, "등록된 회원이 아닙니다. (회원 ID : %s)", memberId);
 
         // 정보 등록인이거나 관리자인지 검사
-        Preconditions.checkArgument(memberId == flight.getAirline().getTours().getGuide().getId() || member.getRole() == MemberDTO.MemberRole.ADMIN);
+        Preconditions.checkArgument(memberId == flight.getAirline().getTours().getGuide().getId() || member.getRole() == MemberDTO.MemberRole.ADMIN, "해당 비행기 정보 등록자가 아닙니다. (비행기 정보 ID : %s, 삭제 요청 회원 ID : %s)", idRequestDTO.getId(), memberId);
 
         flightRepository.delete(flight);
 
