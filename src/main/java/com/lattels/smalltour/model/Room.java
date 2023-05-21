@@ -20,8 +20,9 @@ public class Room {
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
-    @Column(name = "hotel_id")
-    private int hotelId;
+    @ManyToOne
+    @JoinColumn(name = "hotel_id")
+    private Hotel hotel;
 
     @Column(name = "name")
     private String name;

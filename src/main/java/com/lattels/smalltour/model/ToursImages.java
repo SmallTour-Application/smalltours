@@ -21,17 +21,13 @@ public class ToursImages {
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
-    @Column(name = "tour_id")
-    private int tourId;
+    @ManyToOne
+    @JoinColumn(name = "tour_id")
+    private Tours tours;
 
     @Column(name = "image_path")
     private String imagePath;
 
-    @Column(name = "description")
-    private String description;
-
-    @Column(name = "created_day")
-    private LocalDate createdDay;
 
 
 }
