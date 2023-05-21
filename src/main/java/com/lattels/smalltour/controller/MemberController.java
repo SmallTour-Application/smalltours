@@ -4,6 +4,7 @@ package com.lattels.smalltour.controller;
 import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.ResponseDTO;
 import com.lattels.smalltour.dto.favoriteGuideDTO;
+import com.lattels.smalltour.dto.favoriteTourDTO;
 import com.lattels.smalltour.persistence.MemberRepository;
 import com.lattels.smalltour.security.TokenProvider;
 import com.lattels.smalltour.service.MemberService;
@@ -150,13 +151,22 @@ public class MemberController {
         }
     }*/
 
-    @ApiOperation(value = "Get favorite guides")
+    @ApiOperation(value = "즐겨찾기 가이드")
     @GetMapping("/member/favoriteguide/{page}")
     public ResponseEntity<List<favoriteGuideDTO>> getFavoriteGuides(@ApiIgnore Authentication authentication,
                                                                     @PathVariable int page) {
         int memberId = Integer.parseInt(authentication.getPrincipal().toString());
         int size = 10;
         return ResponseEntity.ok(memberService.getFavoriteGuides(memberId, page, size));
+    }
+
+    @ApiOperation(value = "즐겨찾기 상품")
+    @GetMapping("/member/favoriteTour/{page}")
+    public ResponseEntity<List<favoriteTourDTO>> getFavoriteTour(@ApiIgnore Authentication authentication,
+                                                                   @PathVariable int page) {
+        int memberId = Integer.parseInt(authentication.getPrincipal().toString());
+        int size = 10;
+        return ResponseEntity.ok(memberService.getFavoriteTours(memberId, page, size));
     }
 
 }

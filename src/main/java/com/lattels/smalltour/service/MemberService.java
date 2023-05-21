@@ -3,10 +3,15 @@ package com.lattels.smalltour.service;
 
 import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.favoriteGuideDTO;
+import com.lattels.smalltour.dto.favoriteTourDTO;
 import com.lattels.smalltour.model.FavoriteGuide;
+import com.lattels.smalltour.model.FavoriteTour;
 import com.lattels.smalltour.model.Member;
+import com.lattels.smalltour.model.Tours;
 import com.lattels.smalltour.persistence.FavoriteGuideRepository;
+import com.lattels.smalltour.persistence.FavoriteTourRepository;
 import com.lattels.smalltour.persistence.MemberRepository;
+import com.lattels.smalltour.persistence.ToursRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +37,8 @@ public class MemberService {
     private final FavoriteGuideRepository favoriteGuideRepository;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FavoriteTourRepository favoriteTourRepository;
+    private final ToursRepository toursRepository;
 
     @Value("${file.path}")
     private String filePath;
@@ -301,6 +308,40 @@ public class MemberService {
         }
 
         return favoriteGuideDTOList;
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<favoriteTourDTO> getFavoriteTours(int memberId, int page, int size) {
+        List<favoriteTourDTO> favoriteTourDTOList = new ArrayList<>();
+
+        Member member = memberRepository.findByIdAndRole(memberId, 0)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 사용자가 아닙니다. 가이드 혹은 관리자 계정입니다."));
+
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+
+        List<FavoriteTour> favoriteTours = favoriteTourRepository.findByMemberId(member.getId(), pageable).getContent();
+
+        for (FavoriteTour favoriteTour : favoriteTours) {
+            Tours tour = toursRepository.findByToursId(favoriteTour.getTourId());
+            if (tour == null) {
+                throw new IllegalArgumentException("해당상품이 없습니다.");
+            }
+
+            //approval:0 미승인 1:승인
+            if(tour.getApprovals() == 1){
+                favoriteTourDTO tourDTO = favoriteTourDTO.builder()
+                        .tourId(tour.getId())
+                        .tourName(tour.getTitle())
+                        .tourThumb(tour.getThumb())
+                        .build();
+
+                favoriteTourDTOList.add(tourDTO);
+            }
+        }
+
+        return favoriteTourDTOList;
     }
 
 }

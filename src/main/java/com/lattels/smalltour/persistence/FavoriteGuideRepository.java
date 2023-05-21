@@ -3,9 +3,11 @@ package com.lattels.smalltour.persistence;
 
 import com.lattels.smalltour.model.FavoriteGuide;
 
+import com.lattels.smalltour.model.FavoriteTour;
 import com.lattels.smalltour.model.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,5 +22,5 @@ public interface FavoriteGuideRepository extends JpaRepository<FavoriteGuide, Fa
 
     @Query("SELECT fg FROM FavoriteGuide fg WHERE fg.member = :member AND fg.guide.role = 2")
     Page<FavoriteGuide> findByMemberAndGuideRole(@Param("member")Member member, Pageable pageable);
- 
+
 }
