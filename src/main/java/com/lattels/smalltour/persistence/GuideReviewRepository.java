@@ -21,15 +21,25 @@ public interface GuideReviewRepository extends JpaRepository<GuideReview, Intege
     Page<GuideReview> findAllByGuideIdOrderByCreatedDayDesc(@Param("guideId") int guideId, Pageable pageable);
 
     /**
+     * 해당 사용자가 작성한 페이지에 맞는 최근 가이드 리뷰를 불러옵니다.
+     */
+    Page<GuideReview> findAllByReviewerIdOrderByCreatedDayDesc(@Param("reviewerId") int reviewerId, Pageable pageable);
+
+    /**
      * 가이드의 평균 평점을 불러옵니다.
      */
     @Query("SELECT AVG(g.rating) FROM GuideReview g WHERE g.guide.id = :guideId")
     float averageOfRatingsByGuideId(@Param("guideId") int guideId);
 
     /**
-     * 가이드의 가이드 리뷰 개수를 불러옵니다.
+     * 해당 사용자가 작성한 가이드 리뷰 개수를 불러옵니다.
      */
     long countAllByGuideId(@Param("guideId") int guideId);
+
+    /**
+     * 가이드의 가이드 리뷰 개수를 불러옵니다.
+     */
+    long countAllByReviewerId(@Param("reviewerId") int reviewerId);
 
     /**
      * 리뷰 작성자가 가이드에게 댓글을 작성했는지 여부를 반환합니다.

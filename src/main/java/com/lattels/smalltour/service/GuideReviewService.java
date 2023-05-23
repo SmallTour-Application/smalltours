@@ -9,6 +9,7 @@ import com.lattels.smalltour.persistence.GuideReviewRepository;
 import com.lattels.smalltour.persistence.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -30,23 +31,6 @@ public class GuideReviewService {
     private MemberRepository memberRepository;
 
     /**
-     * 해당 가이드의 평균 평점을 불러옵니다.
-     * @param guideId 가이드 ID
-     */
-    public float getGuideAverageRating(int guideId) {
-        return guideReviewRepository.averageOfRatingsByGuideId(guideId);
-    }
-
-    /**
-     * 해당 가이드의 가이드 리뷰 개수를 불러옵니다.
-     * @param guideId 가이드 ID
-     * @return 가이드 리뷰 개수
-     */
-    public long getGuideReviewCount(int guideId) {
-        return guideReviewRepository.countAllByGuideId(guideId);
-    }
-
-    /**
      * 해당 가이드에 맞는 최근 가이드 리뷰 목록을 불러옵니다.
      * @param guideId 가이드 ID
      * @param pageable 페이지
@@ -54,10 +38,10 @@ public class GuideReviewService {
      */
     public GuideReviewListDTO getGuideReviews(int guideId, Pageable pageable) {
         // 가이드 평균 평점 불러오기
-        float averageRating = getGuideAverageRating(guideId);
+        float averageRating = guideReviewRepository.averageOfRatingsByGuideId(guideId);
 
         // 가이드 리뷰 개수 불러오기
-        int reviewCount = Long.valueOf(getGuideReviewCount(guideId)).intValue();
+        int reviewCount = Long.valueOf(guideReviewRepository.countAllByGuideId(guideId)).intValue();
 
         // 페이지에 맞는 가이드 리뷰 불러오기
         Page<GuideReview> guideReviews = guideReviewRepository.findAllByGuideIdOrderByCreatedDayDesc(guideId, pageable);
@@ -68,6 +52,37 @@ public class GuideReviewService {
         // DTO 반환
         return GuideReviewListDTO.builder()
                 .avgRating(averageRating)
+                .count(reviewCount)
+                .reviews(guideReviewDTOS)
+                .build();
+    }
+
+    /**
+     * 내가 작성한 가이드 리뷰 목록을 불러옵니다.
+     * @param guideId 가이드 ID
+     * @param pageable 페이지
+     * @return 가이드 리뷰 목록
+     */
+    public MyGuideReviewListDTO getMyGuideReviews(Authentication authentication, int page, int countPerPage) {
+        int reviewerId = Integer.parseInt(authentication.getPrincipal().toString());
+
+        // 가이드 리뷰 개수 불러오기
+        int reviewCount = Long.valueOf(guideReviewRepository.countAllByReviewerId(reviewerId)).intValue();
+
+        // 리뷰 작성자 회원 존재 여부 체크
+        Member reviewer = memberRepository.findByMemberId(reviewerId);
+        Preconditions.checkNotNull(reviewer, "회원을 찾을 수 없습니다. (회원 ID: %s)", reviewerId);
+
+        // 페이지에 맞는 가이드 리뷰 불러오기
+        Pageable pageable = PageRequest.of(page, countPerPage);
+
+        Page<GuideReview> guideReviews = guideReviewRepository.findAllByReviewerIdOrderByCreatedDayDesc(reviewerId, pageable);
+        List<GuideReviewDTO> guideReviewDTOS = guideReviews.stream()
+                .map(guideReview -> new GuideReviewDTO(guideReview))
+                .collect(Collectors.toList());
+
+        // DTO 반환
+        return MyGuideReviewListDTO.builder()
                 .count(reviewCount)
                 .reviews(guideReviewDTOS)
                 .build();
