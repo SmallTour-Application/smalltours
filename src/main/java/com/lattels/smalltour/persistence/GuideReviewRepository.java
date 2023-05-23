@@ -32,12 +32,12 @@ public interface GuideReviewRepository extends JpaRepository<GuideReview, Intege
     float averageOfRatingsByGuideId(@Param("guideId") int guideId);
 
     /**
-     * 해당 사용자가 작성한 가이드 리뷰 개수를 불러옵니다.
+     * 가이드의 가이드 리뷰 개수를 불러옵니다.
      */
     long countAllByGuideId(@Param("guideId") int guideId);
 
     /**
-     * 가이드의 가이드 리뷰 개수를 불러옵니다.
+     * 해당 사용자가 작성한 가이드 리뷰 개수를 불러옵니다.
      */
     long countAllByReviewerId(@Param("reviewerId") int reviewerId);
 
