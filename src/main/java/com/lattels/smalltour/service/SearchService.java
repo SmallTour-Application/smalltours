@@ -8,10 +8,7 @@ import com.lattels.smalltour.dto.search.SearchPackageDTO;
 import com.lattels.smalltour.model.GuideReview;
 import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.model.Tours;
-import com.lattels.smalltour.persistence.GuideReviewRepository;
-import com.lattels.smalltour.persistence.MemberRepository;
-import com.lattels.smalltour.persistence.ReviewsRepository;
-import com.lattels.smalltour.persistence.ToursRepository;
+import com.lattels.smalltour.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,6 +31,7 @@ public class SearchService {
     private final ToursRepository toursRepository;
     private final ReviewsRepository reviewsRepository;
     private final GuideReviewRepository guideReviewRepository;
+    private final FavoriteGuideRepository favoriteGuideRepository;
 
     
     //type을 패키지로 해놓고 검색창에 패키지 이름으로 검색할 경우
@@ -124,6 +122,13 @@ public class SearchService {
         for (Member guide : guides) {
             if (guide.getRole() == 2) {
                 Float rating = guideReviewRepository.findAverageRatingByGuideId(guide.getId());
+
+                int guideId = guide.getId();
+                // 가이드의 좋아요 수를 세기
+                long favoriteCount = favoriteGuideRepository.countByGuideId(guideId);
+                // 해당 가이드가 올린 상품 갯수
+                long tourCount = toursRepository.countByGuideId(guideId);
+
                 if (rating == null) rating = 0f;
                 response.getContentGuides().add(
                         SearchGuideDTO.ContentGuide.builder()
@@ -131,6 +136,8 @@ public class SearchService {
                                 .guideProfileImg(guide.getProfile() != null ? guide.getProfile() : "")
                                 .guideName(guide.getName() != null ? guide.getName() : "")
                                 .rating(rating)
+                                .favoriteCount((int)favoriteCount)
+                                .uploadTourCount((int)tourCount)
                                 .build()
                 );
             }
