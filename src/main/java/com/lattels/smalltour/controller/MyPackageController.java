@@ -2,7 +2,7 @@ package com.lattels.smalltour.controller;
 
 import com.lattels.smalltour.dto.tour.MyPackageListDTO;
 import com.lattels.smalltour.dto.tour.MyPackageListRequestDTO;
-import com.lattels.smalltour.service.TourService;
+import com.lattels.smalltour.service.ToursService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +24,12 @@ public class MyPackageController {
     private static final int NUMBER_OF_PACKAGE_PER_PAGE = 10;
 
     @Autowired
-    private TourService tourService;
+    private ToursService ToursService;
 
     @ApiOperation("내 패키지 목록 조회")
     @PostMapping("/list")
     public ResponseEntity<MyPackageListDTO> myPackage(@ApiIgnore Authentication authentication, MyPackageListRequestDTO myPackageListRequestDto) {
-        MyPackageListDTO myPackageListDto = tourService.getMyTourList(authentication, myPackageListRequestDto, NUMBER_OF_PACKAGE_PER_PAGE);
+        MyPackageListDTO myPackageListDto = ToursService.getMyTourList(authentication, myPackageListRequestDto, NUMBER_OF_PACKAGE_PER_PAGE);
 
         return ResponseEntity.ok(myPackageListDto);
     }
