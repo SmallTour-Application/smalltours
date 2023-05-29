@@ -2,6 +2,7 @@ package com.lattels.smalltour.service;
 
 
 import com.lattels.smalltour.dto.GuideProfileViewDTO;
+import com.lattels.smalltour.dto.GuideTourRequestDTO;
 import com.lattels.smalltour.dto.GuideTourReviewDTO;
 import com.lattels.smalltour.dto.main.PopularGuideDTO;
 import com.lattels.smalltour.dto.main.PopularTourDTO;
@@ -9,6 +10,7 @@ import com.lattels.smalltour.model.*;
 import com.lattels.smalltour.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -131,5 +133,39 @@ public class ProfileService {
                 .build();
     }
 
+    //해당 가이드의 투어 정보 가져오기
+    public GuideTourRequestDTO getGuideTours(int guideId, int page){
+
+        // 해당 가이드가 존재하는지 확인
+        Member guide = memberRepository.findById(guideId).orElseThrow(()->new IllegalArgumentException("해당 가이드는 없습니다."));
+
+        // 해당 가이드의 role이 2인지 확인
+        if (guide.getRole() != 2) {
+            throw new IllegalArgumentException("해당 사용자는 가이드가 아닙니다.");
+        }
+
+        int size = 10;
+        PageRequest pageRequest = PageRequest.of(page -1, size);
+        Page<Tours> tours = toursRepository.findByGuideIdAndRoleAndApproval(guideId, pageRequest);
+
+        List<GuideTourRequestDTO.contents> content = new ArrayList<>();
+        for(Tours tour : tours){
+            content.add(
+                    GuideTourRequestDTO.contents.builder()
+                            .tourId(tour.getId())
+                            .thumb(tour.getThumb())
+                            .title(tour.getTitle())
+                            .subTitle(tour.getSubTitle())
+                            .build()
+            );
+        }
+
+        GuideTourRequestDTO guideTourRequestDTO = new GuideTourRequestDTO().builder()
+                .count((int) tours.getTotalElements())
+                .contents(content)
+                .build();
+
+        return guideTourRequestDTO;
+    }
 
 }
