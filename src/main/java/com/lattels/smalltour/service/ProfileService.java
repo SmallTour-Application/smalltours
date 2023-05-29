@@ -133,7 +133,7 @@ public class ProfileService {
                 .build();
     }
 
-    //해당 가이드의 투어 정보 가져오기
+    //해당 가이드가 올린 투어 정보 가져오기
     public GuideTourRequestDTO getGuideTours(int guideId, int page){
 
         // 해당 가이드가 존재하는지 확인

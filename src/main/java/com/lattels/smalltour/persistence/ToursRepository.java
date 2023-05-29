@@ -69,4 +69,11 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     @Query("SELECT t FROM Tours t JOIN t.guide g WHERE g.id = :guideId AND g.role = 2 AND t.approvals = 1")
     Page<Tours> findByGuideIdAndRoleAndApproval(@Param("guideId") int guideId, Pageable pageable);
 
+    //해당 가이드가 올린 상품 갯수
+
+    @Query("SELECT COUNT(t) FROM Tours t WHERE t.guide.id = :guideId AND t.guide.role = 2")
+    long countByGuideId(@Param("guideId") int guideId);
+
+
+
 }
