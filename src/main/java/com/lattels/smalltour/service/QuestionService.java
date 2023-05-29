@@ -211,7 +211,6 @@ public class QuestionService {
         if (imageFiles != null && !imageFiles.isEmpty()) {
             // 이미지 저장 한개만 지원 (DB에 이미지 경로가 하나임)
             MultipartFile imageFile = imageFiles.get(0);
-
             // 이미지 저장
             saveQuestionImage(question, memberId, imageFile);
         }

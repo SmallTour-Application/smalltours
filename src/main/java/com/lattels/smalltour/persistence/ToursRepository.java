@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,8 +37,13 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     // 지역명(도시,지역,나라)이(가) 포함된 투어 검색(location테이블이랑 조인)
     //+ 그룹 사이즈가 요청된 사람 수 내에 있는 투어 찾음
     //+ guide_lock 에 start_day, end_day 에 적혀있는 날짜 외인경우에만 검색가능
-    @Query(value = "SELECT t.* FROM Tours t JOIN Locations l ON t.id = l.tour_id JOIN Guide_Lock g ON t.guide_id = g.guide_id WHERE (l.location_name LIKE %:location% OR l.country LIKE %:location% OR l.region LIKE %:location%) AND t.min_group_size <= :people AND t.max_group_size >= :people AND (:start BETWEEN g.start_day AND g.end_day AND :end BETWEEN g.start_day AND g.end_day) AND t.approvals = 1", nativeQuery = true)
-    Page<Tours> findToursBySearchParameters(@Param("location") String location, @Param("people") int people, @Param("start") LocalDate start, @Param("end") LocalDate end, Pageable pageable);
+    //5.29일 수정.
+    //guideLock기간 이 포함되면 패키지 검색 안됨.(5/12~5/15일 락걸림->5/12~5/16일 이렇게 검색하면 패키지 검색돼서 이 부분 수정)
+    //가이드 락을 피해도 해당 상품이 5월 31일날 만들어졌는데 가이드 락만 피하면 검색이 되는 문제 발생(31일날 만들어진 상품 5/16~5/17로 기간 정하고검색하면 패키지나옴)
+    // -> 가이드 락 피하고 + Tours에 createdDay를 기준으로 start되어야 해당 패키지상품이 검색 되도록 상품 검색 하게 최종수정
+    //end는 딱히 기준이 없어서 안함, guideLock이 정해지면 그기간 동안 해당 패키지 검색 안되게 하면되니까 상관없을것같음.
+    @Query(value = "SELECT t.* FROM Tours t JOIN Locations l ON t.id = l.tour_id LEFT JOIN Guide_Lock g ON t.guide_id = g.guide_id WHERE (l.location_name LIKE %:location% OR l.country LIKE %:location% OR l.region LIKE %:location%) AND t.min_group_size <= :people AND t.max_group_size >= :people AND (g.guide_id IS NULL OR NOT ((:start <= g.end_day AND :end >= g.start_day) OR (:end <= g.end_day AND :start >= g.start_day))) AND t.approvals = 1 AND (:startDay <= t.created_day)", nativeQuery = true)
+    Page<Tours> findToursBySearchParameters(@Param("location") String location, @Param("people") int people, @Param("start") LocalDate start, @Param("end") LocalDate end, @Param("startDay") LocalDateTime startDay, Pageable pageable);
 
 
     // id로 tours Entity 가져오기
