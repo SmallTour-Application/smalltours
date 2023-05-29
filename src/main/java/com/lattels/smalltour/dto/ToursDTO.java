@@ -18,6 +18,7 @@ import java.util.List;
 public class ToursDTO {
 
     @Getter
+    @Setter
     @NoArgsConstructor
     @ApiModel(value = "투어 ID 요청 DTO")
     public static class IdRequestDTO {

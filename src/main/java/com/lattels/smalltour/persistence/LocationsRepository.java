@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 public interface LocationsRepository extends JpaRepository<Locations, Integer> {
-  
+
+    Locations findById(int id);
  
 }

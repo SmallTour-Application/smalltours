@@ -54,4 +54,12 @@ public class GuideReviewController {
         return ResponseEntity.ok().build();
     }
 
+    @ApiOperation("내가 작성한 가이드 리뷰 조회")
+    @PostMapping("/review")
+    public ResponseEntity<MyGuideReviewListDTO> getMyGuideReview(@ApiIgnore Authentication authentication, int page) {
+        MyGuideReviewListDTO guideReviewListDTO = guideReviewService.getMyGuideReviews(authentication, page - 1, NUMBER_OF_REVIEW_PER_PAGE);
+
+        return ResponseEntity.ok(guideReviewListDTO);
+    }
+
 }
