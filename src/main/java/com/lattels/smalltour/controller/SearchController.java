@@ -2,6 +2,7 @@ package com.lattels.smalltour.controller;
 
 
 import com.lattels.smalltour.dto.ResponseDTO;
+import com.lattels.smalltour.dto.search.SearchGuideDTO;
 import com.lattels.smalltour.dto.search.SearchPackageDTO;
 import com.lattels.smalltour.service.MainService;
 import com.lattels.smalltour.service.SearchService;
@@ -43,7 +44,7 @@ public class SearchController {
     }
 
     @GetMapping("/guide")
-    public ResponseEntity<SearchPackageDTO> searchGuides(
+    public ResponseEntity<SearchGuideDTO> searchGuides(
             @RequestParam(value = "keyword") String keyword,
             @RequestParam(value = "sort", defaultValue = "0") int sort,
             @RequestParam(value = "page", defaultValue = "1") int page) {

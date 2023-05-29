@@ -17,7 +17,7 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
     // 해당 상품에 결제한 이력이 있어야함
     //Reviews, payment, Member, Tours
     //Member는 회원이니까 role이 0, payment는 결제가 완료되어야하니까 state 1
-    @Query("SELECT AVG(r.rating) FROM Reviews r JOIN r.tours t JOIN r.member m JOIN Payment p ON p.tours.id = t.id AND p.member.id = m.id WHERE t.id = :tourId AND m.role = 0 AND p.state = '1'")
+    @Query("SELECT AVG(r.rating) FROM Reviews r JOIN r.tours t JOIN r.member m JOIN Payment p ON p.tours.id = t.id AND p.member.id = m.id WHERE t.id = :tourId AND m.role = 0 AND p.state = 1")
     Float findAverageRatingByTourId(@Param("tourId") int tourId);
 
 

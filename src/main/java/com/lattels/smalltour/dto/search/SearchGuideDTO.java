@@ -21,6 +21,7 @@ public class SearchGuideDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ContentGuide {
+        private int guideId;
         private String guideName; //가이드이름, guide_id를 member id랑 조인해서 name을 가져와야함
         private String guideProfileImg;// 가이드 썸네일 이미지
         private float rating; //평점(review테이블에서 가져와야함)

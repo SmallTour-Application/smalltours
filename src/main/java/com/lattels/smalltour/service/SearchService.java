@@ -3,6 +3,7 @@ package com.lattels.smalltour.service;
 
 import com.lattels.smalltour.dto.main.PopularGuideDTO;
 import com.lattels.smalltour.dto.main.PopularTourDTO;
+import com.lattels.smalltour.dto.search.SearchGuideDTO;
 import com.lattels.smalltour.dto.search.SearchPackageDTO;
 import com.lattels.smalltour.model.GuideReview;
 import com.lattels.smalltour.model.Member;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -37,11 +39,6 @@ public class SearchService {
     //type을 패키지로 해놓고 검색창에 패키지 이름으로 검색할 경우
     //해당 패키지들 결과물이 출력되어야함
     public ResponseEntity<SearchPackageDTO> searchTours(int type, String location, int people, LocalDate start, LocalDate end, int sort, int page) {
-        // type이 1인 경우, 즉 guide를 검색하는 경우
-        if (type == 1) {
-            return searchGuide(location, sort, page);
-        }
-
 
         // 최소3, 최대 5 이외엔 예외처리
         if (people < 3 || people > 5) {
@@ -54,9 +51,9 @@ public class SearchService {
         }
 
         int size = 10;
-        SearchPackageDTO response = SearchPackageDTO.builder()
+      SearchPackageDTO response = SearchPackageDTO.builder()
                 .content(new ArrayList<>())
-                .build();
+               .build();
 
         Sort sortDirection = Sort.by("created_day");
         if (sort == 0) {
@@ -69,7 +66,8 @@ public class SearchService {
         page = Math.max(page - 1, 0);
 
         if (type == 0) { // 패키지를 검색하는 경우
-            Page<Tours> tours = toursRepository.findToursBySearchParameters(location, people, start, end, PageRequest.of(page, size,sortDirection));
+            LocalDateTime startDay = start.atStartOfDay();  // LocalDateTime->LocalDate
+            Page<Tours> tours = toursRepository.findToursBySearchParameters(location, people, start, end,startDay, PageRequest.of(page, size,sortDirection));
             if (tours.isEmpty()) {
                 throw new IllegalArgumentException("해당 기간에 상품이 없습니다.");
             }
@@ -80,7 +78,8 @@ public class SearchService {
                     Float rating = reviewsRepository.findAverageRatingByTourId(tour.getId());
                     if (rating == null) rating = 0f;
                     response.getContent().add(
-                            SearchPackageDTO.Content.builder()
+                            SearchPackageDTO.PackageContent.builder()
+                                    .tourId(tour.getId())
                                     .thumb(tour.getThumb())
                                     .title(tour.getTitle())
                                     .guideName(guide.getName())
@@ -99,10 +98,10 @@ public class SearchService {
     
     //가이드로 검색할 경우.
     //SearchPackageDTO에 List<ContentGuide>contentGuide
-    public ResponseEntity<SearchPackageDTO> searchGuide(String keyword, int sort, int page) {
+    public ResponseEntity<SearchGuideDTO> searchGuide(String keyword, int sort, int page) {
 
         int size = 10;
-        SearchPackageDTO response = SearchPackageDTO.builder()
+        SearchGuideDTO response = SearchGuideDTO.builder()
                 .contentGuides(new ArrayList<>())
                 .build();
 
@@ -127,7 +126,8 @@ public class SearchService {
                 Float rating = guideReviewRepository.findAverageRatingByGuideId(guide.getId());
                 if (rating == null) rating = 0f;
                 response.getContentGuides().add(
-                        SearchPackageDTO.ContentGuide.builder()
+                        SearchGuideDTO.ContentGuide.builder()
+                                .guideId(guide.getId())
                                 .guideProfileImg(guide.getProfile() != null ? guide.getProfile() : "")
                                 .guideName(guide.getName() != null ? guide.getName() : "")
                                 .rating(rating)
