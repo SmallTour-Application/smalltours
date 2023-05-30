@@ -15,4 +15,5 @@ public class favoriteGuideDTO {
     private int guideId;
     private String guideName;
     private String guideImg;
+    private int favorite;  //해당 가이드의 좋아요 수
 }

@@ -83,7 +83,7 @@ public class ProfileService {
                 .gender(member.getGender())
                 .profileImg(member.getProfile())
                 .tours(tourDTOs)
-                .favoriteCount((int)favoriteCount) //일단은 0으로
+                .favoriteCount((int)favoriteCount)
                 .build();
 
         return guideProfileViewDTO;

@@ -206,7 +206,7 @@ public class MemberService {
 
                 // 기존 이미지 삭제
                 if (member.getProfile() != null) {
-                    String tempPath = "C:" + File.separator + "eum" + File.separator + "member" + File.separator + member.getProfile();
+                    String tempPath = filePath;
                     File delFile = new File(tempPath);
                     // 해당 파일이 존재하는지 한번 더 체크 후 삭제
                     if(delFile.isFile()){
@@ -222,10 +222,10 @@ public class MemberService {
                     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
                     current_date = now.format(dateTimeFormatter);
 
-                    //            String absolutePath = new File("").getAbsolutePath() + File.separator + File.separator;
-                    String absolutePath = "C:" + File.separator + "eum" + File.separator + "member";
+                    // String absolutePath = new File("").getAbsolutePath() + File.separator + File.separator;
+                    String absolutePath =filePath;
 
-                    //            String path = "images" + File.separator + current_date;
+                    //String path = "images" + File.separator + current_date;
                     String path = absolutePath;
                     File file = new File(path);
 
@@ -290,6 +290,9 @@ public class MemberService {
 
         Pageable pageable = PageRequest.of(page - 1, size);
 
+        // 가이드의 좋아요 수를 세기
+
+
         //현재 페이지의 내용을 목록으로 가져오기
         //전체 100개의 데이터 항목 중에서 3번째 페이지(데이터 항목 21-30)를 가져왔다면,
         // getContent()를 호출하면 그 3번째 페이지에 포함된 데이터 항목 21부터 30까지만 List로 반환
@@ -298,10 +301,12 @@ public class MemberService {
         for (FavoriteGuide favoriteGuide : favoriteGuides) {
             Member guide = favoriteGuide.getGuide();
 
+            long favoriteCount = favoriteGuideRepository.countByGuideId(guide.getId());
             favoriteGuideDTO guideDTO = favoriteGuideDTO.builder()
                     .guideId(guide.getId())
                     .guideName(guide.getName())
                     .guideImg(guide.getProfile())
+                    .favorite((int)favoriteCount) //내가 좋아요 누른 가이드에 좋아요 수(다른사람도 누른)
                     .build();
 
             favoriteGuideDTOList.add(guideDTO);
@@ -325,16 +330,22 @@ public class MemberService {
 
         for (FavoriteTour favoriteTour : favoriteTours) {
             Tours tour = toursRepository.findByToursId(favoriteTour.getTourId());
+            
             if (tour == null) {
                 throw new IllegalArgumentException("해당상품이 없습니다.");
             }
 
-            //approval:0 미승인 1:승인
+
+            long countByTourId = favoriteTourRepository.countByTourId(tour.getId());
+
+
+            //approval:0 미승인 1:승인 2:일시정지 3:삭제
             if(tour.getApprovals() == 1){
                 favoriteTourDTO tourDTO = favoriteTourDTO.builder()
                         .tourId(tour.getId())
                         .tourName(tour.getTitle())
                         .tourThumb(tour.getThumb())
+                        .favorite((int)countByTourId)
                         .build();
 
                 favoriteTourDTOList.add(tourDTO);
