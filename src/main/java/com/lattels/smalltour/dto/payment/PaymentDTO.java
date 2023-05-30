@@ -64,7 +64,10 @@ public class PaymentDTO {
     @ApiParam("리뷰 작성 가능 여부")
     private boolean canReview;
 
-    public PaymentDTO(Payment payment, boolean canReview) {
+    @ApiParam("가이드 리뷰 작성 가능 여부")
+    private boolean canGuideReview;
+
+    public PaymentDTO(Payment payment, boolean canReview, boolean canGuideReview) {
         this.paymentId = payment.getId();
         this.thumb = payment.getTours().getThumb();
         this.packageId = payment.getTours().getId();
@@ -80,6 +83,7 @@ public class PaymentDTO {
         this.memberNickname = payment.getMember().getNickname();
         this.memberTel = payment.getMember().getTel();
         this.canReview = canReview;
+        this.canGuideReview = canGuideReview;
     }
 
 }
