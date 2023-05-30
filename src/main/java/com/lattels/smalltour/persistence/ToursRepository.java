@@ -42,11 +42,9 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     //가이드 락을 피해도 해당 상품이 5월 31일날 만들어졌는데 가이드 락만 피하면 검색이 되는 문제 발생(31일날 만들어진 상품 5/16~5/17로 기간 정하고검색하면 패키지나옴)
     // -> 가이드 락 피하고 + Tours에 createdDay를 기준으로 start되어야 해당 패키지상품이 검색 되도록 상품 검색 하게 최종수정
     //end는 딱히 기준이 없어서 안함, guideLock이 정해지면 그기간 동안 해당 패키지 검색 안되게 하면되니까 상관없을것같음.
-    @Query(value = "SELECT t.* FROM Tours t JOIN Locations l ON t.id = l.tour_id LEFT JOIN Guide_Lock g ON t.guide_id = g.guide_id WHERE (l.location_name LIKE %:location% OR l.country LIKE %:location% OR l.region LIKE %:location%) AND t.min_group_size <= :people AND t.max_group_size >= :people AND (g.guide_id IS NULL OR (:start > g.end_day OR :end < g.start_day)) AND t.approvals = 1 AND NOT (:startDay < t.created_day)", nativeQuery = true)
+
+    @Query(value = "SELECT t.* FROM Tours t JOIN Locations l ON t.id = l.tour_id LEFT JOIN Guide_Lock g ON t.guide_id = g.guide_id WHERE (l.location_name LIKE %:location% OR l.country LIKE %:location% OR l.region LIKE %:location%) AND t.min_group_size <= :people AND t.max_group_size >= :people AND ((g.guide_id IS NULL) OR (g.id IS NOT NULL AND ((:start NOT BETWEEN g.start_day AND g.end_day) OR (:end NOT BETWEEN g.start_day AND g.end_day)))) AND t.approvals = 1 AND (:startDay >= t.created_day)", nativeQuery = true)
     Page<Tours> findToursBySearchParameters(@Param("location") String location, @Param("people") int people, @Param("start") LocalDate start, @Param("end") LocalDate end, @Param("startDay") LocalDateTime startDay, Pageable pageable);
-
-
-
 
 
     // id로 tours Entity 가져오기
