@@ -29,6 +29,10 @@ public class GuideReview {
     @JoinColumn(name = "reviewer_id")
     private Member reviewer;
 
+    @OneToOne
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
     @Column(name = "rating")
     private int rating;
 

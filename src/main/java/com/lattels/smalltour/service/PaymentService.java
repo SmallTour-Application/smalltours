@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -28,6 +29,8 @@ public class PaymentService {
     private final ToursRepository toursRepository;
     private final ScheduleItemRepository scheduleItemRepository;
     private final ReviewsRepository reviewsRepository;
+    private final GuideReviewRepository guideReviewRepository;
+    private final GuideLockRepository guideLockRepository;
 
     /**
      * 패키지를 결제합니다.
@@ -64,6 +67,13 @@ public class PaymentService {
         // 인원 수 체크
         Preconditions.checkArgument(tours.getMinGroupSize() <= peopleCount, "패키지 인원 조건에 맞지 않습니다. (최소 인원: %s, 최대 인원: %s, 현재 인원: %s)", tours.getMinGroupSize(), tours.getMaxGroupSize(), peopleCount);
 
+        // 가이드락 체크
+        int guideId = tours.getGuide().getId();
+        LocalDate startDay = paymentOkRequestDTO.getDepartureDay();
+        LocalDate endDay = paymentOkRequestDTO.getDepartureDay().plusDays(tours.getDuration());
+        List<GuideLock> guideLocks = guideLockRepository.findByGuideIdAndStartDayBetweenOrEndDayBetween(guideId, startDay, endDay);
+        Preconditions.checkArgument(guideLocks.isEmpty(), "가이드락에 걸려있는 가이드입니다. (가이드 ID: %s, 결제한 여행 시작일: %s, 결제한 여행 종료일: %s, 가이드락 시작일: %s, 가이드락 종료일: %s)", guideId, startDay, endDay, guideLocks.isEmpty() ? null : guideLocks.get(0).getStartDay(), guideLocks.isEmpty() ? null : guideLocks.get(0).getEndDay());
+
         // 결제 가격 계산
         int price = calculatePrice(tours, scheduleItems);
 
@@ -91,6 +101,15 @@ public class PaymentService {
                         .price(scheduleItem.getPrice())
                         .build())
                 .forEach(paymentSchedule -> paymentScheduleRepository.save(paymentSchedule));
+
+        // 가이드락 저장
+        GuideLock guideLock = GuideLock.builder()
+                .guide(tours.getGuide())
+                .startDay(startDay)
+                .endDay(endDay)
+                .build();
+
+        guideLockRepository.save(guideLock);
     }
 
     /**
@@ -99,6 +118,7 @@ public class PaymentService {
      * @param paymentId 결제 ID
      * @return 결제 취소 결과 DTO
      */
+    @Transactional
     public PaymentCancelDTO paymentCancel(Authentication authentication, int paymentId) {
         // 회원 ID 불러오기
         int memberId = Integer.parseInt(authentication.getPrincipal().toString());
@@ -119,7 +139,7 @@ public class PaymentService {
                     .build();
         }*/
 
-        // 이미 결제한 건인지 체크
+        // 이미 결제 완료한 건인지 체크
         if (payment.getState() == PaymentState.COMPLETE) {
             return PaymentCancelDTO.builder()
                     .message(PaymentCancelDTO.CancelType.ALREADY_PAID)
@@ -138,6 +158,12 @@ public class PaymentService {
 
         // 결제 정보 삭제
         paymentRepository.delete(payment);
+
+        // 가이드락 삭제
+        int guideId = payment.getTours().getGuide().getId();
+        LocalDate startDay = payment.getDepartureDay();
+        LocalDate endDay = startDay.plusDays(payment.getTours().getDuration());
+        guideLockRepository.deleteByGuideIdAndStartDayAndEndDay(guideId, startDay, endDay);
 
         // 결제 삭제 완료 DTO 반환
         return PaymentCancelDTO.builder()
@@ -169,7 +195,7 @@ public class PaymentService {
         // 페이지에 맞는 내 결제 내역 불러오기
         List<Payment> payments = paymentRepository.findAllByMemberIdOrderByPaymentDayDesc(memberId, pageable);
         List<PaymentDTO> paymentDTOS = payments.stream()
-                .map(payment -> new PaymentDTO(payment, canReview(payment)))
+                .map(payment -> new PaymentDTO(payment, canReview(payment), canGuideReview(payment)))
                 .collect(Collectors.toList());
 
         // DTO 반환
@@ -254,7 +280,7 @@ public class PaymentService {
         }
 
         List<PaymentDTO> paymentDTOS = payments.stream()
-                .map(payment -> new PaymentDTO(payment, canReview(payment)))
+                .map(payment -> new PaymentDTO(payment, canReview(payment), canGuideReview(payment)))
                 .collect(Collectors.toList());
 
         // DTO 반환
@@ -295,7 +321,7 @@ public class PaymentService {
         }
 
         // 페이지 계산
-        Pageable pageable = pageable = PageRequest.of(paymentSearchRequestDTO.getPage(), countPerPage);
+        Pageable pageable = PageRequest.of(paymentSearchRequestDTO.getPage(), countPerPage);
 
         // 페이지에 맞는 내 결제 내역 불러오기
         List<Payment> payments = null;
@@ -308,8 +334,9 @@ public class PaymentService {
             payments = paymentRepository.findAllByToursGuideIdAndToursGuideNameContainsAndPaymentDayBetweenOrderByPaymentDayDesc(memberId, keyword, startDay, endDay, pageable);
         }
 
+        // DTO로 변환
         List<PaymentDTO> paymentDTOS = payments.stream()
-                .map(payment -> new PaymentDTO(payment, canReview(payment)))
+                .map(payment -> new PaymentDTO(payment, canReview(payment), canGuideReview(payment)))
                 .collect(Collectors.toList());
 
         // DTO 반환
@@ -341,8 +368,18 @@ public class PaymentService {
      * @return 리뷰 작성 가능 여부
      */
     public boolean canReview(Payment payment) {
-        Reviews reviews = reviewsRepository.findByMemberIdAndToursId(payment.getMember().getId(), payment.getTours().getId());
-        return reviews == null;
+        List<Reviews> reviews = reviewsRepository.findByMemberIdAndPaymentId(payment.getMember().getId(), payment.getId());
+        return reviews.isEmpty();
+    }
+
+    /**
+     * 해당 결제에 대한 가이드 리뷰 작성 가능 여부를 반환합니다.
+     * @param payment 결제
+     * @return 가이드 리뷰 작성 가능 여부
+     */
+    public boolean canGuideReview(Payment payment) {
+        List<GuideReview> guideReviews = guideReviewRepository.findByReviewerIdAndPaymentId(payment.getMember().getId(), payment.getId());
+        return guideReviews.isEmpty();
     }
 
 }

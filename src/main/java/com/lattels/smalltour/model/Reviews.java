@@ -29,6 +29,10 @@ public class Reviews {
     @JoinColumn(name = "tour_id")
     private Tours tours;
 
+    @OneToOne
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
     @Column(name = "rating")
     private int rating;
 

@@ -2,8 +2,6 @@ package com.lattels.smalltour.persistence;
 
 
 import com.lattels.smalltour.model.GuideReview;
-
-import com.lattels.smalltour.model.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,6 +22,11 @@ public interface GuideReviewRepository extends JpaRepository<GuideReview, Intege
      * 해당 사용자가 작성한 페이지에 맞는 최근 가이드 리뷰를 불러옵니다.
      */
     Page<GuideReview> findAllByReviewerIdOrderByCreatedDayDesc(@Param("reviewerId") int reviewerId, Pageable pageable);
+
+    /**
+     * 해당 회원이 해당 결제에 작성한 리뷰를 불러옵니다.
+     */
+    List<GuideReview> findByReviewerIdAndPaymentId(int memberId, int paymentId);
 
     /**
      * 가이드의 평균 평점을 불러옵니다.
