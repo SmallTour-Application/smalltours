@@ -58,7 +58,7 @@ public class PaymentController {
         return ResponseEntity.ok(price);
     }
 
-    @ApiOperation("결제 내역 검색")
+    @ApiOperation("내 결제 내역 검색")
     @PostMapping("/search")
     public ResponseEntity<PaymentListDTO> paymentSearch(@ApiIgnore Authentication authentication, PaymentSearchRequestDTO paymentSearchRequestDTO) {
         paymentSearchRequestDTO.setPage(paymentSearchRequestDTO.getPage() - 1);

@@ -27,6 +27,7 @@ public class PaymentService {
     private final MemberRepository memberRepository;
     private final ToursRepository toursRepository;
     private final ScheduleItemRepository scheduleItemRepository;
+    private final ReviewsRepository reviewsRepository;
 
     /**
      * 패키지를 결제합니다.
@@ -168,7 +169,7 @@ public class PaymentService {
         // 페이지에 맞는 내 결제 내역 불러오기
         List<Payment> payments = paymentRepository.findAllByMemberIdOrderByPaymentDayDesc(memberId, pageable);
         List<PaymentDTO> paymentDTOS = payments.stream()
-                .map(payment -> new PaymentDTO(payment))
+                .map(payment -> new PaymentDTO(payment, canReview(payment)))
                 .collect(Collectors.toList());
 
         // DTO 반환
@@ -253,7 +254,7 @@ public class PaymentService {
         }
 
         List<PaymentDTO> paymentDTOS = payments.stream()
-                .map(payment -> new PaymentDTO(payment))
+                .map(payment -> new PaymentDTO(payment, canReview(payment)))
                 .collect(Collectors.toList());
 
         // DTO 반환
@@ -308,7 +309,7 @@ public class PaymentService {
         }
 
         List<PaymentDTO> paymentDTOS = payments.stream()
-                .map(payment -> new PaymentDTO(payment))
+                .map(payment -> new PaymentDTO(payment, canReview(payment)))
                 .collect(Collectors.toList());
 
         // DTO 반환
@@ -332,6 +333,16 @@ public class PaymentService {
         int totalPrice = defaultPrice + scheduleItemsPrice; // 총 가격
 
         return totalPrice;
+    }
+
+    /**
+     * 해당 결제에 대한 리뷰 작성 가능 여부를 반환합니다.
+     * @param payment 결제
+     * @return 리뷰 작성 가능 여부
+     */
+    public boolean canReview(Payment payment) {
+        Reviews reviews = reviewsRepository.findByMemberIdAndToursId(payment.getMember().getId(), payment.getTours().getId());
+        return reviews == null;
     }
 
 }
