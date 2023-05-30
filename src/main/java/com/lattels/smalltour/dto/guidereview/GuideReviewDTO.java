@@ -21,6 +21,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class GuideReviewDTO {
 
+    @ApiParam("가이드 ID")
+    private int guideId;
+
+    @ApiParam("가이드 이름")
+    private String guideName;
+
     @ApiParam("닉네임")
     private String nickname;
 
@@ -35,6 +41,8 @@ public class GuideReviewDTO {
     private LocalDateTime createdDay;
 
     public GuideReviewDTO(GuideReview guideReview) {
+        this.guideId = guideReview.getGuide().getId();
+        this.guideName = guideReview.getGuide().getName();
         this.nickname = guideReview.getReviewer().getNickname();
         this.rating = guideReview.getRating();
         this.content = guideReview.getContent();

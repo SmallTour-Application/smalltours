@@ -25,6 +25,9 @@ public class PaymentDTO {
     @ApiParam("패키지 썸네일 이미지 경로")
     private String thumb;
 
+    @ApiParam("패키지 ID")
+    private int packageId;
+
     @ApiParam("패키지 이름")
     private String packageName;
 
@@ -43,6 +46,12 @@ public class PaymentDTO {
     @ApiParam("결제 상태 (0: 미결제, 1: 결제)")
     private int state;
 
+    @ApiParam("가이드 ID")
+    private int guideId;
+
+    @ApiParam("가이드 이름")
+    private String guideName;
+
     @ApiParam("결제일")
     private LocalDateTime payDay;
 
@@ -52,9 +61,13 @@ public class PaymentDTO {
     @ApiParam("구매자 전화번호")
     private String memberTel;
 
-    public PaymentDTO(Payment payment) {
+    @ApiParam("리뷰 작성 가능 여부")
+    private boolean canReview;
+
+    public PaymentDTO(Payment payment, boolean canReview) {
         this.paymentId = payment.getId();
         this.thumb = payment.getTours().getThumb();
+        this.packageId = payment.getTours().getId();
         this.packageName = payment.getTours().getTitle();
         this.packageSubTitle = payment.getTours().getSubTitle();
         this.price = payment.getPrice();
@@ -62,8 +75,11 @@ public class PaymentDTO {
         this.departureDay = payment.getDepartureDay();
         this.state = payment.getState();
         this.payDay = payment.getPaymentDay();
+        this.guideId = payment.getTours().getGuide().getId();
+        this.guideName = payment.getTours().getGuide().getName();
         this.memberNickname = payment.getMember().getNickname();
         this.memberTel = payment.getMember().getTel();
+        this.canReview = canReview;
     }
 
 }
