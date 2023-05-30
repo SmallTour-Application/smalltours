@@ -290,8 +290,6 @@ public class MemberService {
 
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        // 가이드의 좋아요 수를 세기
-
 
         //현재 페이지의 내용을 목록으로 가져오기
         //전체 100개의 데이터 항목 중에서 3번째 페이지(데이터 항목 21-30)를 가져왔다면,
@@ -335,9 +333,8 @@ public class MemberService {
                 throw new IllegalArgumentException("해당상품이 없습니다.");
             }
 
-
+            //상품에 좋아요 갯수 확인
             long countByTourId = favoriteTourRepository.countByTourId(tour.getId());
-
 
             //approval:0 미승인 1:승인 2:일시정지 3:삭제
             if(tour.getApprovals() == 1){

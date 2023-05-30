@@ -157,21 +157,20 @@ public class MemberController {
     }*/
 
     @ApiOperation(value = "즐겨찾기 가이드")
-    @GetMapping("/member/favoriteguide/{page}")
+    @GetMapping("/member/favoriteguide")
     public ResponseEntity<List<favoriteGuideDTO>> getFavoriteGuides(@ApiIgnore Authentication authentication,
-                                                                    @PathVariable int page) {
+                                                                    @RequestParam int page) {
         int memberId = Integer.parseInt(authentication.getPrincipal().toString());
         int size = 10;
         return ResponseEntity.ok(memberService.getFavoriteGuides(memberId, page, size));
     }
 
     @ApiOperation(value = "즐겨찾기 상품")
-    @GetMapping("/member/favoriteTour/{page}")
+    @GetMapping("/member/favoriteTour")
     public ResponseEntity<List<favoriteTourDTO>> getFavoriteTour(@ApiIgnore Authentication authentication,
-                                                                   @PathVariable int page) {
+                                                                 @RequestParam int page) {
         int memberId = Integer.parseInt(authentication.getPrincipal().toString());
         int size = 10;
         return ResponseEntity.ok(memberService.getFavoriteTours(memberId, page, size));
     }
-
 }
