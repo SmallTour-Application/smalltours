@@ -1,6 +1,7 @@
 package com.lattels.smalltour.controller;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.ResponseDTO;
 import com.lattels.smalltour.dto.favoriteGuideDTO;
@@ -116,17 +117,21 @@ public class MemberController {
 
 
     // 프로필 이미지 변경
-   @PostMapping("/updateProfileImg")
-    @ApiOperation(value = "", notes = "")
+    @PostMapping("/updateProfileImg")
+    @ApiOperation(value = "Update member profile image", notes = "Provide an id and a new profile image to update a member's profile image")
     public ResponseEntity<?> updateProfileImg(@ApiIgnore Authentication authentication,
                                               @ApiParam(value = "updateProfile", required = true)
-                                              @RequestPart(value = "updateProfile", required = false) MemberDTO.UpdateProfile updateProfile,
+                                              @RequestPart(value = "updateProfile", required = false) String updateProfileString,
                                               @RequestPart(value = "profileImgRequest", required = false) MultipartFile[] files) {
         try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            MemberDTO.UpdateProfile updateProfile = objectMapper.readValue(updateProfileString, MemberDTO.UpdateProfile.class);
+
             if (files != null) {
                 List<MultipartFile> fileList = Arrays.asList(files);
                 updateProfile.setProfileImgRequest(fileList);
             }
+
             MemberDTO responseMemberDTO = memberService.updateProfileImg(
                     Integer.parseInt(authentication.getPrincipal().toString()),
                     updateProfile);
@@ -152,21 +157,20 @@ public class MemberController {
     }*/
 
     @ApiOperation(value = "즐겨찾기 가이드")
-    @GetMapping("/member/favoriteguide/{page}")
+    @GetMapping("/member/favoriteguide")
     public ResponseEntity<List<favoriteGuideDTO>> getFavoriteGuides(@ApiIgnore Authentication authentication,
-                                                                    @PathVariable int page) {
+                                                                    @RequestParam int page) {
         int memberId = Integer.parseInt(authentication.getPrincipal().toString());
         int size = 10;
         return ResponseEntity.ok(memberService.getFavoriteGuides(memberId, page, size));
     }
 
     @ApiOperation(value = "즐겨찾기 상품")
-    @GetMapping("/member/favoriteTour/{page}")
+    @GetMapping("/member/favoriteTour")
     public ResponseEntity<List<favoriteTourDTO>> getFavoriteTour(@ApiIgnore Authentication authentication,
-                                                                   @PathVariable int page) {
+                                                                 @RequestParam int page) {
         int memberId = Integer.parseInt(authentication.getPrincipal().toString());
         int size = 10;
         return ResponseEntity.ok(memberService.getFavoriteTours(memberId, page, size));
     }
-
 }
