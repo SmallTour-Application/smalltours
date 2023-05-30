@@ -21,7 +21,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-//schedule/guide
+//schedule/guide,해당 가이드가 내 상품을 산 사람 정보 가져오는 서비스, memberNickname, memberTel
 public class GuideScheduleService {
 
     private final GuideLockRepository guideLockRepository;
