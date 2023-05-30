@@ -1,9 +1,7 @@
 package com.lattels.smalltour.dto.guidereview;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.model.GuideReview;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +18,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GuideReviewDTO {
+
+    @ApiParam("리뷰 ID")
+    private int reviewId;
 
     @ApiParam("가이드 ID")
     private int guideId;
@@ -41,6 +42,7 @@ public class GuideReviewDTO {
     private LocalDateTime createdDay;
 
     public GuideReviewDTO(GuideReview guideReview) {
+        this.reviewId = guideReview.getId();
         this.guideId = guideReview.getGuide().getId();
         this.guideName = guideReview.getGuide().getName();
         this.nickname = guideReview.getReviewer().getNickname();
