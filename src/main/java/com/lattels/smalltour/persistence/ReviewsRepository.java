@@ -41,6 +41,11 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
     List<Reviews> findByToursIdOrderByCreatedDayDesc(int tourId, Pageable pageable);
 
     /**
+     * 해당 회원이 해당 패키지에 작성한 리뷰를 불러옵니다.
+     */
+    Reviews findByMemberIdAndToursId(int memberId, int toursId);
+
+    /**
      * 해당 패키지에 해당 회원이 리뷰를 작성했는지 반환합니다.
      */
     boolean existsByToursIdAndMemberId(int tourId, int memberId);
