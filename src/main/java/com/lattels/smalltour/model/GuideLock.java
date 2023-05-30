@@ -17,8 +17,13 @@ import java.time.LocalDate;
 public class GuideLock {
 
     @Id
-    @Column(name = "guide_id")
-    private int guideId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // DB에서 자동증가
+    @Column(name = "id")
+    private int id;
+
+    @ManyToOne
+    @JoinColumn(name = "guide_id")
+    private Member guide;
 
     @Column(name = "start_day")
     private LocalDate startDay;
