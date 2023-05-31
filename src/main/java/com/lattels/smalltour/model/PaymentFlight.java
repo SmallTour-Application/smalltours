@@ -13,7 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "airline_ticket")
-public class AirlineTicket {
+public class PaymentFlight {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // DB에서 자동증가
@@ -21,7 +21,7 @@ public class AirlineTicket {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "airline_id")
+    @JoinColumn(name = "flight_id")
     private Airline airline;
 
     @ManyToOne

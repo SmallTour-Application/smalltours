@@ -1,6 +1,7 @@
 package com.lattels.smalltour.service;
 
 
+import com.lattels.smalltour.dto.MemberAndGuideProfileDTO;
 import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.favoriteGuideDTO;
 import com.lattels.smalltour.dto.favoriteTourDTO;
@@ -194,15 +195,24 @@ public class MemberService {
 
 
     // 프로필 이미지 변경
-    public MemberDTO updateProfileImg(int memberId, MemberDTO.UpdateProfile memberDTO) {
+    public MemberDTO.UpdateProfile updateProfileImg(int memberId, MemberDTO.UpdateProfile memberDTO) {
 
 
         try {
 
-            // 이미지가 있는 경우
-            if (memberDTO.checkProfileImgRequestNull()) {
+            // 이미지가 없는 경우
+            if (memberDTO == null || !memberDTO.checkProfileImgRequestNull()) {
+                log.warn("MemberService.updateProfileImg() : 사진이 없습니다.");
+                throw new RuntimeException("MemberService.updateProfileImg() : 사진이 없습니다.");
+            }
 
                 Member member = memberRepository.findByMemberId(memberId);
+
+            // Member가 null인 경우
+                if (member == null) {
+                    log.warn("MemberService.updateProfileImg() : 회원 정보를 찾을 수 없습니다.");
+                    throw new RuntimeException("MemberService.updateProfileImg() : 회원 정보를 찾을 수 없습니다.");
+                }
 
                 // 기존 이미지 삭제
                 if (member.getProfile() != null) {
@@ -217,7 +227,7 @@ public class MemberService {
                 MultipartFile multipartFile = memberDTO.getProfileImgRequest().get(0);
                 String current_date = null;
 
-                if (!multipartFile.isEmpty()) {
+                if (multipartFile != null && !multipartFile.isEmpty()) {
                     LocalDateTime now = LocalDateTime.now();
                     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
                     current_date = now.format(dateTimeFormatter);
@@ -263,17 +273,15 @@ public class MemberService {
                         file.setReadable(true);
                         break;
                     }
-                }
-                memberRepository.save(member);
-                return MemberDTO.builder().profileImg(member.getProfile()).build();
-            } else {
-                log.warn("MemberService.updateProfileImg() : 사진이 없습니다.");
-                throw new RuntimeException("MemberService.updateProfileImg() : 사진이 없습니다.");
-            }
+                }else {
+                    log.warn("MemberService.updateProfileImg() : multipartFile이 null이거나 비어 있습니다");
+                    throw new RuntimeException("MemberService.updateProfileImg() : multipartFile이 null이거나 비어 있습니다");
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("MemberService.updateContact() : 에러 발생.");
+            }         memberRepository.save(member);
+            return MemberDTO.UpdateProfile.builder().profile(member.getProfile()).build();
+        }   catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("MemberGuideService.updateContact() : 에러 발생.");
         }
     }
 

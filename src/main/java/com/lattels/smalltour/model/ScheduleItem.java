@@ -43,4 +43,7 @@ public class ScheduleItem {
     @Column(name = "location_y")
     private double locationY;
 
+    @Column(name = "state")
+    private int state;
+
 }

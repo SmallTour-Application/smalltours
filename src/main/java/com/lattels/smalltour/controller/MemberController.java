@@ -2,12 +2,10 @@ package com.lattels.smalltour.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lattels.smalltour.dto.MemberDTO;
-import com.lattels.smalltour.dto.ResponseDTO;
-import com.lattels.smalltour.dto.favoriteGuideDTO;
-import com.lattels.smalltour.dto.favoriteTourDTO;
+import com.lattels.smalltour.dto.*;
 import com.lattels.smalltour.persistence.MemberRepository;
 import com.lattels.smalltour.security.TokenProvider;
+import com.lattels.smalltour.service.MemberFavoriteStatusService;
 import com.lattels.smalltour.service.MemberService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -22,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,10 +33,7 @@ public class MemberController {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final TokenProvider tokenProvider;
-
-    private final MemberRepository memberRepository;
-
+    private final MemberFavoriteStatusService memberFavoriteStatusService;
 
 
     // 로그인한 정보
@@ -118,21 +114,16 @@ public class MemberController {
 
     // 프로필 이미지 변경
     @PostMapping("/updateProfileImg")
-    @ApiOperation(value = "Update member profile image", notes = "Provide an id and a new profile image to update a member's profile image")
+    @ApiOperation(value = "이미지 변경", notes = "이미지 변경")
     public ResponseEntity<?> updateProfileImg(@ApiIgnore Authentication authentication,
-                                              @ApiParam(value = "updateProfile", required = true)
-                                              @RequestPart(value = "updateProfile", required = false) String updateProfileString,
-                                              @RequestPart(value = "profileImgRequest", required = false) MultipartFile[] files) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            MemberDTO.UpdateProfile updateProfile = objectMapper.readValue(updateProfileString, MemberDTO.UpdateProfile.class);
+                                              @ModelAttribute @Valid MemberDTO.UpdateProfile updateProfile) {
 
-            if (files != null) {
-                List<MultipartFile> fileList = Arrays.asList(files);
-                updateProfile.setProfileImgRequest(fileList);
+        try {
+            if (updateProfile == null || updateProfile.getProfileImgRequest() == null || updateProfile.getProfileImgRequest().isEmpty()) {
+                throw new Exception("이미지가 없습니다.");
             }
 
-            MemberDTO responseMemberDTO = memberService.updateProfileImg(
+            MemberDTO.UpdateProfile responseMemberDTO = memberService.updateProfileImg(
                     Integer.parseInt(authentication.getPrincipal().toString()),
                     updateProfile);
             return ResponseEntity.ok().body(responseMemberDTO);
@@ -142,19 +133,6 @@ public class MemberController {
         }
     }
 
-
-    // 프로필 이미지 변경
-/*    @PostMapping("/updateProfileImg")
-    public ResponseEntity<?> updateProfileImg(@ApiIgnore Authentication authentication, @RequestBody MemberDTO.UpdateProfile memberDTO) {
-
-        try {
-            MemberDTO responseMemberDTO = memberService.updateProfileImg(Integer.parseInt(authentication.getPrincipal().toString()),memberDTO);
-            return ResponseEntity.ok().body(responseMemberDTO);
-        } catch (Exception e) {
-            ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(responseDTO);
-        }
-    }*/
 
     @ApiOperation(value = "즐겨찾기 가이드")
     @GetMapping("/member/favoriteguide")
@@ -173,4 +151,14 @@ public class MemberController {
         int size = 10;
         return ResponseEntity.ok(memberService.getFavoriteTours(memberId, page, size));
     }
+
+    // 좋아요 추가
+    @PostMapping("/heart/add")
+    public ResponseEntity<?> addFavoriteGuide(@ApiIgnore Authentication authentication, @RequestBody favoriteGuideDTO.favoriteDTO favoriteDTO) {
+        int memberId = Integer.parseInt(authentication.getPrincipal().toString());
+        memberFavoriteStatusService.addFavoriteGuide(memberId, favoriteDTO);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

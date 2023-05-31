@@ -38,6 +38,26 @@ public class GuideProfileViewDTO {
         private int price;
     }
 
+    //가이드 회원가입할 떄 guideProfile부분
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GuideProfileDTO {
+        private int guideId;
+        private String resume; //이력서 경로
+        private String introduce; // 자기소개
+        private String portfolioPath;// 포트폴리오 경로
+
+        private List<MultipartFile> resumeFile;
+        private List<MultipartFile> portfolioFile;
+        public boolean checkResumeFileRequestNull() {
+            return this.resumeFile != null;
+        }
+        public boolean checkPortfolioFileRequestNull() {
+            return this.portfolioFile != null;
+        }
+    }
 
 
 

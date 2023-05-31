@@ -61,7 +61,7 @@ public class UnauthMemberService {
                     .birthDay(memberDTO.getBirthDay())
                     .joinDay(LocalDateTime.now()) // 현재 시간
                     .gender(memberDTO.getGender())
-                    .role(memberDTO.getRole())
+                    .role(0)//일반회원 0 고정
                     .build();
 
             int memberId = memberRepository.save(member).getId();
@@ -133,7 +133,6 @@ public class UnauthMemberService {
                     .birthDay(member.getBirthDay())
                     .joinDay(LocalDateTime.now()) // 현재 시간
                     .gender(member.getGender())
-                    .role(member.getRole())
                     .build();
             return memDTO;
 

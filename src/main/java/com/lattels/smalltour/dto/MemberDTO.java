@@ -47,6 +47,8 @@ public class MemberDTO {
 
     @Getter
     @Setter
+    @Builder
+    @AllArgsConstructor
     @NoArgsConstructor
     public static class UpdateProfile{
         private String profile; // 프로필 이미지가 들어있는 경로
@@ -94,8 +96,6 @@ public class MemberDTO {
 
         private int gender;
 
-        private int role; // 0:학생, 1:선생, 2:관리자
-
         private String profile; // 프로필 이미지가 들어있는 경로
 
         private List<MultipartFile> profileImgRequest;
@@ -132,7 +132,7 @@ public class MemberDTO {
 
     private String profile; // 프로필 이미지가 들어있는 경로
 
-    private int role; // 0:학생, 1:선생, 2:관리자
+    private int role; // 0:학생, 1:미등록가이드, 2:가이드 3:관리자
 
     private int state;
 
