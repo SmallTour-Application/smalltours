@@ -31,8 +31,7 @@ public class GuideScheduleController {
     public List<GuideScheduleDTO> getGuideSchedules(
             @ApiIgnore Authentication authentication,
             @RequestParam(value = "startDay") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDay,
-            @RequestParam(value = "endDay") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDay
-    ) {
+            @RequestParam(value = "endDay") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDay) {
         int guideId = Integer.parseInt(authentication.getPrincipal().toString());
         return guideScheduleService.getGuideSchedules(guideId, startDay, endDay);
     }

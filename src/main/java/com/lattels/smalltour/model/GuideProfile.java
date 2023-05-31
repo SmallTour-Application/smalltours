@@ -18,7 +18,7 @@ public class GuideProfile {
 
     @Id
     @Column(name = "guide_id")
-    private int guide_id;
+    private int guideId;
 
     @Column(name = "resume") //이력서 경로
     private String resume;

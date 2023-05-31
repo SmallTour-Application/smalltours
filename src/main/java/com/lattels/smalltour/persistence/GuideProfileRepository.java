@@ -16,8 +16,11 @@ public interface GuideProfileRepository extends JpaRepository<GuideProfile, Inte
 
     // guideId와 role 2에 해당하는 GuideProfile을 찾기
     //GuideProfile 테이블과 Member 테이블을 guide_id 및 id로 조인
-    @Query("SELECT DISTINCT g FROM GuideProfile g JOIN Member m ON g.guide_id = m.id WHERE m.id = :guideId AND m.role = 2")
+    @Query("SELECT DISTINCT g FROM GuideProfile g JOIN Member m ON g.guideId = m.id WHERE m.id = :guideId AND m.role = 2")
     GuideProfile findByGuideIdAndRole(@Param("guideId") int guideId);
-  
+
+
+    @Query(value = "SELECT gp FROM GuideProfile gp, Member m WHERE gp.guideId = m.id AND m.id = :memberId AND m.role = 2 AND m.state = 1")
+   GuideProfile findByGuideId(@Param("memberId")int memberId);
  
 }

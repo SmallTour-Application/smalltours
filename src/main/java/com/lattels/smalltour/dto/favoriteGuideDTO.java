@@ -16,4 +16,15 @@ public class favoriteGuideDTO {
     private String guideName;
     private String guideImg;
     private int favorite;  //해당 가이드의 좋아요 수
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    //가이드에 대해 좋아요 누르기 혹은 취소하기
+    public static class favoriteDTO{
+        private int memberId;
+        private int guideId;
+    }
 }
