@@ -28,12 +28,37 @@ public class ImgController {
     @Value("${file.path.tours}")
     private String toursFilePath;
 
+    @Value("${file.path}")
+    private String memberFilePath;
+
+
     @GetMapping(value = "/detail/{fileOriginName}")
     public ResponseEntity<Resource> getMenuImgByName(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String absolutePath = toursFilePath;
             String path = absolutePath; // 실제 이미지가 있는 위치
             FileSystemResource resource = new FileSystemResource(path+fileName);
+            if(!resource.exists()){
+                throw new Exception();
+            }
+            HttpHeaders header = new HttpHeaders();
+            Path filePath = null;
+            filePath = Paths.get(path+fileName);
+            header.add("Content-Type", Files.probeContentType(filePath)); // filePath의 마임타입 체크해서 header에 추가
+            return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
+        }catch(Exception e){
+            throw new Exception();
+        }
+    }
+
+
+    @GetMapping(value = "/member/{fileOriginName}")
+    public ResponseEntity<Resource> getProfileImg(@PathVariable("fileOriginName") String fileName) throws Exception{
+        try{
+            String absolutePath = memberFilePath;
+            String path = absolutePath; // 실제 이미지가 있는 위치
+            FileSystemResource resource = new FileSystemResource(path + fileName);
+            log.info("이미지 가져오기..." + path + fileName);
             if(!resource.exists()){
                 throw new Exception();
             }

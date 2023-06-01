@@ -47,23 +47,52 @@ public class MemberGuideController {
         }
     }
 
+    /*
     @PostMapping("/updateProfileImg")
     public ResponseEntity<?> updateProfileImg(@ApiIgnore Authentication authentication,
                                               @ModelAttribute @Valid MemberAndGuideProfileDTO.UpdateProfile updateProfile) {
         try {
-            if (updateProfile == null || updateProfile.getProfileImgRequest() == null || updateProfile.getProfileImgRequest().isEmpty()) {
+            if (updateProfile.getProfileImgRequest() != null && !updateProfile.getProfileImgRequest().isEmpty()) {
+                MemberAndGuideProfileDTO.UpdateProfile responseMemberDTO = memberGuideService.updateProfileImg(
+                        Integer.parseInt(authentication.getPrincipal().toString()),
+                        updateProfile);
+                return ResponseEntity.ok().body(responseMemberDTO);
+            } else {
                 throw new Exception("이미지가 없습니다.");
             }
-
-            MemberAndGuideProfileDTO.UpdateProfile responseMemberDTO = memberGuideService.updateProfileImg(
-                    Integer.parseInt(authentication.getPrincipal().toString()),
-                    updateProfile);
-            return ResponseEntity.ok().body(responseMemberDTO);
         } catch (Exception e) {
             ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
             return ResponseEntity.badRequest().body(responseDTO);
         }
     }
+*/
+    @PostMapping("/updateProfileImg")
+    public ResponseEntity<?> updateProfileImg(@ApiIgnore Authentication authentication,
+                                              @ApiParam(value = "profile", required = true)
+                                              @RequestPart(value = "profile", required = false) String updateProfileString,
+                                              @RequestPart(value = "profileImgRequest", required = false) MultipartFile[] files) {
+      try{
+          ObjectMapper objectmapper = new ObjectMapper();
+          if(updateProfileString == null){
+              throw new IllegalArgumentException("ProfileString null");
+          }
+          MemberAndGuideProfileDTO.UpdateProfile updateProfile = objectmapper.readValue(updateProfileString,MemberAndGuideProfileDTO.UpdateProfile.class);
+          if (files != null) {
+              List<MultipartFile> fileList = Arrays.asList(files);
+              updateProfile.setProfileImgRequest(fileList);
+          }
+          MemberAndGuideProfileDTO.UpdateProfile responseMemberDTO = memberGuideService.updateProfileImg(
+                  Integer.parseInt(authentication.getPrincipal().toString()),
+                  updateProfile);
+          return ResponseEntity.ok().body(responseMemberDTO);
+      } catch (Exception e) {
+          e.printStackTrace();
+          ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
+          return ResponseEntity.badRequest().body(responseDTO);
+      }
+    }
+
+
 
     // 이력서랑 포트폴리오 부분 수정(.pdf)
     @PostMapping("/updateResumePortfolio")

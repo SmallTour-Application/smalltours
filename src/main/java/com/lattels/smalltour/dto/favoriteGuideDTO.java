@@ -24,7 +24,6 @@ public class favoriteGuideDTO {
     @NoArgsConstructor
     //가이드에 대해 좋아요 누르기 혹은 취소하기
     public static class favoriteDTO{
-        private int memberId;
         private int guideId;
     }
 }
