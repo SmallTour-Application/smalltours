@@ -33,9 +33,9 @@ public class FavoriteGuide {
     @AllArgsConstructor
     public static class FavoriteGuideID implements Serializable {
 
-        private Member member;
+        private Integer member; // private Member member
 
-        private Member guide;
+        private Integer guide;  //private Guide guide
 
     }
 

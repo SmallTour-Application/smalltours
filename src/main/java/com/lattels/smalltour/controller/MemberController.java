@@ -114,20 +114,28 @@ public class MemberController {
 
     // 프로필 이미지 변경
     @PostMapping("/updateProfileImg")
-    @ApiOperation(value = "이미지 변경", notes = "이미지 변경")
+    @ApiOperation(value = "Update member profile image", notes = "Provide an id and a new profile image to update a member's profile image")
     public ResponseEntity<?> updateProfileImg(@ApiIgnore Authentication authentication,
-                                              @ModelAttribute @Valid MemberDTO.UpdateProfile updateProfile) {
-
+                                              @ApiParam(value = "updateProfile", required = true)
+                                              @RequestPart(value = "updateProfile", required = false) String updateProfileString,
+                                              @RequestPart(value = "profileImgRequest", required = false) MultipartFile[] files) {
         try {
-            if (updateProfile == null || updateProfile.getProfileImgRequest() == null || updateProfile.getProfileImgRequest().isEmpty()) {
-                throw new Exception("이미지가 없습니다.");
+            ObjectMapper objectMapper = new ObjectMapper();
+            if (updateProfileString == null) {
+                throw new IllegalArgumentException("updateProfileString is null");
+            }
+            MemberDTO.UpdateProfile updateProfile = objectMapper.readValue(updateProfileString, MemberDTO.UpdateProfile.class);
+            if (files != null) {
+                List<MultipartFile> fileList = Arrays.asList(files);
+                updateProfile.setProfileImgRequest(fileList);
             }
 
-            MemberDTO.UpdateProfile responseMemberDTO = memberService.updateProfileImg(
+            MemberDTO responseMemberDTO = memberService.updateProfileImg(
                     Integer.parseInt(authentication.getPrincipal().toString()),
                     updateProfile);
             return ResponseEntity.ok().body(responseMemberDTO);
         } catch (Exception e) {
+            e.printStackTrace();
             ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
             return ResponseEntity.badRequest().body(responseDTO);
         }

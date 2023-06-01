@@ -195,8 +195,7 @@ public class MemberService {
 
 
     // 프로필 이미지 변경
-    public MemberDTO.UpdateProfile updateProfileImg(int memberId, MemberDTO.UpdateProfile memberDTO) {
-
+    public MemberDTO updateProfileImg(int memberId, MemberDTO.UpdateProfile memberDTO) {
 
         try {
 
@@ -278,7 +277,7 @@ public class MemberService {
                     throw new RuntimeException("MemberService.updateProfileImg() : multipartFile이 null이거나 비어 있습니다");
 
             }         memberRepository.save(member);
-            return MemberDTO.UpdateProfile.builder().profile(member.getProfile()).build();
+            return MemberDTO.builder().profile(member.getProfile()).build();
         }   catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException("MemberGuideService.updateContact() : 에러 발생.");

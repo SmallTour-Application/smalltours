@@ -42,14 +42,14 @@ public class MemberFavoriteStatusService {
 
     // 좋아요 누르기
     @Transactional
-    public void addFavoriteGuide(int memberId,favoriteGuideDTO.favoriteDTO favoriteGuideDTO) {
+    public void addFavoriteGuide(int memberId, favoriteGuideDTO.favoriteDTO favoriteDTO) {
         // 해당 가이드 조회 (role이 2인 Member)
-        Member guide = memberRepository.findByIdAndRole(favoriteGuideDTO.getGuideId(), 2)
+        Member guide = memberRepository.findByIdAndRole(favoriteDTO.getGuideId(), 2)
                 .orElseThrow(() -> new IllegalArgumentException("가이드를 찾을 수 없습니다."));
 
         // 해당 회원 조회
-        Member member = memberRepository.findById(favoriteGuideDTO.getMemberId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid member Id:" + favoriteGuideDTO.getMemberId()));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid member Id:" + memberId));
 
         // 이미 좋아요를 눌렀는지 확인
         if(favoriteGuideRepository.existsByMemberAndGuide(member, guide)){
