@@ -27,8 +27,9 @@ public interface FavoriteGuideRepository extends JpaRepository<FavoriteGuide, Fa
     Page<FavoriteGuide> findByMemberAndGuideRole(@Param("member")Member member, Pageable pageable);
 
 
-    @Query("SELECT CASE WHEN COUNT(f) > 0 THEN true ELSE false END FROM FavoriteGuide f WHERE f.member = :member AND f.guide = :guide")
+    @Query("SELECT CASE WHEN COUNT(f) > 0 THEN true ELSE false END FROM FavoriteGuide f WHERE f.member = :member AND  f.guide = :guide")
     boolean existsByMemberAndGuide(@Param("member") Member member, @Param("guide") Member guide);
+
 
     @Query("SELECT f FROM FavoriteGuide f WHERE f.member = :member AND f.guide = :guide")
     Optional<FavoriteGuide> findByMemberAndGuide(@Param("member") Member member, @Param("guide") Member guide);
