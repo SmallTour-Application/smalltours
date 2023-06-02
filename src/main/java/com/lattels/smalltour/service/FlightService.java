@@ -94,4 +94,16 @@ public class FlightService {
         flightRepository.delete(flight);
 
     }
+
+    // 비행기 정보 가져오기
+    public FlightDTO.ViewResponseDTO viewFlight(int airlineId) {
+
+        // 항공사 아이디로 비행기 정보 가져오기
+        Flight flight = flightRepository.findByAirlineId(airlineId);
+        // flight Entity에 값이 있다면 DTO에 저장
+        FlightDTO.ViewResponseDTO viewResponseDTO = (flight == null) ? null : new FlightDTO.ViewResponseDTO(flight);
+
+        return viewResponseDTO;
+
+    }
 }

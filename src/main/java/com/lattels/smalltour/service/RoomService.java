@@ -1,6 +1,7 @@
 package com.lattels.smalltour.service;
 
 import com.google.common.base.Preconditions;
+import com.lattels.smalltour.dto.HotelDTO;
 import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.RoomDTO;
 import com.lattels.smalltour.model.*;
@@ -133,7 +134,21 @@ public class RoomService {
 
     }
 
-    // 방 이미지 저장
+    // 방 정보 가져오기
+    public RoomDTO.ViewResponseDTO viewRoom(int hotelId) {
+
+        // 호텔 아이디로 방 정보 가져오기
+        Room room = roomRepository.findByHotelId(hotelId);
+        // RoomEntity 값이 있다면 DTO에 저장
+        RoomDTO.ViewResponseDTO viewResponseDTO = (room == null) ? null : new RoomDTO.ViewResponseDTO(room);
+        // 이미지 설정
+        viewResponseDTO.setImage("http://localhost:8081/img/tours/room/" + viewResponseDTO.getImage());
+        // 반환
+        return viewResponseDTO;
+
+    }
+
+        // 방 이미지 저장
     private void saveRoomImage(Room room, MultipartFile multipartFile) {
 
         // 기존 이미지가 있다면 삭제

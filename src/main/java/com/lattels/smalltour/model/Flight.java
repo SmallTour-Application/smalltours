@@ -49,7 +49,4 @@ public class Flight {
     @Column(name = "seat_type")
     private String seatType;
 
-    @Column(name = "state")
-    private int state;
-
 }

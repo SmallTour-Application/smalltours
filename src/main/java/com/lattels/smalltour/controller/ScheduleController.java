@@ -1,5 +1,6 @@
 package com.lattels.smalltour.controller;
 
+import com.lattels.smalltour.dto.HotelDTO;
 import com.lattels.smalltour.dto.ScheduleDTO;
 import com.lattels.smalltour.dto.ToursDTO;
 import com.lattels.smalltour.service.ScheduleService;
@@ -9,13 +10,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -53,6 +52,16 @@ public class ScheduleController {
 
         scheduleService.deleteSchedule(Integer.parseInt(authentication.getPrincipal().toString()), idRequestDTO);
         return ResponseEntity.ok().build();
+
+    }
+
+    // 여행 일정 정보 불러오기
+    @GetMapping(value = "/unauth/view")
+    @ApiOperation(value = "여행 일정 정보 불러오기")
+    public ResponseEntity<List<ScheduleDTO.ViewResponseDTO>> viewSchedule(@Valid ToursDTO.IdRequestDTO idRequestDTO) {
+
+        List<ScheduleDTO.ViewResponseDTO> viewResponseDTOList = scheduleService.viewSchedule(idRequestDTO);
+        return ResponseEntity.ok().body(viewResponseDTOList);
 
     }
 

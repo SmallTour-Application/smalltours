@@ -1,6 +1,7 @@
 package com.lattels.smalltour.controller;
 
 import com.lattels.smalltour.dto.HotelDTO;
+import com.lattels.smalltour.dto.ToursDTO;
 import com.lattels.smalltour.service.HotelService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -8,13 +9,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -53,6 +52,16 @@ public class HotelController {
 
         hotelService.deleteHotel(Integer.parseInt(authentication.getPrincipal().toString()), idRequestDTO);
         return ResponseEntity.ok().build();
+
+    }
+
+    // 호텔 정보불러오기
+    @GetMapping(value = "/unauth/view")
+    @ApiOperation(value = "호텔 정보 불러오기")
+    public ResponseEntity<List<HotelDTO.ViewResponseDTO>> viewHotel(@Valid ToursDTO.IdRequestDTO idRequestDTO) {
+
+        List<HotelDTO.ViewResponseDTO> viewResponseDTOList = hotelService.viewHotel(idRequestDTO);
+        return ResponseEntity.ok().body(viewResponseDTOList);
 
     }
 

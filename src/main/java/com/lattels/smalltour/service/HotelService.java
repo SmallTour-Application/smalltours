@@ -3,6 +3,8 @@ package com.lattels.smalltour.service;
 import com.google.common.base.Preconditions;
 import com.lattels.smalltour.dto.HotelDTO;
 import com.lattels.smalltour.dto.MemberDTO;
+import com.lattels.smalltour.dto.RoomDTO;
+import com.lattels.smalltour.dto.ToursDTO;
 import com.lattels.smalltour.model.Hotel;
 import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.model.Tours;
@@ -12,6 +14,10 @@ import com.lattels.smalltour.persistence.ToursRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -23,6 +29,8 @@ public class HotelService {
     private final ToursRepository toursRepository;
 
     private final MemberRepository memberRepository;
+
+    private final RoomService roomService;
 
     // 호텔 등록
     public void addHotel(int memberId, HotelDTO.AddRequestDTO addRequestDTO) {
@@ -88,6 +96,29 @@ public class HotelService {
 
         hotelRepository.delete(hotel);
 
+    }
+
+    // 호텔 정보 가져오기
+    public List<HotelDTO.ViewResponseDTO> viewHotel(ToursDTO.IdRequestDTO idRequestDTO) {
+
+        // 해당 TourId에 맞는 호텔 정보 가져오기
+        List<Hotel> hotelList = hotelRepository.findAllByToursId(idRequestDTO.getId());
+
+        // 반환할 DTO 리스트 생성
+        List<HotelDTO.ViewResponseDTO> viewResponseDTOList = new ArrayList<>();
+
+        for (Hotel hotel : hotelList) {
+            // 받아온 Hotel Entity를 Hotel DTO에 담기
+            HotelDTO.ViewResponseDTO viewResponseDTO = new HotelDTO.ViewResponseDTO(hotel);
+            // 호텔 방 DTO 가져오기
+            RoomDTO.ViewResponseDTO roomDTO = roomService.viewRoom(hotel.getId());
+            // Hotel DTO에 담기
+            viewResponseDTO.setRoomDTO(roomDTO);
+            // 반환할 DTO 리스트에 DTO 담기
+            viewResponseDTOList.add(viewResponseDTO);
+        }
+
+        return viewResponseDTOList;
     }
 
 }
