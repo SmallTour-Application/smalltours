@@ -3,6 +3,8 @@ package com.lattels.smalltour.service;
 import com.google.common.base.Preconditions;
 import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.ScheduleDTO;
+import com.lattels.smalltour.dto.ScheduleItemDTO;
+import com.lattels.smalltour.dto.ToursDTO;
 import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.model.Schedule;
 import com.lattels.smalltour.model.Tours;
@@ -12,6 +14,9 @@ import com.lattels.smalltour.persistence.ToursRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -23,6 +28,8 @@ public class ScheduleService {
     private final MemberRepository memberRepository;
 
     private final ToursRepository toursRepository;
+
+    private final ScheduleItemService scheduleItemService;
 
     // 여행 일정 등록
     public void addSchedule(int memberId, ScheduleDTO.AddRequestDTO addRequestDTO) {
@@ -40,7 +47,7 @@ public class ScheduleService {
 
         // 시간이 겹치는 일정이 있는지 검사
         Schedule scheduleTimeChk = scheduleRepository.checkTime(addRequestDTO.getTourId(), addRequestDTO.getTourDay(), addRequestDTO.getStartTime(), addRequestDTO.getEndTime());
-        log.info("체크"+scheduleTimeChk);
+
         boolean chk = false;
         if (scheduleTimeChk == null) chk = true;
         Preconditions.checkArgument(chk, "시간이 겹치는 일정이 있습니다.");
@@ -99,4 +106,27 @@ public class ScheduleService {
 
     }
 
+    // 여행 일정 불러오기
+    public List<ScheduleDTO.ViewResponseDTO> viewSchedule(ToursDTO.IdRequestDTO idRequestDTO) {
+
+        // 해당 TourId에 맞는 여행 일정 정보 가져오기
+        List<Schedule> scheduleList = scheduleRepository.findAllByToursId(idRequestDTO.getId());
+
+        // 반환할 DTO 리스트 생성
+        List<ScheduleDTO.ViewResponseDTO> viewResponseDTOList = new ArrayList<>();
+
+        for (Schedule schedule : scheduleList) {
+            // 받아온 Schedule Entity를 Schedule DTO에 담기
+            ScheduleDTO.ViewResponseDTO viewResponseDTO = new ScheduleDTO.ViewResponseDTO(schedule);
+            // 여행 일정 옵션 DTO 가져오기
+            List<ScheduleItemDTO.ViewResponseDTO> scheduleItemDTOList = scheduleItemService.viewScheduleItemList(schedule.getId());
+            // Schedule DTO에 담기
+            viewResponseDTO.setScheduleItemDTOList(scheduleItemDTOList);
+            // 반환할 DTO 리스트에 DTO 담기
+            viewResponseDTOList.add(viewResponseDTO);
+        }
+
+        return viewResponseDTOList;
+
+    }
 }

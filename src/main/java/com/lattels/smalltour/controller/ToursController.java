@@ -1,6 +1,5 @@
 package com.lattels.smalltour.controller;
 
-import com.lattels.smalltour.dto.FlightDTO;
 import com.lattels.smalltour.dto.ToursDTO;
 import com.lattels.smalltour.service.ToursService;
 import io.swagger.annotations.Api;
@@ -14,8 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -62,6 +59,16 @@ public class ToursController {
 
         toursService.deleteTours(Integer.parseInt(authentication.getPrincipal().toString()), idRequestDTO);
         return ResponseEntity.ok().build();
+
+    }
+
+    // 투어 불러오기
+    @GetMapping(value = "/unauth/view")
+    @ApiOperation(value = "투어 불러오기")
+    public ResponseEntity<ToursDTO.ViewResponseDTO> viewTours(@Valid ToursDTO.IdRequestDTO idRequestDTO) {
+
+        ToursDTO.ViewResponseDTO viewResponseDTO = toursService.viewTours(idRequestDTO);
+        return ResponseEntity.ok().body(viewResponseDTO);
 
     }
 

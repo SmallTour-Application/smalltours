@@ -2,6 +2,7 @@ package com.lattels.smalltour.persistence;
 
 
 import com.lattels.smalltour.model.GuideLock;
+import com.lattels.smalltour.model.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -35,5 +36,7 @@ public interface GuideLockRepository extends JpaRepository<GuideLock, Integer> {
      * 해당 가이드와 해당 기간의 가이드락을 삭제합니다.
      */
     void deleteByGuideIdAndStartDayAndEndDay(int guideId, LocalDate startDay, LocalDate endDay);
+
+    List<GuideLock> findAllByGuideOrderByStartDay(Member member);
 
 }

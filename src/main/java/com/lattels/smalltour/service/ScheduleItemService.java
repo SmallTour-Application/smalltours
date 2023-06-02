@@ -14,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -88,6 +91,20 @@ public class ScheduleItemService {
         // 정보 등록인이거나 관리자인지 검사
         Preconditions.checkArgument(memberId == scheduleItem.getSchedule().getTours().getGuide().getId() || member.getRole() == MemberDTO.MemberRole.ADMIN, "해당 옵션 등록자가 아닙니다. (옵션 ID : %s, 삭제 요청 회원 ID : %s)", idRequestDTO.getId(), memberId);
         scheduleItemRepository.delete(scheduleItem);
+
+    }
+
+    // 여행 일정 옵션 리스트 가져오기
+    public List<ScheduleItemDTO.ViewResponseDTO> viewScheduleItemList(int scheduleId) {
+
+        // 여행 일정 아이디로 옵션 리스트 가져오기
+        List<ScheduleItem> scheduleItemList = scheduleItemRepository.findAllByScheduleId(scheduleId);
+        // 반환할 DTO 리스트에 저장
+        List<ScheduleItemDTO.ViewResponseDTO> viewResponseDTOList = scheduleItemList.stream()
+                .map(scheduleItem -> new ScheduleItemDTO.ViewResponseDTO(scheduleItem))
+                .collect(Collectors.toList());
+
+        return viewResponseDTOList;
 
     }
 }

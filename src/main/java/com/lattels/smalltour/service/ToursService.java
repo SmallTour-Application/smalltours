@@ -1,17 +1,12 @@
 package com.lattels.smalltour.service;
 
 import com.google.common.base.Preconditions;
-import com.lattels.smalltour.dto.MemberDTO;
-import com.lattels.smalltour.dto.ToursDTO;
+import com.lattels.smalltour.dto.*;
 import com.lattels.smalltour.dto.tour.MyPackageDTO;
 import com.lattels.smalltour.dto.tour.MyPackageListDTO;
 import com.lattels.smalltour.dto.tour.MyPackageListRequestDTO;
-import com.lattels.smalltour.model.Member;
-import com.lattels.smalltour.model.Tours;
-import com.lattels.smalltour.model.ToursImages;
-import com.lattels.smalltour.persistence.MemberRepository;
-import com.lattels.smalltour.persistence.ToursImagesRepository;
-import com.lattels.smalltour.persistence.ToursRepository;
+import com.lattels.smalltour.model.*;
+import com.lattels.smalltour.persistence.*;
 import com.lattels.smalltour.util.MultipartUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,6 +34,10 @@ public class ToursService {
     private final MemberRepository memberRepository;
 
     private final ToursImagesRepository toursImagesRepository;
+
+    private final GuideLockRepository guideLockRepository;
+
+    private final LocationsRepository locationsRepository;
 
     @Value("${file.path.tours}")
     private String toursFilePath;
@@ -81,6 +81,7 @@ public class ToursService {
                 .minGroupSize(addRequestDTO.getMinGroupSize())
                 .createdDay(LocalDateTime.now())
                 .defaultPrice(addRequestDTO.getDefaultPrice())
+                .approvals(ToursDTO.ToursApprovals.APPROVAL)
                 .build();
 
         toursRepository.save(tours);
@@ -173,11 +174,9 @@ public class ToursService {
         // 정보 등록인이거나 관리자인지 검사
         Preconditions.checkArgument(memberId == tours.getGuide().getId() || member.getRole() == MemberDTO.MemberRole.ADMIN, "해당 투어 등록자가 아닙니다. (투어 ID : %s, 삭제 요청 회원 ID : %s)", idRequestDTO.getId(), memberId);
 
-        // 투어 이미지 삭제
-        deleteToursImageList(tours);
-
         //투어 삭제
-        toursRepository.delete(tours);
+        tours.setApprovals(ToursDTO.ToursApprovals.DELETE);
+        toursRepository.save(tours);
 
     }
 
@@ -313,4 +312,55 @@ public class ToursService {
                 .build();
     }
 
+    // 투어 불러오기
+    public ToursDTO.ViewResponseDTO viewTours(ToursDTO.IdRequestDTO idRequestDTO) {
+
+        // 해당 ID에 맞는 투어가 있는지 검사
+        Tours tours = toursRepository.findByToursId(idRequestDTO.getId());
+        Preconditions.checkNotNull(tours, "등록된 투어가 없습니다. (투어 ID : %s)", idRequestDTO.getId());
+
+        // 반환 DTO에 추가
+        ToursDTO.ViewResponseDTO viewResponseDTO = new ToursDTO.ViewResponseDTO(tours);
+        // 투어 썸네일 추가
+        viewResponseDTO.setThumb("http://localhost:8081/img/tours/" + tours.getThumb());
+
+        // 투어 소유 가이드 정보 가져오기
+        Member member = memberRepository.findByMemberId(tours.getGuide().getId());
+        MemberDTO.ProfileResponseDTO profileResponseDTO = new MemberDTO.ProfileResponseDTO(member);
+        // 반환 DTO에 추가
+        viewResponseDTO.setProfileResponseDTO(profileResponseDTO);
+
+        // 특정 기간 투어 잠금 정보 가져오기
+        List<GuideLock> guideLockList = guideLockRepository.findAllByGuideOrderByStartDay(member);
+        List<GuideLockDTO.ViewResponseDTO> guideLockDTOList = new ArrayList<>();
+        // 반복해서 GuideLockDTOList에 저장
+        for (GuideLock guideLock : guideLockList) {
+            GuideLockDTO.ViewResponseDTO guideLockDTO = new GuideLockDTO.ViewResponseDTO(guideLock);
+            guideLockDTOList.add(guideLockDTO);
+        }
+        // 반환 DTO에 추가
+        viewResponseDTO.setGuideLockDTOList(guideLockDTOList);
+
+        // 투어 위치 정보 가져오기
+        Locations locations = locationsRepository.findByTours(tours);
+        LocationsDTO.ViewResponseDTO locationsDTO = (locations == null) ? null : new LocationsDTO.ViewResponseDTO(locations);
+        // 반환 DTO에 추가
+        viewResponseDTO.setLocationsDTO(locationsDTO);
+
+        // 투어 이미지 리스트 가져오기
+        List<ToursImages> toursImagesList = toursImagesRepository.findByTours(tours);
+        List<ToursImagesDTO.ViewResponseDTO> toursImagesDTOList = new ArrayList<>();
+        // 반복해서 ToursImagesDTOList에 추가
+        for (ToursImages toursImages : toursImagesList) {
+            ToursImagesDTO.ViewResponseDTO toursImagesDTO = new ToursImagesDTO.ViewResponseDTO();
+            toursImagesDTO.setImagePath("http://localhost:8081/img/tours/images/" + toursImages.getImagePath());
+            toursImagesDTOList.add(toursImagesDTO);
+        }
+        //반환 DTO에 추가
+        viewResponseDTO.setToursImagesDTOList(toursImagesDTOList);
+
+        //반환
+        return viewResponseDTO;
+
+    }
 }

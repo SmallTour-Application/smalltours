@@ -1,12 +1,14 @@
 package com.lattels.smalltour.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.lattels.smalltour.model.Schedule;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import javax.validation.constraints.Positive;
 import java.time.LocalTime;
+import java.util.List;
 
 @AllArgsConstructor
 @Data
@@ -66,6 +68,34 @@ public class ScheduleDTO {
         @ApiModelProperty(value = "일정 종료 시간", example = "23:30")
         private LocalTime endTime;
 
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @ApiModel(value = "여행 일정 정보 응답 DTO")
+    public static class ViewResponseDTO {
+
+        @ApiModelProperty(value = "일정 ID", example = "1")
+        private int id;
+
+        @ApiModelProperty(value = "일정 날짜 (1 : 1일차)", example = "1")
+        private int tourDay;
+
+        @ApiModelProperty(value = "일정 시작 시간", example = "23:30")
+        private LocalTime startTime;
+
+        @ApiModelProperty(value = "일정 종료 시간", example = "23:30")
+        private LocalTime endTime;
+
+        List<ScheduleItemDTO.ViewResponseDTO> scheduleItemDTOList;
+
+        public ViewResponseDTO(Schedule schedule) {
+            this.id = schedule.getId();
+            this.tourDay = schedule.getTourDay();
+            this.startTime = schedule.getStartTime();
+            this.endTime = schedule.getEndTime();
+        }
     }
 
 

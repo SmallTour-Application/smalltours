@@ -2,6 +2,8 @@ package com.lattels.smalltour.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lattels.smalltour.model.Member;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
@@ -71,6 +73,26 @@ public class MemberDTO {
         private int id;
         private String email;
 
+    }
+
+    @Data
+    @NoArgsConstructor
+    @ApiModel(value = "투어 정보에 들어가는 프로필 응답 DTO")
+    public static class ProfileResponseDTO{
+
+        @ApiModelProperty(value = "가이드 ID", example = "1")
+        private int guideId;
+
+        @ApiModelProperty(value = "가이드 닉네임", example = "닉네임입니다.")
+        private String nickname;
+
+        @ApiModelProperty(value = "프로필 이미지", example = "프로필 이미지입니다")
+        private String profile;
+
+        public ProfileResponseDTO(Member member) {
+            this.guideId = member.getId();
+            this.nickname = member.getNickname();
+        }
     }
 
     @Getter

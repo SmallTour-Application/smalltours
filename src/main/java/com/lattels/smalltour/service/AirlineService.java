@@ -2,7 +2,9 @@ package com.lattels.smalltour.service;
 
 import com.google.common.base.Preconditions;
 import com.lattels.smalltour.dto.AirlineDTO;
+import com.lattels.smalltour.dto.FlightDTO;
 import com.lattels.smalltour.dto.MemberDTO;
+import com.lattels.smalltour.dto.ToursDTO;
 import com.lattels.smalltour.model.Airline;
 import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.model.Tours;
@@ -12,6 +14,9 @@ import com.lattels.smalltour.persistence.ToursRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -23,6 +28,8 @@ public class AirlineService {
     private final ToursRepository toursRepository;
 
     private final MemberRepository memberRepository;
+
+    private final FlightService flightService;
 
     // 항공사 등록
     public void addAirline(int memberId, AirlineDTO.AddRequestDTO addRequestDTO) {
@@ -87,4 +94,27 @@ public class AirlineService {
 
     }
 
+    // 항공사 정보 불러오기
+    public List<AirlineDTO.ViewResponseDTO> viewAirline(ToursDTO.IdRequestDTO idRequestDTO) {
+
+        // 해당 TourId에 맞는 항공사 정보 가져오기
+        List<Airline> airlineList = airlineRepository.findAllByToursId(idRequestDTO.getId());
+
+        // 반환할 DTO 리스트 생성
+        List<AirlineDTO.ViewResponseDTO> viewResponseDTOList = new ArrayList<>();
+
+        for (Airline airline : airlineList) {
+            // 받아온 Airline Entity를 Airline DTO에 담기
+            AirlineDTO.ViewResponseDTO viewResponseDTO = new AirlineDTO.ViewResponseDTO(airline);
+            // 비행기 정보 DTO 받아오기
+            FlightDTO.ViewResponseDTO flightDTO = flightService.viewFlight(airline.getId());
+            // Airline DTO에 담기
+            viewResponseDTO.setFlightDTO(flightDTO);
+            // 반환할 DTO 리스트에 DTO 담기
+            viewResponseDTOList.add(viewResponseDTO);
+        }
+
+        return viewResponseDTOList;
+
+    }
 }

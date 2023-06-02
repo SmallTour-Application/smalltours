@@ -1,5 +1,6 @@
 package com.lattels.smalltour.dto;
 
+import com.lattels.smalltour.model.Hotel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -88,6 +89,47 @@ public class HotelDTO {
         @ApiModelProperty(value = "호텔 위도", example = "12.12")
         private double hotelLocationY;
 
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @ApiModel(value = "호텔 정보 응답 DTO")
+    public static class ViewResponseDTO {
+
+        @ApiModelProperty(value = "호텔 ID", example = "1")
+        private int id;
+
+        @ApiModelProperty(value = "호텔 이름", example = "호텔 이름입니다")
+        private String name;
+
+        @ApiModelProperty(value = "호텔 주소", example = "호텔 주소입니다")
+        private String address;
+
+        @ApiModelProperty(value = "호텔 전화번호", example = "호텔 전화번호입니다")
+        private String hotelTel;
+
+        @ApiModelProperty(value = "호텔 설명", example = "호텔 설명입니다")
+        private String description;
+
+        @ApiModelProperty(value = "호텔 경도", example = "12.12")
+        private double hotelLocationX;
+
+        @ApiModelProperty(value = "호텔 위도", example = "12.12")
+        private double hotelLocationY;
+
+        RoomDTO.ViewResponseDTO roomDTO;
+
+        public ViewResponseDTO(Hotel hotel) {
+            this.id = hotel.getId();
+            this.name = hotel.getName();
+            this.address = hotel.getAddress();
+            this.hotelTel = hotel.getHotelTel();
+            this.description = hotel.getDescription();
+            this.hotelLocationX = hotel.getHotelLocationX();
+            this.hotelLocationY = hotel.getHotelLocationY();
+        }
     }
 
 

@@ -38,11 +38,16 @@ public class WebSecurityConfig {
                         "/partners/member/**",
                         "/nonmember/**",
                         "/notice/unauth/**",
+                        "/package/unauth/**",
+                        "/package/hotel/unauth/**",
                         "/package/question/unauth/**",
+                        "/package/schedule/unauth/**",
+                        "/package/airline/unauth/**",
                         "/review/package/unauth/**",
                         "/images/menu/**",
                         "/images/**",
                         "/error",
+                        "/img/**",
                         "/confirm/**").permitAll().anyRequest() // 인증 안해도 되는 경로 설정
                 // "/error" 추가해야 403오류와 json 함께 반환
                 .authenticated();

@@ -1,6 +1,7 @@
 package com.lattels.smalltour.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.lattels.smalltour.model.Flight;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -106,6 +107,52 @@ public class FlightDTO {
         @ApiModelProperty(value = "좌석 타입", example = "좌석 타입입니다")
         private String seatType;
 
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @ApiModel(value = "비행기 정보 응답 DTO")
+    public static class ViewResponseDTO {
+
+        @ApiModelProperty(value = "비행기 ID", example = "1")
+        private int id;
+
+        @ApiModelProperty(value = "출발 일자, 시간", example = "2023-03-03T09:23:00.000")
+        private LocalDateTime departDateTime;
+
+        @ApiModelProperty(value = "도착 일자, 시간", example = "2023-03-03T09:23:00.000")
+        private LocalDateTime arrivalDateTime;
+
+        @ApiModelProperty(value = "출발 도시", example = "출발 도시입니다")
+        private String departCity;
+
+        @ApiModelProperty(value = "도착 공항", example = "도착 공항입니다")
+        private String arrivalAirport;
+
+        @ApiModelProperty(value = "비행 시간", example = "1")
+        private int duration;
+
+        @ApiModelProperty(value = "항공편 가격", example = "10000")
+        private int price;
+
+        @ApiModelProperty(value = "항공기 이름", example = "항공기 이름입니다")
+        private String flightName;
+
+        @ApiModelProperty(value = "좌석 타입", example = "좌석 타입입니다")
+        private String seatType;
+
+        public ViewResponseDTO(Flight flight) {
+            this.id = flight.getId();
+            this.departDateTime = flight.getDepartDateTime();
+            this.arrivalDateTime = flight.getArrivalDateTime();
+            this.departCity = flight.getDepartCity();
+            this.arrivalAirport = flight.getArrivalAirport();
+            this.duration = flight.getDuration();
+            this.price = flight.getPrice();
+            this.flightName = flight.getFlightName();
+            this.seatType = flight.getSeatType();
+        }
     }
 
 
