@@ -21,17 +21,17 @@ public class UpperPayment {
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
-    @Column(name = "item_id")
-    private int itemId;
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
 
-    @Column(name = "guide_id")
-    private int guideId;
+    @ManyToOne
+    @JoinColumn(name = "guide_id")
+    private Member guide;
 
-    @Column(name = "tour_id")
-    private int tourId;
-
-    @Column(name = "image_path")
-    private String imagePath;
+    @ManyToOne
+    @JoinColumn(name = "tours_id")
+    private Tours tours;
 
     @Column(name = "pay_day")
     private LocalDateTime payDay;
