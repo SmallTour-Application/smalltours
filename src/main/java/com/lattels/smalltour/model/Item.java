@@ -21,6 +21,9 @@ public class Item {
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
+    @Column(name = "title")
+    private String title;
+
     @Column(name = "image_path")
     private String imagePath;
 
@@ -28,7 +31,7 @@ public class Item {
     private int price;
 
     @Column(name = "period")
-    private LocalDateTime period;
+    private int period;
  
     @Column(name = "type")
     private int type;
