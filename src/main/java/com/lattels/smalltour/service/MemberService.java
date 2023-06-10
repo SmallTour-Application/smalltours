@@ -1,10 +1,9 @@
 package com.lattels.smalltour.service;
 
 
-import com.lattels.smalltour.dto.MemberAndGuideProfileDTO;
+import com.lattels.smalltour.dto.FavoriteTourDTO;
 import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.favoriteGuideDTO;
-import com.lattels.smalltour.dto.favoriteTourDTO;
 import com.lattels.smalltour.model.FavoriteGuide;
 import com.lattels.smalltour.model.FavoriteTour;
 import com.lattels.smalltour.model.Member;
@@ -322,8 +321,8 @@ public class MemberService {
 
 
     @Transactional(readOnly = true)
-    public List<favoriteTourDTO> getFavoriteTours(int memberId, int page, int size) {
-        List<favoriteTourDTO> favoriteTourDTOList = new ArrayList<>();
+    public List<FavoriteTourDTO> getFavoriteTours(int memberId, int page, int size) {
+        List<FavoriteTourDTO> favoriteTourDTOList = new ArrayList<>();
 
         Member member = memberRepository.findByIdAndRole(memberId, 0)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 사용자가 아닙니다. 가이드 혹은 관리자 계정입니다."));
@@ -345,7 +344,7 @@ public class MemberService {
 
             //approval:0 미승인 1:승인 2:일시정지 3:삭제
             if(tour.getApprovals() == 1){
-                favoriteTourDTO tourDTO = favoriteTourDTO.builder()
+                FavoriteTourDTO tourDTO = FavoriteTourDTO.builder()
                         .tourId(tour.getId())
                         .tourName(tour.getTitle())
                         .tourThumb(tour.getThumb())

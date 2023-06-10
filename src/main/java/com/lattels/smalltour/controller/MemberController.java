@@ -153,7 +153,7 @@ public class MemberController {
 
     @ApiOperation(value = "즐겨찾기 상품")
     @GetMapping("/member/favoriteTour")
-    public ResponseEntity<List<favoriteTourDTO>> getFavoriteTour(@ApiIgnore Authentication authentication,
+    public ResponseEntity<List<FavoriteTourDTO>> getFavoriteTour(@ApiIgnore Authentication authentication,
                                                                  @RequestParam int page) {
         int memberId = Integer.parseInt(authentication.getPrincipal().toString());
         int size = 10;
