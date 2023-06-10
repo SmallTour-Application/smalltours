@@ -202,6 +202,35 @@ public class ToursDTO {
 
     }
 
+    @Data
+    @NoArgsConstructor
+    @ApiModel(value = "가이드 자신이 올린 투어 리스트 응답 DTO")
+    public static class GuideListResponseDTO {
+
+        @ApiModelProperty(value = "투어 ID", example = "1")
+        private int id;
+
+        @ApiModelProperty(value = "투어 이름", example = "투어 이름입니다")
+        private String title;
+
+        @ApiModelProperty(value = "투어 가격", example = "10000")
+        private int price;
+
+        @ApiModelProperty(value = "투어 기간", example = "1")
+        private int duration;
+
+        @ApiModelProperty(value = "투어 상태", example = "1")
+        private int approvals;
+
+        public GuideListResponseDTO(Tours tours) {
+            this.id = tours.getId();
+            this.title = tours.getTitle();
+            this.price = tours.getPrice();
+            this.duration = tours.getDuration();
+            this.approvals = tours.getApprovals();
+        }
+    }
+
     public static class ToursApprovals {
 
         // 미승인
@@ -210,11 +239,14 @@ public class ToursDTO {
         // 승인
         public static final int APPROVAL = 1;
 
-        // 정지
+        // 정지 (관리자 권한)
         public static final int PAUSE = 2;
 
         // 삭제
         public static final int DELETE = 3;
+
+        // 중지 (가이드가 중지함)
+        public static final int STOP = 4;
 
     }
 }
