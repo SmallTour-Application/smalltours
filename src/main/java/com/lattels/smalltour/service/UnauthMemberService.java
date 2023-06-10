@@ -140,10 +140,7 @@ public class UnauthMemberService {
             e.printStackTrace();
             throw new RuntimeException("MemberService.add() : 에러 발생.");
         }
-
     }
-
-
     // 로그인 - 자격증명
     public MemberDTO getByCredentials(final String email, final String password, final PasswordEncoder encoder){
         final Member originalMember = memberRepository.findByEmail(email); // 이메일로 MemberEntity를 찾음

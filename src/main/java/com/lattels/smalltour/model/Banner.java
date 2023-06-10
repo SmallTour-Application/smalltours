@@ -13,26 +13,21 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "banner_payment")
-public class BannerPayment {
+@Table(name = "banner")
+public class Banner {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // DB에서 자동증가
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
-    @ManyToOne
-    @JoinColumn(name = "item_id")
-    private Item item;
-
-    @ManyToOne
-    @JoinColumn(name = "guide_id")
-    private Member guide;
-
     @Column(name = "image_path")
     private String imagePath;
  
-    @Column(name = "pay_day")
-    private LocalDateTime payDay;
+    @Column(name = "upload_day")
+    private LocalDateTime uploadDay;
+
+    @Column(name = "title")
+    private String title;
 
 }
