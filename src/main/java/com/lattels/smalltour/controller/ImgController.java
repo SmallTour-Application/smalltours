@@ -1,5 +1,6 @@
 package com.lattels.smalltour.controller;
 
+import com.lattels.smalltour.service.ItemService;
 import com.lattels.smalltour.service.RoomService;
 import com.lattels.smalltour.service.ToursService;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +25,14 @@ import java.nio.file.Paths;
 @Validated
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/eumCodingImgs")
+@RequestMapping("/img")
 public class ImgController {
 
     private final ToursService toursService;
 
     private final RoomService roomService;
+
+    private final ItemService itemService;
 
     @Value("${file.path}")
     private String memberFilePath;
@@ -78,6 +81,25 @@ public class ImgController {
     public ResponseEntity<Resource> getRoomImage(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = roomService.getRoomDirectoryPath().getPath();
+            FileSystemResource resource = new FileSystemResource(path + "\\" + fileName);
+            if(!resource.exists()){
+                throw new Exception();
+            }
+            HttpHeaders header = new HttpHeaders();
+            Path filePath = null;
+            filePath = Paths.get(path+fileName);
+            header.add("Content-Type", Files.probeContentType(filePath)); // filePath의 마임타입 체크해서 header에 추가
+            return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
+        }catch(Exception e){
+            throw new Exception();
+        }
+    }
+
+    // 아이템 이미지 url
+    @GetMapping(value = "/item/{fileOriginName}")
+    public ResponseEntity<Resource> getItemImage(@PathVariable("fileOriginName") String fileName) throws Exception{
+        try{
+            String path = itemService.getItemDirectoryPath().getPath();
             FileSystemResource resource = new FileSystemResource(path + "\\" + fileName);
             if(!resource.exists()){
                 throw new Exception();
