@@ -1,5 +1,6 @@
 package com.lattels.smalltour.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lattels.smalltour.model.Item;
 import com.lattels.smalltour.model.Tours;
 import com.lattels.smalltour.model.UpperPayment;
@@ -9,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
@@ -125,9 +127,13 @@ public class ItemDTO {
         private int itemPrice;
 
         @ApiModelProperty(value = "결제일", example = "")
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime payDay;
 
         @ApiModelProperty(value = "만료일", example = "")
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime ExpirationDate;
 
         @ApiModelProperty(value = "상태. 0 : 이용 중, 1: 만료", example = "1")
@@ -145,6 +151,22 @@ public class ItemDTO {
         }
 
     }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @ApiModel(value = "상위노출 tourId만가져오는 DTO")
+    public static class UpperPaymentTourIdResponseDTO {
+
+        @ApiModelProperty(value = "투어 아이디", example = "1")
+        private int toursId;
+
+        public UpperPaymentTourIdResponseDTO(UpperPayment upperPayment) {
+            this.toursId = upperPayment.getTours().getId();
+        }
+    }
+
+
 
     public static class ItemType {
 

@@ -51,7 +51,7 @@ public class UnauthProfileController {
     }
 
     @ApiOperation(value = "가이드의 투어 리뷰 가져오기")
-    @GetMapping("/guide/reviews")
+    @GetMapping("/guide/tour/review")
     public ResponseEntity<GuideTourReviewDTO> getGuideTourReview(@RequestParam("guideId") int guideId,
                                                                  @RequestParam(value = "page", defaultValue = "1") int page) {
         GuideTourReviewDTO guideTourReview = profileService.getGuideTourReview(guideId, page);

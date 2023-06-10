@@ -44,6 +44,4 @@ public class MainController {
         return new ResponseEntity<>(bannerContent, HttpStatus.OK);
     }*/
 
-
-
 }

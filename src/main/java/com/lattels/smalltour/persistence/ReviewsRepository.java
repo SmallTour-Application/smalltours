@@ -26,8 +26,12 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
 
 
 
-    @Query("SELECT r FROM Reviews r WHERE r.tours.guide.id = :guideId AND r.tours.guide.role = 2")
+    @Query("SELECT r FROM Reviews r JOIN r.payment p WHERE r.tours.guide.id = :guideId AND r.payment.id = p.id AND r.payment.tours.id = r.tours.id")
     List<Reviews> findAllByGuideId(@Param("guideId") int guideId, Pageable pageable);
+
+    @Query("SELECT count(r) FROM Reviews r JOIN r.payment p WHERE r.tours.guide.id = :guideId AND r.payment.id = p.id AND r.payment.tours.id = r.tours.id ")
+    int countByGuideId(@Param("guideId") int guideId);
+
 
 
     //가이드에 대한 평점

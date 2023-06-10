@@ -1,6 +1,7 @@
 package com.lattels.smalltour.service;
 
 
+import com.lattels.smalltour.dto.ItemDTO;
 import com.lattels.smalltour.dto.main.PopularGuideDTO;
 import com.lattels.smalltour.dto.main.PopularTourDTO;
 import com.lattels.smalltour.dto.mainBannerDTO;
@@ -26,7 +27,9 @@ public class MainService {
     private final ToursRepository toursRepository;
     private final ReviewsRepository reviewsRepository;
 
-    private final BannerPaymentRepository bannerPaymentRepository;
+    private final UpperPaymentRepository upperPaymentRepository;
+
+    private final BannerRepository bannertRepository;
     private final ItemRepository itemRepository;
 
     //가이드인 사람들 role이 1임, 메인화면에서 TOP3 가이드를 나타내기 위한 부분,GuideReview에 Rating기준으로 높은 점수순으로.
@@ -44,6 +47,15 @@ public class MainService {
         for (Member guide : guides) {
             //guideReview테이블에서 해당 가이드의 리뷰를 모두 가져옴
             List<GuideReview> reviews = guideReviewRepository.findGuideReviewsByGuideIdAndRole(guide.getId());
+
+            // Payment가 null인 리뷰를 제거, 상품 결제 이력이 없는데 가이드 리뷰를 남겼으면 제거해야함
+            reviews.removeIf(review -> review.getPayment().getTours().getGuide() != review.getGuide());
+
+            if(reviews.size() == 0) // 이 가이드에 대한 결제 이력이 있는 리뷰가 없다면 평점 계산을 생략하고 다음 가이드로 넘어감
+                continue;
+
+
+
             float sum = 0;
             //해당 가이드 모든 리뷰에 대해 평점 더함
             for (GuideReview review : reviews) {
@@ -101,6 +113,14 @@ public class MainService {
                     .rating(averageRating)
                     .build();
 
+            Optional<UpperPayment> optionalUpperPayment = upperPaymentRepository.findByTourIdAndGuideRoleAndItemTypeAndApprovals(tour.getId());
+            if (optionalUpperPayment.isPresent()) {
+                UpperPayment upperPayment = optionalUpperPayment.get();
+                ItemDTO.UpperPaymentTourIdResponseDTO upperPaymentTourIdResponseDTO = new ItemDTO.UpperPaymentTourIdResponseDTO(upperPayment);
+                tourInfo.setUpperPaymentTourIdResponseDTO(upperPaymentTourIdResponseDTO);
+            }
+
+
             if (topTours.size() < 3) {
                 topTours.add(tourInfo);
             } else if (averageRating > topTours.peek().getRating()) {
@@ -118,8 +138,8 @@ public class MainService {
         return popularTourResult;
     }
 
-  /*  //결제한 가이드 배너 가져오기
-    public mainBannerDTO getBannerContent() {
+    //결제한 가이드 배너 가져오기
+  /*  public mainBannerDTO getBannerContent() {
         List<Item> items = itemRepository.findAll(); // 모든 Item을 가져옵니다.
         mainBannerDTO bannerResultDTO = new mainBannerDTO();
         List<mainBannerDTO.BannerDTO> contents = new ArrayList<>();

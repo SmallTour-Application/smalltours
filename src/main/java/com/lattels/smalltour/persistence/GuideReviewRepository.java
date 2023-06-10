@@ -54,9 +54,11 @@ public interface GuideReviewRepository extends JpaRepository<GuideReview, Intege
     boolean existsByReviewerIdAndGuideId(@Param("reviewerId") int reviewerId, @Param("guideId") int guideId);
 
 
-    //
-    @Query("SELECT gr FROM GuideReview gr JOIN gr.guide m WHERE m.id = :guideId")
+    //가이드 리뷰 가져오기
+
+    @Query("SELECT gr FROM GuideReview gr JOIN gr.payment p WHERE gr.guide.id = :guideId AND gr.guide.role = 2 AND p.id IS NOT NULL")
     List<GuideReview> findGuideReviewsByGuideIdAndRole(@Param("guideId") int guideId);
+
 
 
 
