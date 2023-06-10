@@ -1,33 +1,16 @@
 package com.lattels.smalltour.service;
 
 
-import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.favoriteGuideDTO;
-import com.lattels.smalltour.dto.favoriteTourDTO;
 import com.lattels.smalltour.model.FavoriteGuide;
-import com.lattels.smalltour.model.FavoriteTour;
 import com.lattels.smalltour.model.Member;
-import com.lattels.smalltour.model.Tours;
 import com.lattels.smalltour.persistence.FavoriteGuideRepository;
-import com.lattels.smalltour.persistence.FavoriteTourRepository;
 import com.lattels.smalltour.persistence.MemberRepository;
-import com.lattels.smalltour.persistence.ToursRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Service
