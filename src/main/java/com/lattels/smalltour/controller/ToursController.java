@@ -1,11 +1,14 @@
 package com.lattels.smalltour.controller;
 
 import com.lattels.smalltour.dto.ToursDTO;
+import com.lattels.smalltour.model.Tours;
 import com.lattels.smalltour.service.ToursService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -69,6 +72,19 @@ public class ToursController {
 
         ToursDTO.ViewResponseDTO viewResponseDTO = toursService.viewTours(idRequestDTO);
         return ResponseEntity.ok().body(viewResponseDTO);
+
+    }
+
+
+    /*
+    * 가이드 자신이 올린 리스트 가져오기
+    */
+    @PostMapping(value = "/guide_list")
+    @ApiOperation(value = "가이드 자신이 올린 리스트 불러오기")
+    public ResponseEntity<List<ToursDTO.GuideListResponseDTO>> getToursList(@ApiIgnore Authentication authentication, @PageableDefault(size = 10) Pageable pageable) {
+
+        List<ToursDTO.GuideListResponseDTO> guideListResponseDTOList = toursService.getToursList(Integer.parseInt(authentication.getPrincipal().toString()), pageable);
+        return ResponseEntity.ok().body(guideListResponseDTOList);
 
     }
 

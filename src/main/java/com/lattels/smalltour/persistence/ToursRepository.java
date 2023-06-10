@@ -72,6 +72,8 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     @Query("SELECT COUNT(t) FROM Tours t WHERE t.guide.id = :guideId AND t.guide.role = 2")
     long countByGuideId(@Param("guideId") int guideId);
 
-
-
+    /*
+     * 가이드가 올린 투어 모든 상태 가져오기
+     */
+    Page<Tours> findAllByGuideOrderByCreatedDayDesc(Member guide, Pageable pageable);
 }

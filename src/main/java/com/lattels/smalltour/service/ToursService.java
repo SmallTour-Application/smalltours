@@ -363,4 +363,30 @@ public class ToursService {
         return viewResponseDTO;
 
     }
+
+    /*
+    * 가이드 자신이 올린 투어 리스트 가져오기
+    */
+    public List<ToursDTO.GuideListResponseDTO> getToursList(int memberId, Pageable pageable) {
+
+        // 등록된 회원인지 검사
+        Member member = memberRepository.findByMemberId(memberId);
+        Preconditions.checkNotNull(member, "등록된 회원이 아닙니다. (회원 ID : %s)", memberId);
+
+        // 가이드 회원인지 검사
+        Preconditions.checkArgument(member.getRole() == MemberDTO.MemberRole.GUIDE, "가이드 회원이 아닙니다. (회원 ID : %s)", memberId);
+
+        // 투어 리스트 가져오기
+        Page<Tours> toursPage = toursRepository.findAllByGuideOrderByCreatedDayDesc(member, pageable);
+        Preconditions.checkNotNull(toursPage, "등록된 투어가 없습니다. (회원 ID : %s)", memberId);
+
+        // 반환할 dto 리스트에 저장
+        List<Tours> toursList = toursPage.getContent();
+        List<ToursDTO.GuideListResponseDTO> responseDTOList = toursList.stream()
+                .map(tours -> new ToursDTO.GuideListResponseDTO(tours))
+                .collect(Collectors.toList());
+
+        return responseDTOList;
+
+    }
 }
