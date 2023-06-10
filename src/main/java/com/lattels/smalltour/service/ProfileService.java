@@ -4,6 +4,7 @@ package com.lattels.smalltour.service;
 import com.lattels.smalltour.dto.GuideProfileViewDTO;
 import com.lattels.smalltour.dto.GuideTourRequestDTO;
 import com.lattels.smalltour.dto.GuideTourReviewDTO;
+import com.lattels.smalltour.dto.ItemDTO;
 import com.lattels.smalltour.dto.main.PopularGuideDTO;
 import com.lattels.smalltour.dto.main.PopularTourDTO;
 import com.lattels.smalltour.model.*;
@@ -34,6 +35,8 @@ public class ProfileService {
     private final MemberRepository memberRepository;
 
     private final FavoriteGuideRepository favoriteGuideRepository;
+
+    private final UpperPaymentRepository upperPaymentRepository;
 
 
     // unauth/profile/guide 부분
@@ -149,16 +152,7 @@ public class ProfileService {
         Page<Tours> tours = toursRepository.findByGuideIdAndRoleAndApproval(guideId, pageRequest);
 
         List<GuideTourRequestDTO.contents> content = new ArrayList<>();
-        for(Tours tour : tours){
-            content.add(
-                    GuideTourRequestDTO.contents.builder()
-                            .tourId(tour.getId())
-                            .thumb(tour.getThumb())
-                            .title(tour.getTitle())
-                            .subTitle(tour.getSubTitle())
-                            .build()
-            );
-        }
+
 
         long count = toursRepository.countByGuideId(guideId);
 
@@ -166,6 +160,27 @@ public class ProfileService {
                 .count((int)count)
                 .contents(content)
                 .build();
+
+        for (Tours tour : tours) {
+            Optional<UpperPayment> optionalUpperPayment = upperPaymentRepository.findByTourIdAndGuideRoleAndItemTypeAndApprovals(tour.getId());
+
+            GuideTourRequestDTO.contents tourContent = GuideTourRequestDTO.contents.builder()
+                    .tourId(tour.getId())
+                    .thumb(tour.getThumb())
+                    .title(tour.getTitle())
+                    .subTitle(tour.getSubTitle())
+                    .build();
+
+            if (optionalUpperPayment.isPresent()) {
+                UpperPayment upperPayment = optionalUpperPayment.get();
+
+                ItemDTO.UpperPaymentTourIdResponseDTO upperPaymentTourIdResponseDTO = new ItemDTO.UpperPaymentTourIdResponseDTO(upperPayment);
+
+                tourContent.setUpperPaymentTourIdResponseDTO(upperPaymentTourIdResponseDTO); // 상위결제시 표시
+            }
+
+            content.add(tourContent);
+        }
 
         return guideTourRequestDTO;
     }
