@@ -1,13 +1,17 @@
 package com.lattels.smalltour.persistence;
 
+import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.model.Reviews;
 
+import com.lattels.smalltour.model.Tours;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -63,5 +67,16 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
      * 패키지 리뷰 개수를 반환합니다.
      */
     long countAllByToursId(int tourId);
+
+
+    /*
+     * 해당 기간에 받은 리뷰 평균
+     */
+    @Query("SELECT AVG(r.rating) FROM Reviews r " +
+            "WHERE r.tours.guide = :guide " +
+            "AND r.createdDay >= :startDate AND r.createdDay <= :endDate")
+    String getReviewRating(@Param("guide") Member guide,
+                         @Param("startDate") LocalDateTime startDate,
+                         @Param("endDate") LocalDateTime endDate);
 
 }

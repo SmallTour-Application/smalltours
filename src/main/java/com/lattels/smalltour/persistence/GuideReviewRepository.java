@@ -2,12 +2,16 @@ package com.lattels.smalltour.persistence;
 
 
 import com.lattels.smalltour.model.GuideReview;
+import com.lattels.smalltour.model.Member;
+import com.lattels.smalltour.model.Tours;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -86,6 +90,15 @@ public interface GuideReviewRepository extends JpaRepository<GuideReview, Intege
 
 
 
+    /*
+     * 해당 기간에 받은 리뷰 평균
+     */
+    @Query("SELECT AVG(gr.rating) FROM GuideReview gr " +
+            "WHERE gr.guide = :guide " +
+            "AND gr.createdDay >= :startDate AND gr.createdDay <= :endDate")
+    String getReviewRating(@Param("guide") Member member,
+                           @Param("startDate") LocalDateTime startDate,
+                           @Param("endDate") LocalDateTime endDate);
 
 
 

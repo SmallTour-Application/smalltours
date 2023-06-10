@@ -1,6 +1,8 @@
 package com.lattels.smalltour.persistence;
 
+import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.model.Payment;
+import com.lattels.smalltour.model.Tours;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -89,5 +91,26 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
      * 해당 가이드와 날짜에 맞는 결제 내역을 가이드명으로 검색하고 최근순으로 불러옵니다.
      */
     List<Payment> findAllByToursGuideIdAndToursGuideNameContainsAndPaymentDayBetweenOrderByPaymentDayDesc(int toursGuideId, String toursGuideName, LocalDateTime startPaymentDay, LocalDateTime endPaymentDay, Pageable pageable);
+
+
+    /*
+     * 해당 기간에 결제된 총 금액
+     */
+    @Query("SELECT SUM(p.price) FROM Payment p " +
+            "WHERE p.tours = :tours " +
+            "AND p.paymentDay >= :startDate AND p.paymentDay <= :endDate")
+    String getPriceByDate(@Param("tours") Tours tours,
+                       @Param("startDate") LocalDateTime startDate,
+                       @Param("endDate") LocalDateTime endDate);
+
+    /*
+     * 해당 기간에 결제된 총 횟수
+     */
+    @Query("SELECT count(p) FROM Payment p " +
+            "WHERE p.tours = :tours " +
+            "AND p.paymentDay >= :startDate AND p.paymentDay <= :endDate")
+    long getVolumeByDate(@Param("tours") Tours tours,
+                       @Param("startDate") LocalDateTime startDate,
+                       @Param("endDate") LocalDateTime endDate);
 
 }
