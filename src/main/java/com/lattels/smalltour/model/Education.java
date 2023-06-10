@@ -31,4 +31,7 @@ public class Education {
     @Column(name = "end_day")
     private LocalDate endDay;
 
+    @Column(name = "play_time")
+    private LocalTime playTime;
+
 }
