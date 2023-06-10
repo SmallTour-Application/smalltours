@@ -34,4 +34,7 @@ public class Education {
     @Column(name = "play_time")
     private LocalTime playTime;
 
+    @Column(name = "title")
+    private String title;
+
 }
