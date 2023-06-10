@@ -103,13 +103,13 @@ public class ProfileService {
             throw new IllegalArgumentException("해당 사용자는 가이드가 아닙니다.");
         }
 
-
-        Float avgRating = guideReviewRepository.findAverageRatingByGuideId(guideId);
-        if (avgRating == null) {
-            throw new IllegalArgumentException("해당 가이드에 대한 평가는 없습니다.");
+        int count = reviewsRepository.countByGuideId(guideId);
+        if (count == 0) {
+            throw new IllegalArgumentException("해당 가이드에 대한 리뷰가 없습니다.");
         }
 
-        int count = guideReviewRepository.findGuideReviewsByGuideIdAndRole(guideId).size();
+        Float avgRating = guideReviewRepository.findAverageRatingByGuideId(guideId);
+        //결제 이력이 있는 리뷰만 가져오게
         List<Reviews> reviewsList = reviewsRepository.findAllByGuideId(guideId, PageRequest.of(page - 1, 10));
 
         List<GuideTourReviewDTO.Review> reviewList = new ArrayList<>();
@@ -160,8 +160,10 @@ public class ProfileService {
             );
         }
 
+        long count = toursRepository.countByGuideId(guideId);
+
         GuideTourRequestDTO guideTourRequestDTO = new GuideTourRequestDTO().builder()
-                .count((int) tours.getTotalElements())
+                .count((int)count)
                 .contents(content)
                 .build();
 

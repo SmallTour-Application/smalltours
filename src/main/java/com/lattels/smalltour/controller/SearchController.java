@@ -33,14 +33,14 @@ public class SearchController {
 
     @ApiOperation(value = "패키지 검색", notes = "검색창에 입력한 값으로 패키지를 검색합니다.")
     @GetMapping("/package")
-    public ResponseEntity<?> searchTours(@RequestParam int type,
+    public ResponseEntity<?> searchPackage(@RequestParam int type,
                                          @RequestParam String location,
                                          @RequestParam int people,
                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
                                          @RequestParam int sort,
-                                         @RequestParam(defaultValue = "0") int page) {
-        return searchService.searchTours(type, location, people, start, end, sort, page);
+                                         @RequestParam(defaultValue = "1") int page) {
+        return searchService.searchPackage(type, location, people, start, end, sort, page);
     }
 
     @GetMapping("/guide")
@@ -49,6 +49,18 @@ public class SearchController {
             @RequestParam(value = "sort", defaultValue = "0") int sort,
             @RequestParam(value = "page", defaultValue = "1") int page) {
         return searchService.searchGuide(keyword, sort, page);
+    }
+
+    @ApiOperation(value = "패키지 검색", notes = "검색창에 입력한 값으로 패키지를 검색합니다.")
+    @GetMapping("/tour")
+    public ResponseEntity<?> searchTour(@RequestParam String keyword,
+                                        @RequestParam int sort,
+                                        @RequestParam String location,
+                                        @RequestParam int people,
+                                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+                                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
+                                        @RequestParam(defaultValue = "1") int page) {
+        return searchService.searchTours(keyword, sort,location,people,start,end,page);
     }
 
 }

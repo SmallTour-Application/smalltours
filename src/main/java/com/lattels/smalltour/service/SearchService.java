@@ -1,13 +1,13 @@
 package com.lattels.smalltour.service;
 
 
+import com.lattels.smalltour.dto.ItemDTO;
 import com.lattels.smalltour.dto.main.PopularGuideDTO;
 import com.lattels.smalltour.dto.main.PopularTourDTO;
 import com.lattels.smalltour.dto.search.SearchGuideDTO;
 import com.lattels.smalltour.dto.search.SearchPackageDTO;
-import com.lattels.smalltour.model.GuideReview;
-import com.lattels.smalltour.model.Member;
-import com.lattels.smalltour.model.Tours;
+import com.lattels.smalltour.dto.search.SearchTourDTO;
+import com.lattels.smalltour.model.*;
 import com.lattels.smalltour.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,11 +32,13 @@ public class SearchService {
     private final ReviewsRepository reviewsRepository;
     private final GuideReviewRepository guideReviewRepository;
     private final FavoriteGuideRepository favoriteGuideRepository;
+    private final UpperPaymentRepository upperPaymentRepository;
+    private final ItemRepository itemRepository;
 
     
     //type을 패키지로 해놓고 검색창에 패키지 이름으로 검색할 경우
     //해당 패키지들 결과물이 출력되어야함
-    public ResponseEntity<SearchPackageDTO> searchTours(int type, String location, int people, LocalDate start, LocalDate end, int sort, int page) {
+    public ResponseEntity<SearchPackageDTO> searchPackage(int type, String location, int people, LocalDate start, LocalDate end, int sort, int page) {
 
         // 최소3, 최대 5 이외엔 예외처리
         if (people < 3 || people > 5) {
@@ -50,7 +52,7 @@ public class SearchService {
 
         int size = 10;
       SearchPackageDTO response = SearchPackageDTO.builder()
-                .content(new ArrayList<>())
+               .content(new ArrayList<>())
                .build();
 
         Sort sortDirection = Sort.by("created_day");
@@ -75,17 +77,28 @@ public class SearchService {
                 if (guide.getId() == tour.getGuide().getId() && guide.getRole() == 2) {
                     Float rating = reviewsRepository.findAverageRatingByTourId(tour.getId());
                     if (rating == null) rating = 0f;
-                    response.getContent().add(
-                            SearchPackageDTO.PackageContent.builder()
-                                    .tourId(tour.getId())
-                                    .thumb(tour.getThumb())
-                                    .title(tour.getTitle())
-                                    .guideName(guide.getName())
-                                    .guideProfileImg(guide.getProfile())
-                                    .rating(rating)
-                                    .price(tour.getPrice())
-                                    .build()
-                    );
+
+                    Optional<UpperPayment> optionalUpperPayment = upperPaymentRepository.findByTourIdAndGuideRoleAndItemTypeAndApprovals(tour.getId());
+
+                    SearchPackageDTO.PackageContent packageContent = SearchPackageDTO.PackageContent.builder()
+                            .tourId(tour.getId())
+                            .thumb(tour.getThumb())
+                            .title(tour.getTitle())
+                            .guideName(guide.getName())
+                            .guideProfileImg(guide.getProfile())
+                            .rating(rating)
+                            .price(tour.getPrice())
+                            .build();
+
+                    if (optionalUpperPayment.isPresent()) {
+                        UpperPayment upperPayment = optionalUpperPayment.get();
+
+                        ItemDTO.UpperPaymentTourIdResponseDTO upperPaymentTourIdResponseDTO = new ItemDTO.UpperPaymentTourIdResponseDTO(upperPayment);
+
+                        packageContent.setUpperPaymentTourIdResponseDTO(upperPaymentTourIdResponseDTO); // 상위결제시 표시
+                    }
+
+                    response.getContent().add(packageContent);
                 }
             }
         }
@@ -147,5 +160,76 @@ public class SearchService {
         // 검색 결과 반환
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    public ResponseEntity<SearchTourDTO> searchTours(String keyword, int sort, String location, int people, LocalDate startDate, LocalDate endDate, int page) {
+        // 최소3, 최대 5 이외엔 예외처리
+        if (people < 3 || people > 5) {
+            throw new IllegalArgumentException("해당 상품은 최소 인원 3명에서 최대 5명 까지 돼야 이용이 가능합니다.");
+        }
+
+        // 입력한 날짜에 상품이 없을경우
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("날짜에 해당하는 상품(패키지)가 없습니다.");
+        }
+
+        // 상품 정렬방식
+        Sort sortDirection = Sort.by("created_day");
+        if (sort == 0) {
+            sortDirection = sortDirection.descending(); // 내림차순
+        } else if (sort == 1) {
+            sortDirection = sortDirection.ascending(); // 오름차순
+        }
+        // LocalDateTime->LocalDate
+        LocalDateTime startDay = startDate.atStartOfDay();
+
+        //페이지 번호를 1부터 시작하도록 조정
+        page = Math.max(page - 1, 0);
+
+        // 검색 파라미터를 기준으로 상품 찾기
+        Page<Tours> tours = toursRepository.findToursKeywordBySearchParameters(keyword, location, people, startDate, endDate, startDay, PageRequest.of(page, 10, sortDirection));
+
+
+        if (tours.isEmpty()) {
+            throw new IllegalArgumentException("해당 기간에 상품이 없습니다.");
+        }
+
+        // 검색결과 DTO 생성
+        SearchTourDTO response = SearchTourDTO.builder()
+                .content(new ArrayList<>())
+                .build();
+
+        for (Tours tour : tours) {
+            Member guide = memberRepository.findById(tour.getGuide().getId()).orElseThrow(() -> new RuntimeException("가이드가 없습니다."));
+            if (guide.getId() == tour.getGuide().getId() && guide.getRole() == 2) {
+                Float rating = reviewsRepository.findAverageRatingByTourId(tour.getId());
+                if (rating == null) rating = 0f;
+
+
+                SearchTourDTO.TourContentDTO tourContent = SearchTourDTO.TourContentDTO.builder()
+                        .tourId(tour.getId())
+                        .thumb(tour.getThumb())
+                        .title(tour.getTitle())
+                        .subTitle(tour.getSubTitle())
+                        .rating(rating)
+                        .price(tour.getPrice())
+                        .guideName(guide.getName())
+                        .guideProfileImg(guide.getProfile())
+                        .build();
+
+                Optional<UpperPayment> optionalUpperPayment = upperPaymentRepository.findByTourIdAndGuideRoleAndItemTypeAndApprovals(tour.getId());
+                if(optionalUpperPayment.isPresent()){
+                    UpperPayment upperPayment = optionalUpperPayment.get();
+                    ItemDTO.UpperPaymentTourIdResponseDTO upperPaymentTourIdResponseDTO = new ItemDTO.UpperPaymentTourIdResponseDTO(upperPayment);
+                    tourContent.setUpperPaymentTourIdResponseDTO(upperPaymentTourIdResponseDTO); // 상위결제시 표시
+                }
+
+                response.getContent().add(tourContent);
+            }
+        }
+        response.setCount(response.getContent().size());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
 
 }

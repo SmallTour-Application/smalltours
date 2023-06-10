@@ -4,6 +4,7 @@ import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.model.Tours;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -76,4 +77,9 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
      * 가이드가 올린 투어 모든 상태 가져오기
      */
     Page<Tours> findAllByGuideOrderByCreatedDayDesc(Member guide, Pageable pageable);
+
+
+    @Query(value = "SELECT t.* FROM Tours t JOIN Locations l ON t.id = l.tour_id LEFT JOIN Guide_Lock g ON t.guide_id = g.guide_id WHERE (l.location_name LIKE %:location% OR l.country LIKE %:location% OR l.region LIKE %:location% OR t.title LIKE %:title%) AND t.min_group_size <= :people AND t.max_group_size >= :people AND ((g.guide_id IS NULL) OR (g.id IS NOT NULL AND ((:start NOT BETWEEN g.start_day AND g.end_day) OR (:end NOT BETWEEN g.start_day AND g.end_day)))) AND t.approvals = 1 AND (:startDay >= t.created_day)", nativeQuery = true)
+    Page<Tours> findToursKeywordBySearchParameters(@Param("title") String title,@Param("location") String location, @Param("people") int people, @Param("start") LocalDate start, @Param("end") LocalDate end, @Param("startDay") LocalDateTime startDay, Pageable pageable);
+
 }
