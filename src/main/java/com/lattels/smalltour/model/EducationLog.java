@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Data
@@ -14,9 +15,9 @@ import java.time.LocalTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@IdClass(GuideEducation.GuideEducationID.class)
-@Table(name = "guide_education")
-public class GuideEducation {
+@IdClass(EducationLog.EducationLogID.class)
+@Table(name = "education_log")
+public class EducationLog {
 
     @Id
     @Column(name = "education_id")
@@ -29,15 +30,18 @@ public class GuideEducation {
     @Column(name = "last_view")
     private LocalTime lastView; //DB에선 타입이 TIME
 
-    @Column(name = "is_finish")
-    private int isFinish;
+    @Column(name = "state")
+    private int state;
+
+    @Column(name = "completed_date")
+    private LocalDate completedDate;
 
 
     @Builder
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class GuideEducationID implements Serializable {
+    public static class EducationLogID implements Serializable {
 
         private Integer educationId;
 

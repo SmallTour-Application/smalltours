@@ -1,5 +1,6 @@
 package com.lattels.smalltour.controller;
 
+import com.lattels.smalltour.service.EducationService;
 import com.lattels.smalltour.service.ItemService;
 import com.lattels.smalltour.service.RoomService;
 import com.lattels.smalltour.service.ToursService;
@@ -33,6 +34,8 @@ public class ImgController {
     private final RoomService roomService;
 
     private final ItemService itemService;
+
+    private final EducationService educationService;
 
     @Value("${file.path}")
     private String memberFilePath;
@@ -134,4 +137,25 @@ public class ImgController {
         }
     }
 
+
+    /*
+     * 교육 동영상 가져오기
+     */
+    @GetMapping(value = "/education/{fileOriginName}")
+    public ResponseEntity<Resource> getEducationFile(@PathVariable("fileOriginName") String fileName) throws Exception{
+        try{
+            String path = educationService.getEducationDirectoryPath().getPath();
+            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            if(!resource.exists()){
+                throw new Exception();
+            }
+            HttpHeaders header = new HttpHeaders();
+            Path filePath = null;
+            filePath = Paths.get(path+fileName);
+            header.add("Content-Type", Files.probeContentType(filePath)); // filePath의 마임타입 체크해서 header에 추가
+            return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
+        }catch(Exception e){
+            throw new Exception();
+        }
+    }
 }
