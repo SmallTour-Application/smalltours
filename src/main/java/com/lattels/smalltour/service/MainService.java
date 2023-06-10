@@ -3,13 +3,9 @@ package com.lattels.smalltour.service;
 
 import com.lattels.smalltour.dto.main.PopularGuideDTO;
 import com.lattels.smalltour.dto.main.PopularTourDTO;
-import com.lattels.smalltour.model.GuideReview;
-import com.lattels.smalltour.model.Member;
-import com.lattels.smalltour.model.Tours;
-import com.lattels.smalltour.persistence.GuideReviewRepository;
-import com.lattels.smalltour.persistence.MemberRepository;
-import com.lattels.smalltour.persistence.ReviewsRepository;
-import com.lattels.smalltour.persistence.ToursRepository;
+import com.lattels.smalltour.dto.mainBannerDTO;
+import com.lattels.smalltour.model.*;
+import com.lattels.smalltour.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +25,9 @@ public class MainService {
     //PopluarTOP3Tour
     private final ToursRepository toursRepository;
     private final ReviewsRepository reviewsRepository;
+
+    private final BannerPaymentRepository bannerPaymentRepository;
+    private final ItemRepository itemRepository;
 
     //가이드인 사람들 role이 1임, 메인화면에서 TOP3 가이드를 나타내기 위한 부분,GuideReview에 Rating기준으로 높은 점수순으로.
     public PopularGuideDTO getTopRatedGuides(){
@@ -119,5 +118,30 @@ public class MainService {
         return popularTourResult;
     }
 
+  /*  //결제한 가이드 배너 가져오기
+    public mainBannerDTO getBannerContent() {
+        List<Item> items = itemRepository.findAll(); // 모든 Item을 가져옵니다.
+        mainBannerDTO bannerResultDTO = new mainBannerDTO();
+        List<mainBannerDTO.BannerDTO> contents = new ArrayList<>();
+
+        for (Item item : items) {
+            List<Banner> banners = bannerPaymentRepository.findByItem(item.getId()); // 각 Item에 대한 배너 결제를 찾습니다.
+
+            if(banners.isEmpty()){
+                throw new RuntimeException("결제 내역이 없는 상품입니다.");
+            }
+
+            for (Banner banner : banners) {
+                mainBannerDTO.BannerDTO contentDTO = new mainBannerDTO.BannerDTO();
+                contentDTO.setBannerImg(banner.getImagePath());
+                contentDTO.setTourId(item.getId()); // 해당 아이템의 ID를 가져옵니다.
+                contents.add(contentDTO);
+            }
+        }
+        bannerResultDTO.setCount(contents.size());
+        bannerResultDTO.setContent(contents);
+
+        return bannerResultDTO;
+    }*/
 
 }
