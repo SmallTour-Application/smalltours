@@ -1,6 +1,8 @@
 package com.lattels.smalltour.dto;
 
 import com.lattels.smalltour.model.Item;
+import com.lattels.smalltour.model.Tours;
+import com.lattels.smalltour.model.UpperPayment;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -9,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Positive;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Data
@@ -104,6 +107,43 @@ public class ItemDTO {
             this.period = item.getPeriod();
             this.type = item.getType();
         }
+    }
+
+
+    @Data
+    @NoArgsConstructor
+    @ApiModel(value = "가이드의 결제 리스트 응답 DTO")
+    public static class PaymentListResponseDTO {
+
+        @ApiModelProperty(value = "결제 아이디", example = "1")
+        private int paymentId;
+
+        @ApiModelProperty(value = "상품 이름", example = "상품 이름")
+        private String itemTitle;
+
+        @ApiModelProperty(value = "상품 가격", example = "100000")
+        private int itemPrice;
+
+        @ApiModelProperty(value = "결제일", example = "")
+        private LocalDateTime payDay;
+
+        @ApiModelProperty(value = "만료일", example = "")
+        private LocalDateTime ExpirationDate;
+
+        @ApiModelProperty(value = "상태. 0 : 이용 중, 1: 만료", example = "1")
+        private int state;
+
+        @ApiModelProperty(value = "투어 아이디", example = "1")
+        private int toursId;
+
+        @ApiModelProperty(value = "투어 이름", example = "투어 이름입니다")
+        private String toursTitle;
+
+        public PaymentListResponseDTO(UpperPayment upperPayment) {
+            this.paymentId = upperPayment.getId();
+            this.payDay = upperPayment.getPayDay();
+        }
+
     }
 
     public static class ItemType {

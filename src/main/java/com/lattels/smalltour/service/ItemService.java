@@ -9,6 +9,8 @@ import com.lattels.smalltour.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -138,6 +140,50 @@ public class ItemService {
                 .build();
         upperPaymentRepository.save(upperPayment);
 
+    }
+
+    // 강사가 결제한 리스트
+    public List<ItemDTO.PaymentListResponseDTO> getPaymentList(int memberId, Pageable pageable) {
+
+        // 등록된 회원인지 검사
+        Member member = memberRepository.findByMemberId(memberId);
+        Preconditions.checkNotNull(member, "등록된 회원이 아닙니다. (회원 ID : %s)", memberId);
+
+        // 가이드 회원인지 검사
+        Preconditions.checkArgument((member.getRole() == MemberDTO.MemberRole.GUIDE) || (member.getRole() == MemberDTO.MemberRole.ADMIN), "가이드나 관리자 회원이 아닙니다. (회원 ID : %s)", memberId);
+
+        // 결제한 상위노출 리스트 가져오기
+        Page<UpperPayment> upperPaymentPage = upperPaymentRepository.findAllByGuideOrderByPayDay(member, pageable);
+        List<UpperPayment> upperPaymentList = upperPaymentPage.getContent();
+
+        List<ItemDTO.PaymentListResponseDTO> paymentListResponseDTOList = new ArrayList<>();
+        for (UpperPayment upperpayment: upperPaymentList) {
+
+            // item 가져오기
+            Item item = itemRepository.findById(upperpayment.getItem().getId());
+            // tours 가져오기
+            Tours tours = toursRepository.findByToursId(upperpayment.getTours().getId());
+            // 만료일 저장
+            LocalDateTime expirationDate = upperpayment.getPayDay().plusMonths(item.getPeriod());
+
+            // dto에 값 넣기
+            ItemDTO.PaymentListResponseDTO paymentListResponseDTO = new ItemDTO.PaymentListResponseDTO(upperpayment);
+            paymentListResponseDTO.setItemTitle(item.getTitle());
+            paymentListResponseDTO.setItemPrice(item.getPrice());
+            paymentListResponseDTO.setToursId(tours.getId());
+            paymentListResponseDTO.setToursTitle(tours.getTitle());
+            paymentListResponseDTO.setExpirationDate(expirationDate);
+            // 만료일이 현재보다 뒤라면 1 (만료) 할당
+            if (expirationDate.isBefore(LocalDateTime.now())) {
+                paymentListResponseDTO.setState(1);
+            }
+            else {
+                paymentListResponseDTO.setState(0);
+            }
+            paymentListResponseDTOList.add(paymentListResponseDTO);
+        }
+
+        return paymentListResponseDTOList;
     }
 
 }
