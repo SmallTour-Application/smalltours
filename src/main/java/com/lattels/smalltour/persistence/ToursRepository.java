@@ -76,4 +76,5 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
      * 가이드가 올린 투어 모든 상태 가져오기
      */
     Page<Tours> findAllByGuideOrderByCreatedDayDesc(Member guide, Pageable pageable);
+
 }
