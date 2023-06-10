@@ -74,8 +74,13 @@ public interface GuideReviewRepository extends JpaRepository<GuideReview, Intege
     Float findAverageRatingByGuideId(@Param("guideId") int guideId);
 
 
-
-
+    // 가이드 리뷰 평점과 투어 리뷰 평점의 평점
+    @Query(value = "SELECT ( " +
+            "(SELECT AVG(rating) FROM guide_review WHERE guide_id = :guideId) " +
+            "+ (SELECT AVG(r.rating) FROM reviews r, tours t , `member` m  " +
+            "where r.tour_id = t.id and t.guide_id = m.id and m.id = :guideId ) " +
+            ") / 2 AS rating", nativeQuery = true)
+    double getGuideAndToursRating(@Param("guideId") int guideId);
 
 
 
