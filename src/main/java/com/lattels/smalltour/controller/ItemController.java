@@ -8,6 +8,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -65,5 +67,14 @@ public class ItemController {
 
     }
 
+    // 가이드 결제 상품 리스트 불러오기
+    @PostMapping(value = "/payment/list")
+    @ApiOperation(value = "가이드가 결제한 리스트 불러오기")
+    public ResponseEntity<List<ItemDTO.PaymentListResponseDTO>> getPaymentList(@ApiIgnore Authentication authentication, @PageableDefault(size = 10) Pageable pageable) {
+
+        List<ItemDTO.PaymentListResponseDTO> paymentListResponseDTOList = itemService.getPaymentList(Integer.parseInt(authentication.getPrincipal().toString()), pageable);
+        return ResponseEntity.ok().body(paymentListResponseDTOList);
+
+    }
 
 }
