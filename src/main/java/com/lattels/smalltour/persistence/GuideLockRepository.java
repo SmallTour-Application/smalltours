@@ -14,6 +14,10 @@ import java.util.List;
 public interface GuideLockRepository extends JpaRepository<GuideLock, Integer> {
 
 
+    @Query("SELECT g FROM GuideLock g WHERE g.guide.id = :guideId AND g.guide.role = 2 AND g.startDay <= :startDay AND g.endDay >= :endDay")
+    GuideLock findGuideLockByGuideIdAndRoleAndPeriod(@Param("guideId") int guideId, @Param("startDay") LocalDate startDay, @Param("endDay") LocalDate endDay);
+
+
     //해당 가이드 특정 기간 날짜 가져오기
     //다른 회원들은 특정 기간동안 해당 가이드 사용 불가하기 위한 목적
     @Query("SELECT gl FROM GuideLock gl WHERE gl.guide.id = :guideId AND gl.startDay >= :startDay AND gl.endDay <= :endDay")
@@ -39,4 +43,8 @@ public interface GuideLockRepository extends JpaRepository<GuideLock, Integer> {
 
     List<GuideLock> findAllByGuideOrderByStartDay(Member member);
 
+    @Query("select g.guide from GuideLock g where g.guide =: guide")
+    List<GuideLock> findByGuide(Member guide);
+
+    List<GuideLock> findAllByGuideId(int guideId);
 }

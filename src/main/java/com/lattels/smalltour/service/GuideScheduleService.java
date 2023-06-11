@@ -51,22 +51,22 @@ public class GuideScheduleService {
                     List<Payment> payments = paymentRepository.findPaymentsByGuideAndTourAndDepartureDay(guideId, tour.getId(), startDay, endDay);
 
                     for (Payment payment : payments) {
-                            //date : String, startDay ~ endDay
-                            String period = guideLock.getStartDay().toString() + "~" + guideLock.getEndDay().toString();
+                        //date : String, startDay ~ endDay
+                        String period = guideLock.getStartDay().toString() + "~" + guideLock.getEndDay().toString();
 
-                            GuideScheduleDTO guideScheduleDTO = GuideScheduleDTO.builder()
-                                    .date(period)
-                                    .packageId(tour.getId())
-                                    .packageName(tour.getTitle())
-                                    .memberNickName(payment.getMember().getNickname())
-                                    .memberTel(payment.getMember().getTel())
-                                    .build();
+                        GuideScheduleDTO guideScheduleDTO = GuideScheduleDTO.builder()
+                                .date(period)
+                                .packageId(tour.getId())
+                                .packageName(tour.getTitle())
+                                .memberNickName(payment.getMember().getNickname())
+                                .memberTel(payment.getMember().getTel())
+                                .build();
 
-                            guideScheduleDTOList.add(guideScheduleDTO);
-                        }
+                        guideScheduleDTOList.add(guideScheduleDTO);
                     }
                 }
             }
+        }
         return guideScheduleDTOList;
     }
 }

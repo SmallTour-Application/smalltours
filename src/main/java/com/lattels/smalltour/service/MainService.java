@@ -9,6 +9,8 @@ import com.lattels.smalltour.model.*;
 import com.lattels.smalltour.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -32,8 +34,27 @@ public class MainService {
     private final BannerRepository bannertRepository;
     private final ItemRepository itemRepository;
 
+    //application.properties
+    //server.domain=http://localhost
+    private final Environment env;
+
+    @Value("${file.path}")
+    private String filePath;
+
+    @Value("${file.path.tours.images}")
+    private String filePathToursImages;
+
+
     //가이드인 사람들 role이 1임, 메인화면에서 TOP3 가이드를 나타내기 위한 부분,GuideReview에 Rating기준으로 높은 점수순으로.
     public PopularGuideDTO getTopRatedGuides(){
+        // 메소드 내부에서 사용
+        String domain = env.getProperty("server.domain");
+        String port = env.getProperty("server.port");
+
+        String filePathMember = domain + ":" + port + "/" + filePath.replace("\\", "/") + "/";
+
+
+
         //member테이블에 role이 2인 사람 = 가이드
         List<Member> guides = memberRepository.findByRole(2);
 
@@ -65,7 +86,7 @@ public class MainService {
             float average = (reviews.size() > 0) ? sum / reviews.size() : 0;
 
             PopularGuideDTO.ReviewInfo reviewInfo = new PopularGuideDTO.ReviewInfo();
-            reviewInfo.setProfileImg(guide.getProfile());
+            reviewInfo.setProfileImg(filePathMember + guide.getProfile());
             reviewInfo.setGuideName(guide.getName());
             reviewInfo.setRating(average);
 
@@ -94,6 +115,14 @@ public class MainService {
 
     //평점이 높은 순서대로 Top3 투어상품
     public PopularTourDTO getPopularTours(){
+
+        // 메소드 내부에서 사용
+        String domain = env.getProperty("server.domain");
+        String port = env.getProperty("server.port");
+
+        String filePathToursImg = domain + ":" + port + "/" + filePathToursImages.replace("\\", "/") + "/";
+
+
         List<Tours> allTours = toursRepository.findAll();
         PriorityQueue<PopularTourDTO.TourInfo> topTours = new PriorityQueue<>(
                 Comparator.comparing(PopularTourDTO.TourInfo::getRating)
@@ -104,7 +133,7 @@ public class MainService {
             if (averageRating == null) continue; //평점이 없는경우, 해당 상품에 대해 리뷰가 없다고 판단 ,그냥넘어감
 
             PopularTourDTO.TourInfo tourInfo = PopularTourDTO.TourInfo.builder()
-                    .thumb(tour.getThumb())
+                    .thumb(filePathToursImg + tour.getThumb())
                     .title(tour.getTitle())
                     .subTitle(tour.getSubTitle())
                     .price(tour.getPrice())
