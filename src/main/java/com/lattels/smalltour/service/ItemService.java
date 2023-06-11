@@ -37,6 +37,12 @@ public class ItemService {
     @Value("${file.path.item}")
     private String itemFilePath;
 
+    @Value("${server.domain}")
+    private String domain;
+
+    @Value("${server.port}")
+    private String port;
+
     public File getItemDirectoryPath() {
         File file = new File(itemFilePath);
         file.mkdirs();
@@ -80,7 +86,7 @@ public class ItemService {
         Preconditions.checkArgument((member.getRole() == MemberDTO.MemberRole.GUIDE) || (member.getRole() == MemberDTO.MemberRole.ADMIN), "가이드나 관리자 회원이 아닙니다. (회원 ID : %s)", memberId);
 
         ItemDTO.ViewResponseDTO viewResponseDTO = new ItemDTO.ViewResponseDTO(item);
-        viewResponseDTO.setImagePath("http://localhost:8081/img/item/" + viewResponseDTO.getImagePath());
+        viewResponseDTO.setImagePath(domain + port + "/img/item/" + viewResponseDTO.getImagePath());
 
         return viewResponseDTO;
 
