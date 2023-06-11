@@ -61,7 +61,6 @@ public class ToursService {
     public File getToursImagesDirectoryPath() {
         File file = new File(toursImagesFilePath);
         file.mkdirs();
-
         return file;
     }
 

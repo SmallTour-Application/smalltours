@@ -1,9 +1,6 @@
 package com.lattels.smalltour.controller;
 
-import com.lattels.smalltour.service.EducationService;
-import com.lattels.smalltour.service.ItemService;
-import com.lattels.smalltour.service.RoomService;
-import com.lattels.smalltour.service.ToursService;
+import com.lattels.smalltour.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +26,8 @@ import java.nio.file.Paths;
 @RequestMapping("/img")
 public class ImgController {
 
+    private final MemberService memberService;
+
     private final ToursService toursService;
 
     private final RoomService roomService;
@@ -37,8 +36,16 @@ public class ImgController {
 
     private final EducationService educationService;
 
-    @Value("${file.path}")
-    private String memberFilePath;
+    private final SearchService searchService;
+
+    private final ProfileService profileService;
+
+    private final MemberGuideService memberGuideService;
+
+    private final MainService mainService;
+
+
+
 
 
     // 투어 썸네일 url
@@ -120,8 +127,7 @@ public class ImgController {
     @GetMapping(value = "/member/{fileOriginName}")
     public ResponseEntity<Resource> getProfileImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
-            String absolutePath = memberFilePath;
-            String path = absolutePath; // 실제 이미지가 있는 위치
+            String path = memberService.getMemberDirectoryPath().getPath();
             FileSystemResource resource = new FileSystemResource(path + fileName);
             log.info("이미지 가져오기..." + path + fileName);
             if(!resource.exists()){
@@ -158,4 +164,174 @@ public class ImgController {
             throw new Exception();
         }
     }
+
+
+    @GetMapping(value = "/search/member/{fileOriginName}")
+    public ResponseEntity<Resource> getSearchProfileImg(@PathVariable("fileOriginName") String fileName) throws Exception{
+        try{
+            String path = searchService.getMemberDirectoryPath().getPath();
+            FileSystemResource resource = new FileSystemResource(path + fileName);
+            log.info("이미지 가져오기..." + path + fileName);
+            if(!resource.exists()){
+                throw new Exception();
+            }
+            HttpHeaders header = new HttpHeaders();
+            Path filePath = null;
+            filePath = Paths.get(path+fileName);
+            header.add("Content-Type", Files.probeContentType(filePath)); // filePath의 마임타입 체크해서 header에 추가
+            return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
+        }catch(Exception e){
+            throw new Exception();
+        }
+    }
+
+    @GetMapping(value = "/search/tour/{fileOriginName}")
+    public ResponseEntity<Resource> getTourImg(@PathVariable("fileOriginName") String fileName) throws Exception{
+        try{
+            String path = searchService.getTourDirectoryPath().getPath();
+            FileSystemResource resource = new FileSystemResource(path + fileName);
+            log.info("이미지 가져오기..." + path + fileName);
+            if(!resource.exists()){
+                throw new Exception();
+            }
+            HttpHeaders header = new HttpHeaders();
+            Path filePath = null;
+            filePath = Paths.get(path+fileName);
+            header.add("Content-Type", Files.probeContentType(filePath)); // filePath의 마임타입 체크해서 header에 추가
+            return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
+        }catch(Exception e){
+            throw new Exception();
+        }
+    }
+
+    @GetMapping(value = "/profile/member/{fileOriginName}")
+    public ResponseEntity<Resource> getProfileMemberImg(@PathVariable("fileOriginName") String fileName) throws Exception{
+        try{
+            String path = profileService.getMemberDirectoryPath().getPath();
+            FileSystemResource resource = new FileSystemResource(path + fileName);
+            log.info("이미지 가져오기..." + path + fileName);
+            if(!resource.exists()){
+                throw new Exception();
+            }
+            HttpHeaders header = new HttpHeaders();
+            Path filePath = null;
+            filePath = Paths.get(path+fileName);
+            header.add("Content-Type", Files.probeContentType(filePath)); // filePath의 마임타입 체크해서 header에 추가
+            return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
+        }catch(Exception e){
+            throw new Exception();
+        }
+    }
+
+    @GetMapping(value = "/profile/tour/{fileOriginName}")
+    public ResponseEntity<Resource> getProfileTourImg(@PathVariable("fileOriginName") String fileName) throws Exception{
+        try{
+            String path = profileService.getTourDirectoryPath().getPath();
+            FileSystemResource resource = new FileSystemResource(path + fileName);
+            log.info("이미지 가져오기..." + path + fileName);
+            if(!resource.exists()){
+                throw new Exception();
+            }
+            HttpHeaders header = new HttpHeaders();
+            Path filePath = null;
+            filePath = Paths.get(path+fileName);
+            header.add("Content-Type", Files.probeContentType(filePath)); // filePath의 마임타입 체크해서 header에 추가
+            return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
+        }catch(Exception e){
+            throw new Exception();
+        }
+    }
+
+
+    @GetMapping(value = "/guide/member/{fileOriginName}")
+    public ResponseEntity<Resource> getGuideProfileMemberImg(@PathVariable("fileOriginName") String fileName) throws Exception{
+        try{
+            String path = memberGuideService.getMemberDirectoryPath().getPath();
+            FileSystemResource resource = new FileSystemResource(path + fileName);
+            log.info("이미지 가져오기..." + path + fileName);
+            if(!resource.exists()){
+                throw new Exception();
+            }
+            HttpHeaders header = new HttpHeaders();
+            Path filePath = null;
+            filePath = Paths.get(path+fileName);
+            header.add("Content-Type", Files.probeContentType(filePath)); // filePath의 마임타입 체크해서 header에 추가
+            return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
+        }catch(Exception e){
+            throw new Exception();
+        }
+    }
+
+    @GetMapping(value = "/guide/portResume/{fileOriginName}")
+    public ResponseEntity<Resource> getPortResumeImg(@PathVariable("fileOriginName") String fileName) throws Exception{
+        try{
+            String path = memberGuideService.getPortResumeDirectoryPath().getPath();
+            FileSystemResource resource = new FileSystemResource(path + fileName);
+            log.info("이미지 가져오기..." + path + fileName);
+            if(!resource.exists()){
+                throw new Exception();
+            }
+            HttpHeaders header = new HttpHeaders();
+            Path filePath = null;
+            filePath = Paths.get(path+fileName);
+            header.add("Content-Type", Files.probeContentType(filePath)); // filePath의 마임타입 체크해서 header에 추가
+            return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
+        }catch(Exception e){
+            throw new Exception();
+        }
+    }
+
+
+
+    @GetMapping(value = "/main/member/{fileOriginName}")
+    public ResponseEntity<Resource> getMainMemberImg(@PathVariable("fileOriginName") String fileName) throws Exception{
+        try{
+            String path = mainService.getMemberDirectoryPath().getPath();
+            FileSystemResource resource = new FileSystemResource(path + fileName);
+            log.info("이미지 가져오기..." + path + fileName);
+            if(!resource.exists()){
+                throw new Exception();
+            }
+            HttpHeaders header = new HttpHeaders();
+            Path filePath = null;
+            filePath = Paths.get(path+fileName);
+            header.add("Content-Type", Files.probeContentType(filePath)); // filePath의 마임타입 체크해서 header에 추가
+            return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
+        }catch(Exception e){
+            throw new Exception();
+        }
+    }
+
+    @GetMapping(value = "/main/tour/{fileOriginName}")
+    public ResponseEntity<Resource> getMainTourImg(@PathVariable("fileOriginName") String fileName) throws Exception{
+        try{
+            String path = mainService.getTourDirectoryPath().getPath();
+            FileSystemResource resource = new FileSystemResource(path + fileName);
+            log.info("이미지 가져오기..." + path + fileName);
+            if(!resource.exists()){
+                throw new Exception();
+            }
+            HttpHeaders header = new HttpHeaders();
+            Path filePath = null;
+            filePath = Paths.get(path+fileName);
+            header.add("Content-Type", Files.probeContentType(filePath)); // filePath의 마임타입 체크해서 header에 추가
+            return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
+        }catch(Exception e){
+            throw new Exception();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

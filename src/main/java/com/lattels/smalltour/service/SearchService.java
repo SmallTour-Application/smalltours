@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -49,9 +50,34 @@ public class SearchService {
     @Value("${file.path}")
     private String filePath;
 
+    public File getMemberDirectoryPath() {
+        File file = new File(filePath);
+        file.mkdirs();
+
+        return file;
+    }
+
+    public File getTourDirectoryPath() {
+        File file = new File(filePathToursImages);
+        file.mkdirs();
+
+        return file;
+    }
+
+
+
     //type을 패키지로 해놓고 검색창에 패키지 이름으로 검색할 경우
     //해당 패키지들 결과물이 출력되어야함
     public ResponseEntity<SearchPackageDTO> searchPackage(int type, String location, int people, LocalDate start, LocalDate end, int sort, int page) {
+
+        // 메소드 내부에서 사용
+        String domain = env.getProperty("server.domain");
+        String port = env.getProperty("server.port");
+
+        String filePathToursImg = domain + port + "/" + filePathToursImages.replace("\\", "/") + "/";
+        String filePathMember = domain + port + "/" + filePath.replace("\\", "/");
+
+
         if (people < 3 || people > 5) {
             throw new IllegalArgumentException("해당 상품은 최소 인원 3명에서 최대 5명 까지 돼야 이용이 가능합니다.");
         }
@@ -112,10 +138,10 @@ public class SearchService {
 
                     SearchPackageDTO.PackageContent packageContent = SearchPackageDTO.PackageContent.builder()
                             .tourId(tour.getId())
-                            .thumb(tour.getThumb())
+                            .thumb(filePathToursImg + "img/search/tour/" + tour.getThumb())
                             .title(tour.getTitle())
                             .guideName(guide.getName())
-                            .guideProfileImg(guide.getProfile())
+                            .guideProfileImg(filePathMember + "img/search/member/" + guide.getProfile())
                             .rating(rating)
                             .price(tour.getPrice())
                             .build();
@@ -149,7 +175,7 @@ public class SearchService {
         String port = env.getProperty("server.port");
 
 
-        String filePathMember = domain + port + "/" + filePath.replace("\\", "/") + "/";
+        String filePathMember = domain + port + "/" + filePath.replace("\\", "/");
 
         int size = 10;
         SearchGuideDTO response = SearchGuideDTO.builder()
@@ -186,7 +212,7 @@ public class SearchService {
                 response.getContentGuides().add(
                         SearchGuideDTO.ContentGuide.builder()
                                 .guideId(guide.getId())
-                                .guideProfileImg(filePathMember + guide.getProfile())
+                                .guideProfileImg(filePathMember + "img/search/member/" + guide.getProfile())
                                 .guideName(guide.getName())
                                 .rating(rating)
                                 .favoriteCount((int)favoriteCount)
@@ -207,7 +233,7 @@ public class SearchService {
         String port = env.getProperty("server.port");
 
         String filePathToursImg = domain + port + "/" + filePathToursImages.replace("\\", "/") + "/";
-        String filePathMember = domain + port + "/" + filePath.replace("\\", "/") + "/";
+        String filePathMember = domain + port + "/" + filePath.replace("\\", "/");
 
 
 
@@ -256,13 +282,13 @@ public class SearchService {
 
                 SearchTourDTO.TourContentDTO tourContent = SearchTourDTO.TourContentDTO.builder()
                         .tourId(tour.getId())
-                        .thumb(filePathToursImg + tour.getThumb())
+                        .thumb(filePathToursImg + "img/search/tour/"+ tour.getThumb())
                         .title(tour.getTitle())
                         .subTitle(tour.getSubTitle())
                         .rating(rating)
                         .price(tour.getPrice())
                         .guideName(guide.getName())
-                        .guideProfileImg(filePathMember + guide.getProfile())
+                        .guideProfileImg(filePathMember + "img/search/member/" +  guide.getProfile())
                         .build();
 
                 Optional<UpperPayment> optionalUpperPayment = upperPaymentRepository.findByTourIdAndGuideRoleAndItemTypeAndApprovals(tour.getId());
