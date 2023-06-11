@@ -73,10 +73,21 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     Page<Tours> findAllByGuideOrderByCreatedDayDesc(Member guide, Pageable pageable);
 
 
-    @Query(value = "SELECT t.* FROM Tours t JOIN Locations l ON t.id = l.tour_id LEFT JOIN Guide_Lock g ON t.guide_id = g.guide_id WHERE (l.location_name LIKE %:location% OR l.country LIKE %:location% OR l.region LIKE %:location% OR t.title LIKE %:title%) AND t.min_group_size <= :people AND t.max_group_size >= :people AND ((g.guide_id IS NULL) OR (g.id IS NOT NULL AND ((:start NOT BETWEEN g.start_day AND g.end_day) OR (:end NOT BETWEEN g.start_day AND g.end_day)))) AND t.approvals = 1 AND (:startDay >= t.created_day)", nativeQuery = true)
+
+/*
+    @Query(value = "SELECT distinct t.* FROM Tours t JOIN Locations l ON t.id = l.tour_id LEFT JOIN Guide_Lock g ON t.guide_id = g.guide_id WHERE (l.location_name LIKE %:location% OR l.country LIKE %:location% OR l.region LIKE %:location% OR t.title LIKE %:title%)" +
+                    " AND t.min_group_size <= :people AND t.max_group_size >= :people AND ((g.guide_id IS NULL AND (DATEDIFF(:end, :start) + 1 = t.duration)) OR (g.guide_id IS NOT NULL AND ((:start NOT BETWEEN g.start_day AND g.end_day) OR (:end NOT BETWEEN g.start_day AND g.end_day)) AND (DATEDIFF(:end, :start) + 1 = t.duration))) AND t.approvals = 1 AND (:startDay >= t.created_day)", nativeQuery = true)
     Page<Tours> findToursKeywordBySearchParameters(@Param("title") String title,@Param("location") String location, @Param("people") int people, @Param("start") LocalDate start, @Param("end") LocalDate end, @Param("startDay") LocalDateTime startDay, Pageable pageable);
+*/
 
+/*
+    @Query(value = "SELECT t.* FROM Tours t JOIN Locations l ON t.id = l.tour_id LEFT JOIN Guide_Lock g ON t.guide_id = g.guide_id WHERE (l.location_name LIKE %:location% OR l.country LIKE %:location% OR l.region LIKE %:location% OR t.title LIKE %:title%) AND t.min_group_size <= :people AND t.max_group_size >= :people AND ((g.guide_id IS NULL)" +
+            " OR (g.id IS NOT NULL AND ((:start NOT BETWEEN g.start_day AND g.end_day) OR (:end NOT BETWEEN g.start_day AND g.end_day)))) AND t.approvals = 1 AND (:startDay >= t.created_day)", nativeQuery = true)
+    Page<Tours> findToursKeywordBySearchParameters(@Param("title") String title,@Param("location") String location, @Param("people") int people, @Param("start") LocalDate start, @Param("end") LocalDate end, @Param("startDay") LocalDateTime startDay, Pageable pageable);
+*/
 
-
+    @Query(value = "SELECT distinct t.* FROM Tours t JOIN Locations l ON t.id = l.tour_id LEFT JOIN Guide_Lock g ON t.guide_id = g.guide_id WHERE (l.location_name LIKE %:location% OR l.country LIKE %:location% OR l.region LIKE %:location% OR t.title LIKE %:keyword%) AND t.min_group_size <= :people AND t.max_group_size >= :people AND" +
+            "((g.guide_id IS NULL AND (DATEDIFF(:end, :start) + 1 = t.duration)) OR (g.guide_id IS NOT NULL AND ((DATEDIFF(:end, :start) + 1 = t.duration) AND (:start > g.end_day OR :end < g.start_day)))) AND t.approvals = 1", nativeQuery = true)
+    Page<Tours> findToursBySearchParameters(@Param("keyword") String keyword, @Param("location") String location, @Param("people") int people, @Param("start") LocalDate start, @Param("end") LocalDate end, Pageable pageable);
 
 }

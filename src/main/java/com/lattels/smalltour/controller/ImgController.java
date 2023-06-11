@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -128,17 +129,19 @@ public class ImgController {
     public ResponseEntity<Resource> getProfileImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = memberService.getMemberDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + "\\" + fileName);
+            FileSystemResource resource = new FileSystemResource(path + File.separator + fileName);
             if(!resource.exists()){
-                throw new Exception("File not found: " + path + fileName);
+                throw new Exception("File not found: " + path + File.separator + fileName);
+
             }
+            System.out.println("fileName: " + fileName);
             HttpHeaders header = new HttpHeaders();
             Path filePath = null;
             filePath = Paths.get(path+fileName);
             header.add("Content-Type", Files.probeContentType(filePath)); // filePath의 마임타입 체크해서 header에 추가
             return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
         }catch(Exception e){
-            throw new Exception();
+            throw new Exception(e.getMessage() + "메세지좀");
         }
     }
 
@@ -165,12 +168,13 @@ public class ImgController {
     }
 
 
+    /*searchService */
     @GetMapping(value = "/search/member/{fileOriginName}")
     public ResponseEntity<Resource> getSearchProfileImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = searchService.getMemberDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + fileName);
-            log.info("이미지 가져오기..." + path + fileName);
+            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
             }
@@ -188,8 +192,8 @@ public class ImgController {
     public ResponseEntity<Resource> getTourImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = searchService.getTourDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + fileName);
-            log.info("이미지 가져오기..." + path + fileName);
+            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
             }
@@ -203,12 +207,13 @@ public class ImgController {
         }
     }
 
+    /*profileService */
     @GetMapping(value = "/profile/member/{fileOriginName}")
     public ResponseEntity<Resource> getProfileMemberImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = profileService.getMemberDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + fileName);
-            log.info("이미지 가져오기..." + path + fileName);
+            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
             }
@@ -226,8 +231,8 @@ public class ImgController {
     public ResponseEntity<Resource> getProfileTourImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = profileService.getTourDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + fileName);
-            log.info("이미지 가져오기..." + path + fileName);
+            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
             }
@@ -241,13 +246,13 @@ public class ImgController {
         }
     }
 
-
+    /*MemberGuideService */
     @GetMapping(value = "/guide/member/{fileOriginName}")
     public ResponseEntity<Resource> getGuideProfileMemberImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = memberGuideService.getMemberDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + fileName);
-            log.info("이미지 가져오기..." + path + fileName);
+            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
             }
@@ -265,8 +270,8 @@ public class ImgController {
     public ResponseEntity<Resource> getPortResumeImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = memberGuideService.getPortResumeDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + fileName);
-            log.info("이미지 가져오기..." + path + fileName);
+            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
             }
@@ -282,12 +287,13 @@ public class ImgController {
 
 
 
+    /*mainService */
     @GetMapping(value = "/main/member/{fileOriginName}")
     public ResponseEntity<Resource> getMainMemberImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = mainService.getMemberDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + fileName);
-            log.info("이미지 가져오기..." + path + fileName);
+            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
             }
@@ -305,8 +311,8 @@ public class ImgController {
     public ResponseEntity<Resource> getMainTourImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = mainService.getTourDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + fileName);
-            log.info("이미지 가져오기..." + path + fileName);
+            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
             }

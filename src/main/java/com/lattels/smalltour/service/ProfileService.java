@@ -41,15 +41,19 @@ public class ProfileService {
 
     private final UpperPaymentRepository upperPaymentRepository;
 
-    //application.properties
-    //server.domain=http://localhost:
-    private final Environment env;
 
     @Value("${file.path.tours.images}")
     private String filePathToursImages;
 
     @Value("${file.path}")
     private String filePath;
+
+    @Value("${server.domain}")
+    private String domain;
+
+    @Value("${server.port}")
+    private String port;
+
 
     public File getMemberDirectoryPath() {
         File file = new File(filePath);
@@ -70,13 +74,6 @@ public class ProfileService {
     // unauth/profile/guide 부분
     //가이드 클릭시 해당 정보들 나오는 메서드
     public GuideProfileViewDTO searchGuide(int guideId) {
-        // 메소드 내부에서 사용
-        String domain = env.getProperty("server.domain");
-        String port = env.getProperty("server.port");
-
-        String filePathToursImg = domain + port + "/" + filePathToursImages.replace("\\", "/") + "/";
-        String filePathMember = domain + port + "/" + filePath.replace("\\", "/");
-
 
         // guideId에 해당하는 GuideProfile를 찾기
         GuideProfile guideProfile = guideProfileRepository.findByGuideIdAndRole(guideId);
@@ -100,10 +97,10 @@ public class ProfileService {
             float rating = (averageRating != null) ? averageRating : 0.0f;
 
             GuideProfileViewDTO.TourDTO tourDTO = GuideProfileViewDTO.TourDTO.builder()
-                    .thumb(filePathToursImg + "img/profile/tour/" +  tour.getThumb())
+                    .thumb(domain + port + "/img/profile/tour/" +  tour.getThumb())
                     .title(tour.getTitle())
                     .guideName(tour.getGuide().getName())
-                    .guideProfileImg(filePathMember + "img/search/member/" + tour.getGuide().getProfile())
+                    .guideProfileImg(domain + port + "/img/profile/member/" + tour.getGuide().getProfile())
                     .rating(rating)
                     .price(tour.getPrice())
                     .build();
@@ -120,7 +117,7 @@ public class ProfileService {
                 .introduce(guideProfile.getIntroduce())
                 .joinDay(member.getJoinDay())
                 .gender(member.getGender())
-                .profileImg(filePathMember + "img/search/member/" + member.getProfile())
+                .profileImg(domain + port + "/img/profile/member/" + member.getProfile())
                 .tours(tourDTOs)
                 .favoriteCount((int)favoriteCount)
                 .build();
@@ -174,11 +171,6 @@ public class ProfileService {
 
     //해당 가이드가 올린 투어 정보 가져오기
     public GuideTourRequestDTO getGuideTours(int guideId, int page){
-        // 메소드 내부에서 사용
-        String domain = env.getProperty("server.domain");
-        String port = env.getProperty("server.port");
-
-        String filePathToursImg = domain + port + "/" + filePathToursImages.replace("\\", "/");
 
         // 해당 가이드가 존재하는지 확인
         Member guide = memberRepository.findById(guideId).orElseThrow(()->new IllegalArgumentException("해당 가이드는 없습니다."));
@@ -207,7 +199,7 @@ public class ProfileService {
 
             GuideTourRequestDTO.contents tourContent = GuideTourRequestDTO.contents.builder()
                     .tourId(tour.getId())
-                    .thumb(filePathToursImg + "img/profile/tour/" +  tour.getThumb())
+                    .thumb(domain + port + "/img/profile/tour/" +  tour.getThumb())
                     .title(tour.getTitle())
                     .subTitle(tour.getSubTitle())
                     .build();

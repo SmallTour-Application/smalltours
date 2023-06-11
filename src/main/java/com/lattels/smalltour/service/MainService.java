@@ -35,15 +35,18 @@ public class MainService {
     private final BannerRepository bannertRepository;
     private final ItemRepository itemRepository;
 
-    //application.properties
-    //server.domain=http://localhost
-    private final Environment env;
 
     @Value("${file.path}")
     private String filePath;
 
     @Value("${file.path.tours.images}")
     private String filePathToursImages;
+
+    @Value("${server.domain}")
+    private String domain;
+
+    @Value("${server.port}")
+    private String port;
 
 
     public File getMemberDirectoryPath() {
@@ -63,13 +66,6 @@ public class MainService {
 
     //가이드인 사람들 role이 1임, 메인화면에서 TOP3 가이드를 나타내기 위한 부분,GuideReview에 Rating기준으로 높은 점수순으로.
     public PopularGuideDTO getTopRatedGuides(){
-        // 메소드 내부에서 사용
-        String domain = env.getProperty("server.domain");
-        String port = env.getProperty("server.port");
-
-        String filePathMember = domain + ":" + port + "/" + filePath.replace("\\", "/");
-
-
 
         //member테이블에 role이 2인 사람 = 가이드
         List<Member> guides = memberRepository.findByRole(2);
@@ -102,7 +98,7 @@ public class MainService {
             float average = (reviews.size() > 0) ? sum / reviews.size() : 0;
 
             PopularGuideDTO.ReviewInfo reviewInfo = new PopularGuideDTO.ReviewInfo();
-            reviewInfo.setProfileImg(filePathMember + "img/main/member/" + guide.getProfile());
+            reviewInfo.setProfileImg(domain + port +  "/img/main/member/" + guide.getProfile());
             reviewInfo.setGuideName(guide.getName());
             reviewInfo.setRating(average);
 
@@ -132,13 +128,6 @@ public class MainService {
     //평점이 높은 순서대로 Top3 투어상품
     public PopularTourDTO getPopularTours(){
 
-        // 메소드 내부에서 사용
-        String domain = env.getProperty("server.domain");
-        String port = env.getProperty("server.port");
-
-        String filePathToursImg = domain + ":" + port + "/" + filePathToursImages.replace("\\", "/") + "/";
-
-
         List<Tours> allTours = toursRepository.findAll();
         PriorityQueue<PopularTourDTO.TourInfo> topTours = new PriorityQueue<>(
                 Comparator.comparing(PopularTourDTO.TourInfo::getRating)
@@ -149,7 +138,7 @@ public class MainService {
             if (averageRating == null) continue; //평점이 없는경우, 해당 상품에 대해 리뷰가 없다고 판단 ,그냥넘어감
 
             PopularTourDTO.TourInfo tourInfo = PopularTourDTO.TourInfo.builder()
-                    .thumb(filePathToursImg +"img/main/tour/" + tour.getThumb())
+                    .thumb(domain + port  +"/img/main/tour/" + tour.getThumb())
                     .title(tour.getTitle())
                     .subTitle(tour.getSubTitle())
                     .price(tour.getPrice())
@@ -182,31 +171,5 @@ public class MainService {
 
         return popularTourResult;
     }
-
-    //결제한 가이드 배너 가져오기
-  /*  public mainBannerDTO getBannerContent() {
-        List<Item> items = itemRepository.findAll(); // 모든 Item을 가져옵니다.
-        mainBannerDTO bannerResultDTO = new mainBannerDTO();
-        List<mainBannerDTO.BannerDTO> contents = new ArrayList<>();
-
-        for (Item item : items) {
-            List<Banner> banners = bannerPaymentRepository.findByItem(item.getId()); // 각 Item에 대한 배너 결제를 찾습니다.
-
-            if(banners.isEmpty()){
-                throw new RuntimeException("결제 내역이 없는 상품입니다.");
-            }
-
-            for (Banner banner : banners) {
-                mainBannerDTO.BannerDTO contentDTO = new mainBannerDTO.BannerDTO();
-                contentDTO.setBannerImg(banner.getImagePath());
-                contentDTO.setTourId(item.getId()); // 해당 아이템의 ID를 가져옵니다.
-                contents.add(contentDTO);
-            }
-        }
-        bannerResultDTO.setCount(contents.size());
-        bannerResultDTO.setContent(contents);
-
-        return bannerResultDTO;
-    }*/
 
 }

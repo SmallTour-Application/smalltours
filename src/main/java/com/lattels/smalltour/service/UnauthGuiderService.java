@@ -159,7 +159,7 @@ public class UnauthGuiderService {
             }
 
             String new_file_name = String.valueOf(memberId);
-            String new_file_path = absolutePath + File.separator + new_file_name + originalFileExtension;
+            String new_file_path = new_file_name + originalFileExtension;
             file = new File(new_file_path);
             multipartFile.transferTo(file);
             file.setWritable(true);

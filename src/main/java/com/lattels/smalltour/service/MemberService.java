@@ -41,8 +41,6 @@ public class MemberService {
     private final FavoriteTourRepository favoriteTourRepository;
     private final ToursRepository toursRepository;
 
-
-
     @Value("${file.path}")
     private String filePath;
 
