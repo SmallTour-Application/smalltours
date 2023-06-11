@@ -128,10 +128,9 @@ public class ImgController {
     public ResponseEntity<Resource> getProfileImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = memberService.getMemberDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + fileName);
-            log.info("이미지 가져오기..." + path + fileName);
+            FileSystemResource resource = new FileSystemResource(path + "\\" + fileName);
             if(!resource.exists()){
-                throw new Exception();
+                throw new Exception("File not found: " + path + fileName);
             }
             HttpHeaders header = new HttpHeaders();
             Path filePath = null;
