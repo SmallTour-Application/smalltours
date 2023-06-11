@@ -40,15 +40,17 @@ public class SearchService {
     private final ItemRepository itemRepository;
     private final GuideLockRepository guideLockRepository;
 
-    //application.properties
-    //server.domain=http://localhost:
-    private final Environment env;
+    @Value("${file.path}")
+    private String filePath;
+
+    @Value("${server.domain}")
+    private String domain;
+
+    @Value("${server.port}")
+    private String port;
 
     @Value("${file.path.tours.images}")
     private String filePathToursImages;
-
-    @Value("${file.path}")
-    private String filePath;
 
     public File getMemberDirectoryPath() {
         File file = new File(filePath);
@@ -65,17 +67,9 @@ public class SearchService {
     }
 
 
-
     //type을 패키지로 해놓고 검색창에 패키지 이름으로 검색할 경우
     //해당 패키지들 결과물이 출력되어야함
     public ResponseEntity<SearchPackageDTO> searchPackage(int type, String location, int people, LocalDate start, LocalDate end, int sort, int page) {
-
-        // 메소드 내부에서 사용
-        String domain = env.getProperty("server.domain");
-        String port = env.getProperty("server.port");
-
-        String filePathToursImg = domain + port + "/" + filePathToursImages.replace("\\", "/") + "/";
-        String filePathMember = domain + port + "/" + filePath.replace("\\", "/");
 
 
         if (people < 3 || people > 5) {
@@ -85,7 +79,6 @@ public class SearchService {
         if (start.isAfter(end)) {
             throw new IllegalArgumentException("날짜에 해당하는 상품(패키지)가 없습니다.");
         }
-
 
 
         int size = 10;
@@ -103,7 +96,7 @@ public class SearchService {
         page = Math.max(page - 1, 0);
 
         if (type == 0) { // 패키지를 검색하는 경우
-            Page<Tours> tours = toursRepository.findToursBySearchParameters(location, people, start, end, PageRequest.of(page, size,sortDirection));
+            Page<Tours> tours = toursRepository.findToursBySearchParameters(location, people, start, end, PageRequest.of(page, size, sortDirection));
             if (tours.isEmpty()) {
                 throw new IllegalArgumentException("해당 기간에 상품이 없습니다.");
             }
@@ -122,14 +115,6 @@ public class SearchService {
                     }
                 }
 
-
-                for (GuideLock guideLock : guideLocks) {
-                    if (start.isBefore(guideLock.getEndDay()) && end.isAfter(guideLock.getStartDay())) {
-                        isLocked = true;
-                        break;
-                    }
-                }
-
                 if (!isLocked && guide.getId() == tour.getGuide().getId() && guide.getRole() == 2) {
                     Float rating = reviewsRepository.findAverageRatingByTourId(tour.getId());
                     if (rating == null) rating = 0f;
@@ -138,10 +123,10 @@ public class SearchService {
 
                     SearchPackageDTO.PackageContent packageContent = SearchPackageDTO.PackageContent.builder()
                             .tourId(tour.getId())
-                            .thumb(filePathToursImg + "img/search/tour/" + tour.getThumb())
+                            .thumb(domain + port + "/img/search/tour/" + tour.getThumb())
                             .title(tour.getTitle())
                             .guideName(guide.getName())
-                            .guideProfileImg(filePathMember + "img/search/member/" + guide.getProfile())
+                            .guideProfileImg(domain + port + "/img/search/member/" + guide.getProfile())
                             .rating(rating)
                             .price(tour.getPrice())
                             .build();
@@ -166,16 +151,9 @@ public class SearchService {
     }
 
 
-
     //가이드로 검색할 경우.
     //SearchPackageDTO에 List<ContentGuide>contentGuide
     public ResponseEntity<SearchGuideDTO> searchGuide(String keyword, int sort, int page) {
-        // 메소드 내부에서 사용
-        String domain = env.getProperty("server.domain");
-        String port = env.getProperty("server.port");
-
-
-        String filePathMember = domain + port + "/" + filePath.replace("\\", "/");
 
         int size = 10;
         SearchGuideDTO response = SearchGuideDTO.builder()
@@ -212,11 +190,11 @@ public class SearchService {
                 response.getContentGuides().add(
                         SearchGuideDTO.ContentGuide.builder()
                                 .guideId(guide.getId())
-                                .guideProfileImg(filePathMember + "img/search/member/" + guide.getProfile())
+                                .guideProfileImg(domain + port + "/img/search/member/" + guide.getProfile())
                                 .guideName(guide.getName())
                                 .rating(rating)
-                                .favoriteCount((int)favoriteCount)
-                                .uploadTourCount((int)tourCount)
+                                .favoriteCount((int) favoriteCount)
+                                .uploadTourCount((int) tourCount)
                                 .build()
                 );
             }
@@ -226,15 +204,7 @@ public class SearchService {
         // 검색 결과 반환
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-    public ResponseEntity<SearchTourDTO> searchTours(String keyword, int sort, String location, int people, LocalDate startDate, LocalDate endDate, int page) {
-        // 메소드 내부에서 사용
-        String domain = env.getProperty("server.domain");
-        String port = env.getProperty("server.port");
-
-        String filePathToursImg = domain + port + "/" + filePathToursImages.replace("\\", "/") + "/";
-        String filePathMember = domain + port + "/" + filePath.replace("\\", "/");
-
+    public ResponseEntity<SearchTourDTO> searchTours(String keyword, int sort, String location, int people, LocalDate start,LocalDate end, int page) {
 
 
         // 최소3, 최대 5 이외엔 예외처리
@@ -243,7 +213,7 @@ public class SearchService {
         }
 
         // 입력한 날짜에 상품이 없을경우
-        if (startDate.isAfter(endDate)) {
+        if (start.isAfter(end)) {
             throw new IllegalArgumentException("날짜에 해당하는 상품(패키지)가 없습니다.");
         }
 
@@ -254,45 +224,54 @@ public class SearchService {
         } else if (sort == 1) {
             sortDirection = sortDirection.ascending(); // 오름차순
         }
+
         // LocalDateTime->LocalDate
-        LocalDateTime startDay = startDate.atStartOfDay();
+        LocalDateTime startDay = start.atStartOfDay();
 
         //페이지 번호를 1부터 시작하도록 조정
         page = Math.max(page - 1, 0);
 
         // 검색 파라미터를 기준으로 상품 찾기
-        Page<Tours> tours = toursRepository.findToursKeywordBySearchParameters(keyword, location, people, startDate, endDate, startDay, PageRequest.of(page, 10, sortDirection));
-
+        Page<Tours> tours = toursRepository.findToursBySearchParameters(keyword, location, people, start, end, PageRequest.of(page, 10, sortDirection));
 
         if (tours.isEmpty()) {
-            throw new IllegalArgumentException("해당 기간에 상품이 없습니다.");
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
         // 검색결과 DTO 생성
-        SearchTourDTO response = SearchTourDTO.builder()
-                .content(new ArrayList<>())
-                .build();
+        SearchTourDTO response = SearchTourDTO.builder().content(new ArrayList<>()).build();
 
         for (Tours tour : tours) {
             Member guide = memberRepository.findById(tour.getGuide().getId()).orElseThrow(() -> new RuntimeException("가이드가 없습니다."));
-            if (guide.getId() == tour.getGuide().getId() && guide.getRole() == 2) {
+            List<GuideLock> guideLocks = guideLockRepository.findAllByGuideId((guide.getId()));
+            boolean isLocked = false;
+
+            for (GuideLock guideLock : guideLocks) {
+                if ((start.isAfter(guideLock.getStartDay()) && start.isBefore(guideLock.getEndDay()))
+                        || (end.isAfter(guideLock.getStartDay()) && end.isBefore(guideLock.getEndDay()))
+                        || (start.isBefore(guideLock.getStartDay()) && end.isAfter(guideLock.getEndDay()))) {
+                    isLocked = true;
+                    break;
+                }
+            }
+
+            if (!isLocked && guide.getId() == tour.getGuide().getId() && guide.getRole() == 2) {
                 Float rating = reviewsRepository.findAverageRatingByTourId(tour.getId());
                 if (rating == null) rating = 0f;
 
-
                 SearchTourDTO.TourContentDTO tourContent = SearchTourDTO.TourContentDTO.builder()
                         .tourId(tour.getId())
-                        .thumb(filePathToursImg + "img/search/tour/"+ tour.getThumb())
+                        .thumb(domain + port + "/img/search/tour/" + tour.getThumb())
                         .title(tour.getTitle())
                         .subTitle(tour.getSubTitle())
                         .rating(rating)
                         .price(tour.getPrice())
                         .guideName(guide.getName())
-                        .guideProfileImg(filePathMember + "img/search/member/" +  guide.getProfile())
+                        .guideProfileImg(domain + port + "/img/search/member/" + guide.getProfile())
                         .build();
 
                 Optional<UpperPayment> optionalUpperPayment = upperPaymentRepository.findByTourIdAndGuideRoleAndItemTypeAndApprovals(tour.getId());
-                if(optionalUpperPayment.isPresent()){
+                if (optionalUpperPayment.isPresent()) {
                     UpperPayment upperPayment = optionalUpperPayment.get();
                     ItemDTO.UpperPaymentTourIdResponseDTO upperPaymentTourIdResponseDTO = new ItemDTO.UpperPaymentTourIdResponseDTO(upperPayment);
                     tourContent.setUpperPaymentTourIdResponseDTO(upperPaymentTourIdResponseDTO); // 상위결제시 표시
@@ -301,10 +280,8 @@ public class SearchService {
                 response.getContent().add(tourContent);
             }
         }
+
         response.setCount(response.getContent().size());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-
-
 }

@@ -34,15 +34,17 @@ public class MemberGuideService {
 
     private final GuideProfileRepository guideProfileRepository;
 
-    //application.properties
-    //server.domain=http://localhost
-    private final Environment env;
-
     @Value("${file.path}")
     private String filePath;
 
     @Value("${file.path.resumePortfolio}")
     private String filePathRP;
+
+    @Value("${server.domain}")
+    private String domain;
+
+    @Value("${server.port}")
+    private String port;
 
     public File getMemberDirectoryPath() {
         File file = new File(filePath);
@@ -52,7 +54,7 @@ public class MemberGuideService {
     }
 
     public File getPortResumeDirectoryPath() {
-        File file = new File(filePath);
+        File file = new File(filePathRP);
         file.mkdirs();
 
         return file;
@@ -164,13 +166,6 @@ public class MemberGuideService {
 
     public MemberAndGuideProfileDTO viewProfile(MemberAndGuideProfileDTO memberAndGuideProfileDTO){
 
-        // 메소드 내부에서 사용
-        String domain = env.getProperty("server.domain");
-        String port = env.getProperty("server.port");
-
-        String filePathMember = domain + port + "/" + filePath.replace("\\", "/");
-        String filePathPortResume = domain + port + "/" + filePathRP.replace("\\", "/") + "/";
-
 
         Optional<Member> memberOpt = memberRepository.findById(memberAndGuideProfileDTO.getId());
         GuideProfile guideProfileOpt = guideProfileRepository.findByGuideId(memberAndGuideProfileDTO.getId());
@@ -194,11 +189,11 @@ public class MemberGuideService {
                 .birthDay(member.getBirthDay())
                 .joinDay(member.getJoinDay())
                 .gender(member.getGender())
-                .profile(filePathMember + "img/guide/member/" + member.getProfile())
+                .profile(domain + port + "/img/guide/member/" + member.getProfile())
                 .guideId(guideProfile.getGuideId())
-                .resume(filePathPortResume +"img/guide/portResume/"+ guideProfile.getResume())
+                .resume(domain + port +"/img/guide/portResume/"+ guideProfile.getResume())
                 .introduce(guideProfile.getIntroduce())
-                .portfolioPath(filePathPortResume + guideProfile.getPortfolioPath())
+                .portfolioPath(domain + port + "/img/guide/portResume/" + guideProfile.getPortfolioPath())
                 .build();
     }
 
