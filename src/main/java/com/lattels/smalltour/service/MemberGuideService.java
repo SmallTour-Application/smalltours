@@ -10,6 +10,7 @@ import com.lattels.smalltour.persistence.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -33,6 +34,10 @@ public class MemberGuideService {
 
     private final GuideProfileRepository guideProfileRepository;
 
+    //application.properties
+    //server.domain=http://localhost
+    private final Environment env;
+
     @Value("${file.path}")
     private String filePath;
 
@@ -42,6 +47,7 @@ public class MemberGuideService {
     // 프로필 이미지 변경
     public MemberAndGuideProfileDTO.UpdateProfile updateProfileImg(int memberId, MemberAndGuideProfileDTO.UpdateProfile memberGuideDTO) {
         try {
+
             // 이미지가 없는 경우
             if (memberGuideDTO == null || !memberGuideDTO.checkProfileImgRequestNull()) {
                 log.warn("MemberService.updateProfileImg() : 사진이 없습니다.");
@@ -142,6 +148,15 @@ public class MemberGuideService {
 
 
     public MemberAndGuideProfileDTO viewProfile(MemberAndGuideProfileDTO memberAndGuideProfileDTO){
+
+        // 메소드 내부에서 사용
+        String domain = env.getProperty("server.domain");
+        String port = env.getProperty("server.port");
+
+        String filePathMember = domain + port + "/" + filePath.replace("\\", "/") + "/";
+        String filePathPortResume = domain + port + "/" + filePathRP.replace("\\", "/") + "/";
+
+
         Optional<Member> memberOpt = memberRepository.findById(memberAndGuideProfileDTO.getId());
         GuideProfile guideProfileOpt = guideProfileRepository.findByGuideId(memberAndGuideProfileDTO.getId());
 
@@ -164,11 +179,11 @@ public class MemberGuideService {
                 .birthDay(member.getBirthDay())
                 .joinDay(member.getJoinDay())
                 .gender(member.getGender())
-                .profile(member.getProfile())
+                .profile(filePathMember + member.getProfile())
                 .guideId(guideProfile.getGuideId())
-                .resume(guideProfile.getResume())
+                .resume(filePathPortResume + guideProfile.getResume())
                 .introduce(guideProfile.getIntroduce())
-                .portfolioPath(guideProfile.getPortfolioPath())
+                .portfolioPath(filePathPortResume + guideProfile.getPortfolioPath())
                 .build();
     }
 

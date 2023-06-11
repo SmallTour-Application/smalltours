@@ -19,6 +19,9 @@ public class GuideProfileViewDTO {
     private String name;
     private String tel;
     private String introduce;// 자기 소개
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime joinDay;
     private int gender;
     private String profileImg;
