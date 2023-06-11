@@ -35,6 +35,12 @@ public class EducationService {
     @Value("${file.path.education}")
     private String educationFilePath;
 
+    @Value("${server.domain}")
+    private String domain;
+
+    @Value("${server.port}")
+    private String port;
+
     public File getEducationDirectoryPath() {
         File file = new File(educationFilePath);
         file.mkdirs();
@@ -95,7 +101,7 @@ public class EducationService {
 
         // 반환할 리스트에 education 정보 저장
         EducationDTO.ViewResponseDTO viewResponseDTO = new EducationDTO.ViewResponseDTO(education);
-        viewResponseDTO.setVideoPath("http://localhost:8081/img/education/" + education.getVideoPath());
+        viewResponseDTO.setVideoPath(domain + port + "/img/education/" + education.getVideoPath());
 
         // educationLog 가져오기
         EducationLog educationLog = educationLogRepository.findByEducationIdAndGuideId(education.getId(), memberId);

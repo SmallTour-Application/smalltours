@@ -9,6 +9,7 @@ import com.lattels.smalltour.model.Tours;
 import com.lattels.smalltour.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -32,6 +33,12 @@ public class StatsService {
     private final GuideReviewRepository guideReviewRepository;
 
     private final ReviewsRepository reviewsRepository;
+
+    @Value("${server.domain}")
+    private String domain;
+
+    @Value("${server.port}")
+    private String port;
 
 
     /*
@@ -75,7 +82,7 @@ public class StatsService {
             // 총 판매횟수 저장
             toursDTO.setSalesVolume((int) paymentRepository.getVolumeByDate(tours, startDate,endDate));
             // 이미지 저장
-            toursDTO.setThumb("http://localhost:8081/img/tours/" + tours.getThumb());
+            toursDTO.setThumb(domain + port + "/img/tours/" + tours.getThumb());
             // dto 리스트에 저장
             toursDTOS.add(toursDTO);
 

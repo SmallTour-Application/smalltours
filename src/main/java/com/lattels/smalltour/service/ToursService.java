@@ -45,6 +45,12 @@ public class ToursService {
     @Value("${file.path.tours.images}")
     private String toursImagesFilePath;
 
+    @Value("${server.domain}")
+    private String domain;
+
+    @Value("${server.port}")
+    private String port;
+
     public File getToursDirectoryPath() {
         File file = new File(toursFilePath);
         file.mkdirs();
@@ -321,7 +327,7 @@ public class ToursService {
         // 반환 DTO에 추가
         ToursDTO.ViewResponseDTO viewResponseDTO = new ToursDTO.ViewResponseDTO(tours);
         // 투어 썸네일 추가
-        viewResponseDTO.setThumb("http://localhost:8081/img/tours/" + tours.getThumb());
+        viewResponseDTO.setThumb(domain + port + "/img/tours/" + tours.getThumb());
 
         // 투어 소유 가이드 정보 가져오기
         Member member = memberRepository.findByMemberId(tours.getGuide().getId());
@@ -352,7 +358,7 @@ public class ToursService {
         // 반복해서 ToursImagesDTOList에 추가
         for (ToursImages toursImages : toursImagesList) {
             ToursImagesDTO.ViewResponseDTO toursImagesDTO = new ToursImagesDTO.ViewResponseDTO();
-            toursImagesDTO.setImagePath("http://localhost:8081/img/tours/images/" + toursImages.getImagePath());
+            toursImagesDTO.setImagePath(domain + port + "/img/tours/images/" + toursImages.getImagePath());
             toursImagesDTOList.add(toursImagesDTO);
         }
         //반환 DTO에 추가
