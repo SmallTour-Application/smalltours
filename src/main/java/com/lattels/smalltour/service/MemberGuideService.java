@@ -44,6 +44,21 @@ public class MemberGuideService {
     @Value("${file.path.resumePortfolio}")
     private String filePathRP;
 
+    public File getMemberDirectoryPath() {
+        File file = new File(filePath);
+        file.mkdirs();
+
+        return file;
+    }
+
+    public File getPortResumeDirectoryPath() {
+        File file = new File(filePath);
+        file.mkdirs();
+
+        return file;
+    }
+
+
     // 프로필 이미지 변경
     public MemberAndGuideProfileDTO.UpdateProfile updateProfileImg(int memberId, MemberAndGuideProfileDTO.UpdateProfile memberGuideDTO) {
         try {
@@ -153,7 +168,7 @@ public class MemberGuideService {
         String domain = env.getProperty("server.domain");
         String port = env.getProperty("server.port");
 
-        String filePathMember = domain + port + "/" + filePath.replace("\\", "/") + "/";
+        String filePathMember = domain + port + "/" + filePath.replace("\\", "/");
         String filePathPortResume = domain + port + "/" + filePathRP.replace("\\", "/") + "/";
 
 
@@ -179,9 +194,9 @@ public class MemberGuideService {
                 .birthDay(member.getBirthDay())
                 .joinDay(member.getJoinDay())
                 .gender(member.getGender())
-                .profile(filePathMember + member.getProfile())
+                .profile(filePathMember + "img/guide/member/" + member.getProfile())
                 .guideId(guideProfile.getGuideId())
-                .resume(filePathPortResume + guideProfile.getResume())
+                .resume(filePathPortResume +"img/guide/portResume/"+ guideProfile.getResume())
                 .introduce(guideProfile.getIntroduce())
                 .portfolioPath(filePathPortResume + guideProfile.getPortfolioPath())
                 .build();

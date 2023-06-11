@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -50,6 +51,21 @@ public class ProfileService {
     @Value("${file.path}")
     private String filePath;
 
+    public File getMemberDirectoryPath() {
+        File file = new File(filePath);
+        file.mkdirs();
+
+        return file;
+    }
+
+    public File getTourDirectoryPath() {
+        File file = new File(filePathToursImages);
+        file.mkdirs();
+
+        return file;
+    }
+
+
 
     // unauth/profile/guide 부분
     //가이드 클릭시 해당 정보들 나오는 메서드
@@ -59,7 +75,7 @@ public class ProfileService {
         String port = env.getProperty("server.port");
 
         String filePathToursImg = domain + port + "/" + filePathToursImages.replace("\\", "/") + "/";
-        String filePathMember = domain + port + "/" + filePath.replace("\\", "/") + "/";
+        String filePathMember = domain + port + "/" + filePath.replace("\\", "/");
 
 
         // guideId에 해당하는 GuideProfile를 찾기
@@ -84,10 +100,10 @@ public class ProfileService {
             float rating = (averageRating != null) ? averageRating : 0.0f;
 
             GuideProfileViewDTO.TourDTO tourDTO = GuideProfileViewDTO.TourDTO.builder()
-                    .thumb(filePathToursImg + tour.getThumb())
+                    .thumb(filePathToursImg + "img/profile/tour/" +  tour.getThumb())
                     .title(tour.getTitle())
                     .guideName(tour.getGuide().getName())
-                    .guideProfileImg(filePathMember + tour.getGuide().getProfile())
+                    .guideProfileImg(filePathMember + "img/search/member/" + tour.getGuide().getProfile())
                     .rating(rating)
                     .price(tour.getPrice())
                     .build();
@@ -104,7 +120,7 @@ public class ProfileService {
                 .introduce(guideProfile.getIntroduce())
                 .joinDay(member.getJoinDay())
                 .gender(member.getGender())
-                .profileImg(filePathMember + member.getProfile())
+                .profileImg(filePathMember + "img/search/member/" + member.getProfile())
                 .tours(tourDTOs)
                 .favoriteCount((int)favoriteCount)
                 .build();
@@ -162,7 +178,7 @@ public class ProfileService {
         String domain = env.getProperty("server.domain");
         String port = env.getProperty("server.port");
 
-        String filePathToursImg = domain + port + "/" + filePathToursImages.replace("\\", "/") + "/";
+        String filePathToursImg = domain + port + "/" + filePathToursImages.replace("\\", "/");
 
         // 해당 가이드가 존재하는지 확인
         Member guide = memberRepository.findById(guideId).orElseThrow(()->new IllegalArgumentException("해당 가이드는 없습니다."));
@@ -191,7 +207,7 @@ public class ProfileService {
 
             GuideTourRequestDTO.contents tourContent = GuideTourRequestDTO.contents.builder()
                     .tourId(tour.getId())
-                    .thumb(filePathToursImg + tour.getThumb())
+                    .thumb(filePathToursImg + "img/profile/tour/" +  tour.getThumb())
                     .title(tour.getTitle())
                     .subTitle(tour.getSubTitle())
                     .build();

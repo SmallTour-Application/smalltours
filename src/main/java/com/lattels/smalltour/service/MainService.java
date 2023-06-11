@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.*;
 
 @Slf4j
@@ -45,13 +46,28 @@ public class MainService {
     private String filePathToursImages;
 
 
+    public File getMemberDirectoryPath() {
+        File file = new File(filePath);
+        file.mkdirs();
+
+        return file;
+    }
+
+    public File getTourDirectoryPath() {
+        File file = new File(filePathToursImages);
+        file.mkdirs();
+
+        return file;
+    }
+
+
     //가이드인 사람들 role이 1임, 메인화면에서 TOP3 가이드를 나타내기 위한 부분,GuideReview에 Rating기준으로 높은 점수순으로.
     public PopularGuideDTO getTopRatedGuides(){
         // 메소드 내부에서 사용
         String domain = env.getProperty("server.domain");
         String port = env.getProperty("server.port");
 
-        String filePathMember = domain + ":" + port + "/" + filePath.replace("\\", "/") + "/";
+        String filePathMember = domain + ":" + port + "/" + filePath.replace("\\", "/");
 
 
 
@@ -86,7 +102,7 @@ public class MainService {
             float average = (reviews.size() > 0) ? sum / reviews.size() : 0;
 
             PopularGuideDTO.ReviewInfo reviewInfo = new PopularGuideDTO.ReviewInfo();
-            reviewInfo.setProfileImg(filePathMember + guide.getProfile());
+            reviewInfo.setProfileImg(filePathMember + "img/main/member/" + guide.getProfile());
             reviewInfo.setGuideName(guide.getName());
             reviewInfo.setRating(average);
 
@@ -133,7 +149,7 @@ public class MainService {
             if (averageRating == null) continue; //평점이 없는경우, 해당 상품에 대해 리뷰가 없다고 판단 ,그냥넘어감
 
             PopularTourDTO.TourInfo tourInfo = PopularTourDTO.TourInfo.builder()
-                    .thumb(filePathToursImg + tour.getThumb())
+                    .thumb(filePathToursImg +"img/main/tour/" + tour.getThumb())
                     .title(tour.getTitle())
                     .subTitle(tour.getSubTitle())
                     .price(tour.getPrice())
