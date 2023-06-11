@@ -30,6 +30,12 @@ public class RoomService {
     @Value("${file.path.tours.room}")
     private String roomFilePath;
 
+    @Value("${server.domain}")
+    private String domain;
+
+    @Value("${server.port}")
+    private String port;
+
     public File getRoomDirectoryPath() {
         File file = new File(roomFilePath);
         file.mkdirs();
@@ -142,7 +148,7 @@ public class RoomService {
         // RoomEntity 값이 있다면 DTO에 저장
         RoomDTO.ViewResponseDTO viewResponseDTO = (room == null) ? null : new RoomDTO.ViewResponseDTO(room);
         // 이미지 설정
-        viewResponseDTO.setImage("http://localhost:8081/img/tours/room/" + viewResponseDTO.getImage());
+        viewResponseDTO.setImage(domain + port + "/img/tours/room/" + viewResponseDTO.getImage());
         // 반환
         return viewResponseDTO;
 
