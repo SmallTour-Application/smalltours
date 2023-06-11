@@ -32,41 +32,33 @@ public class GuideScheduleService {
     public List<GuideScheduleDTO> getGuideSchedules(int guideId, LocalDate startDay, LocalDate endDay) {
         List<GuideScheduleDTO> guideScheduleDTOList = new ArrayList<>();
 
-        //GuideLock테이블에 해당 guide에 대한 startDay,endDay를가져옴
-        GuideLock guideLock = guideLockRepository.findGuideLockPeriod(guideId, startDay, endDay);
-
-        if (guideLock == null) {
-            return guideScheduleDTOList;
-        }
-
         Member guide = memberRepository.findById(guideId).orElse(null);
 
         if (guide != null && guide.getRole() == 2) {  // 0:회원, 1:미등록가이드, 2:가이드, 3:관리자
-            List<Tours> tours = toursRepository.findByGuide(guide);
-
+            List<Tours> tours = toursRepository.findByGuideAndApprovals(guideId);
+ 
             for (Tours tour : tours) {
                 // 내가 올린 상품이 결제가 된 상품에만 내 스케줄에 보여줄 수 있게 조건.
                 boolean isPaymentExists = paymentRepository.existsByTourIdAndState(tour.getId(), 1);
                 if (isPaymentExists) {
-                    List<Payment> payments = paymentRepository.findPaymentsByGuideAndTourAndDepartureDay(guideId, tour.getId(), startDay, endDay);
+                        List<Payment> payments = paymentRepository.findPaymentsByGuideAndTourAndDepartureDay(guideId, tour.getId(),startDay, endDay);
+                        for (Payment payment : payments) {
+                            //payment에 departureDay는 출발일, tours에 duration을 더해서 출발일 + duration = 종료일 구함
+                            //DB에 Schedule여행일정에 tour_day 가 뭘의미하는지 이해안가서 일단 사용안함
+                            String period = payment.getDepartureDay().toString()+ "~" + payment.getDepartureDay().plusDays(tour.getDuration()).toString();
 
-                    for (Payment payment : payments) {
-                        //date : String, startDay ~ endDay
-                        String period = guideLock.getStartDay().toString() + "~" + guideLock.getEndDay().toString();
-
-                        GuideScheduleDTO guideScheduleDTO = GuideScheduleDTO.builder()
-                                .date(period)
-                                .packageId(tour.getId())
-                                .packageName(tour.getTitle())
-                                .memberNickName(payment.getMember().getNickname())
-                                .memberTel(payment.getMember().getTel())
-                                .build();
-
-                        guideScheduleDTOList.add(guideScheduleDTO);
+                            GuideScheduleDTO guideScheduleDTO = GuideScheduleDTO.builder()
+                                    .date(period)
+                                    .packageId(tour.getId())
+                                    .packageName(tour.getTitle())
+                                    .memberNickName(payment.getMember().getNickname())
+                                    .memberTel(payment.getMember().getTel())
+                                    .build();
+                            guideScheduleDTOList.add(guideScheduleDTO);
+                        }
                     }
                 }
             }
-        }
         return guideScheduleDTOList;
     }
 }

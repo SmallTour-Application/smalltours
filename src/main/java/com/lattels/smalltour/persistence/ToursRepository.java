@@ -54,8 +54,8 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     @Query("SELECT t FROM Tours t JOIN t.guide m WHERE m.id = :guideId AND m.role = 2")
     List<Tours> findAllByGuideId(@Param("guideId") int guideId);
 
-    @Query("SELECT t FROM Tours t WHERE t.guide = :guide")
-    List<Tours> findByGuide(@Param("guide") Member guide);
+    @Query("SELECT t FROM Tours t WHERE t.guide.id = :guideId AND t.approvals = 1")
+    List<Tours> findByGuideAndApprovals(@Param("guideId") int guideId);
 
 
     //가이드 role2, 상품은 승인받아야함(1)
