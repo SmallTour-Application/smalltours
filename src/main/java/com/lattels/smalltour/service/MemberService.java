@@ -41,12 +41,17 @@ public class MemberService {
     private final FavoriteTourRepository favoriteTourRepository;
     private final ToursRepository toursRepository;
 
-    //application.properties
-    //server.domain=http://localhost
-    private final Environment env;
+
 
     @Value("${file.path}")
     private String filePath;
+
+    @Value("${server.domain}")
+    private String domain;
+
+    @Value("${server.port}")
+    private String port;
+
 
     public File getMemberDirectoryPath() {
         File file = new File(filePath);
@@ -63,12 +68,6 @@ public class MemberService {
             //Optional<Member> member = memberRepository.findById(memberDTO.getId());
             Member member = memberRepository.findByMemberId(memberDTO.getId());
 
-            // 메소드 내부에서 사용
-            String domain = env.getProperty("server.domain");
-            String port = env.getProperty("server.port");
-
-            String filePathMember = domain + port + "/" + filePath.replace("\\", "/");
-
             MemberDTO responseMemberDTO = MemberDTO.builder()
                     .email(member.getEmail())
                     .password(passwordEncoder.encode(member.getPassword()))
@@ -83,7 +82,7 @@ public class MemberService {
 
             //이미지가 있으면
             if (member.getProfile() != null) {
-                responseMemberDTO.setProfile(filePathMember + "img/member/" + member.getProfile());
+                responseMemberDTO.setProfile(domain + port + "/img/member/"+ member.getProfile());
             }
 
 
