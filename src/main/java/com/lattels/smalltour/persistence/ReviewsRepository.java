@@ -79,4 +79,7 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
                          @Param("startDate") LocalDateTime startDate,
                          @Param("endDate") LocalDateTime endDate);
 
+    @Query("SELECT AVG(r.rating) FROM Reviews r WHERE r.tours = :tours")
+    String getRating(@Param("tours") Tours tours);
+
 }

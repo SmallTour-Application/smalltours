@@ -2,11 +2,10 @@ package com.lattels.smalltour.dto.packagereview;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lattels.smalltour.model.Reviews;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiParam;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -53,6 +52,19 @@ public class PackageReviewDTO {
         this.content = reviews.getContent();
         this.rating = reviews.getRating();
         this.createdDay = reviews.getCreatedDay();
+    }
+
+    @Data
+    @NoArgsConstructor
+    @ApiModel(value = "리뷰 평점 응답 DTO")
+    public static class RatingResponseDTO {
+
+        @ApiModelProperty(value = "평점", example = "1")
+        private double rating;
+
+        public RatingResponseDTO(double rating) {
+            this.rating = rating;
+        }
     }
 
 }
