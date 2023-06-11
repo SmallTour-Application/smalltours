@@ -2,6 +2,7 @@ package com.lattels.smalltour.service;
 
 import com.google.common.base.Preconditions;
 import com.lattels.smalltour.dto.MemberDTO;
+import com.lattels.smalltour.dto.ToursDTO;
 import com.lattels.smalltour.dto.packagereview.*;
 import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.model.Reviews;
@@ -178,4 +179,16 @@ public class PackageReviewService {
         reviewsRepository.deleteById(reviewId);
     }
 
+    public PackageReviewDTO.RatingResponseDTO getRating(ToursDTO.IdRequestDTO idRequestDTO) {
+
+        // 리뷰 작성자 회원 존재 여부 체크
+        Tours tours = toursRepository.findByToursId(idRequestDTO.getId());
+        Preconditions.checkNotNull(tours, "투어을 찾을 수 없습니다. (투어 ID: %s)", tours);
+
+        String rating = reviewsRepository.getRating(tours);
+        if (rating == null) rating = "0";
+
+        return new PackageReviewDTO.RatingResponseDTO(Double.parseDouble(rating));
+
+    }
 }
