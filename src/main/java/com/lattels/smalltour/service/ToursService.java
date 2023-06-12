@@ -65,7 +65,7 @@ public class ToursService {
     }
 
     // 투어 등록
-    public void addTours(int memberId, ToursDTO.AddRequestDTO addRequestDTO, List<MultipartFile> tourImages, List<MultipartFile> thumb) {
+    public ToursDTO.IdResponseDTO addTours(int memberId, ToursDTO.AddRequestDTO addRequestDTO, List<MultipartFile> tourImages, List<MultipartFile> thumb) {
 
         // 등록된 회원인지 검사
         Member member = memberRepository.findByMemberId(memberId);
@@ -109,6 +109,10 @@ public class ToursService {
             saveToursImageList(tours, tourImages);
 
         }
+
+        ToursDTO.IdResponseDTO idResponseDTO = new ToursDTO.IdResponseDTO(tours.getId());
+        return idResponseDTO;
+
     }
 
     // 투어 수정

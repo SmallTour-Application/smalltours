@@ -30,14 +30,14 @@ public class ToursController {
     // 투어 등록
     @PostMapping(value = "/add")
     @ApiOperation(value = "투어 등록")
-    public ResponseEntity<Object> addTours(@ApiIgnore Authentication authentication,
+    public ResponseEntity<ToursDTO.IdResponseDTO> addTours(@ApiIgnore Authentication authentication,
                                            @Valid ToursDTO.AddRequestDTO addRequestDTO,
                                            @RequestPart(value = "tourImages", required = false) List<MultipartFile> tourImages,
                                            @RequestPart(value = "thumb", required = false) List<MultipartFile> thumb) {
 
 
-        toursService.addTours(Integer.parseInt(authentication.getPrincipal().toString()), addRequestDTO, tourImages, thumb);
-        return ResponseEntity.ok().build();
+        ToursDTO.IdResponseDTO idResponseDTO = toursService.addTours(Integer.parseInt(authentication.getPrincipal().toString()), addRequestDTO, tourImages, thumb);
+        return ResponseEntity.ok().body(idResponseDTO);
 
     }
 

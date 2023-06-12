@@ -18,14 +18,27 @@ import java.util.List;
 @Builder
 public class ToursDTO {
 
-    @Getter
-    @Setter
+    @Data
     @NoArgsConstructor
     @ApiModel(value = "투어 ID 요청 DTO")
     public static class IdRequestDTO {
 
         @ApiModelProperty(value = "투어 ID", example = "1")
         private int id;
+
+    }
+
+    @Data
+    @NoArgsConstructor
+    @ApiModel(value = "투어 ID 응답 DTO")
+    public static class IdResponseDTO {
+
+        @ApiModelProperty(value = "투어 ID", example = "1")
+        private int id;
+
+        public IdResponseDTO(int id) {
+            this.id = id;
+        }
 
     }
 
