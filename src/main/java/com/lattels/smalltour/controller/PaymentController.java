@@ -9,9 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 @Api(description = "결제 API 컨트롤러")
@@ -48,6 +46,12 @@ public class PaymentController {
         PaymentListDTO paymentListDTO = paymentService.getMyPayment(authentication, page - 1, NUMBER_OF_PAYMENT_PER_PAGE);
 
         return ResponseEntity.ok(paymentListDTO);
+    }
+
+    @PostMapping("/info")
+    public ResponseEntity<PaymentMemberInfoDTO> getPaymentMemberInfo(@ApiIgnore Authentication authentication, @RequestParam int paymentId) {
+        PaymentMemberInfoDTO paymentMemberInfoDTO = paymentService.getPaymentMemberInfo(authentication, paymentId);
+        return ResponseEntity.ok(paymentMemberInfoDTO);
     }
 
     @ApiOperation("결제 가격 확인")
