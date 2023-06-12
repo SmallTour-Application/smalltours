@@ -47,10 +47,17 @@ public class ScheduleItemService {
                 .title(addRequestDTO.getTitle())
                 .content(addRequestDTO.getContent())
                 .price(addRequestDTO.getPrice())
-                .defaultItem(addRequestDTO.getDefaultItem())
                 .locationX(addRequestDTO.getLocationX())
                 .locationY(addRequestDTO.getLocationY())
                 .build();
+
+        // 해당 스케줄의 item이 없다면 지금 item을 기본값으로 지정
+        if (scheduleItemRepository.countBySchedule(schedule) == 0) {
+            scheduleItem.setDefaultItem(1);
+        }
+        else {
+            scheduleItem.setDefaultItem(0);
+        }
 
         scheduleItemRepository.save(scheduleItem);
 
@@ -63,7 +70,7 @@ public class ScheduleItemService {
         ScheduleItem scheduleItem = scheduleItemRepository.findById(updateRequestDTO.getId());
         Preconditions.checkNotNull(scheduleItem, "등록된 일정 옵션이 없습니다. (옵션 ID : %s)", updateRequestDTO.getId());
 
-        // 비행기 등록인이 맞는지 검사
+        // 옵션 등록인이 맞는지 검사
         Preconditions.checkArgument(memberId == scheduleItem.getSchedule().getTours().getGuide().getId(), "해당 유저와 등록인이 일치하지 않습니다. (수정 요청 회원 ID : %s, 기존 등록 회원 ID : %s)", memberId, scheduleItem.getSchedule().getTours().getGuide().getId());
 
         scheduleItem.setTitle(updateRequestDTO.getTitle());
@@ -105,6 +112,36 @@ public class ScheduleItemService {
                 .collect(Collectors.toList());
 
         return viewResponseDTOList;
+
+    }
+
+    /*
+    * 일정 옵션 기본값 수정
+    */
+    public void setDefaultItem(int memberId, ScheduleItemDTO.IdRequestDTO idRequestDTO) {
+
+        // 옵션 가져오기
+        ScheduleItem scheduleItem = scheduleItemRepository.findById(idRequestDTO.getId());
+        Preconditions.checkNotNull(scheduleItem, "등록된 일정 옵션이 없습니다. (옵션 ID : %s)", idRequestDTO.getId());
+
+        // 가져온 옵션이 이미 기본값인지 검사
+        Preconditions.checkArgument(scheduleItem.getDefaultItem() != 1, "해당 일정은 이미 기본값으로 설정되어 있습니다. (옵션 ID : %s)", idRequestDTO.getId());
+
+        // 등록된 회원인지 검사
+        Member member = memberRepository.findByMemberId(memberId);
+        Preconditions.checkNotNull(member, "등록된 회원이 아닙니다. (회원 ID : %s)", memberId);
+
+        // 옵션 등록인이 맞는지 검사
+        Preconditions.checkArgument(memberId == scheduleItem.getSchedule().getTours().getGuide().getId(), "해당 유저와 등록인이 일치하지 않습니다. (수정 요청 회원 ID : %s, 기존 등록 회원 ID : %s)", memberId, scheduleItem.getSchedule().getTours().getGuide().getId());
+
+        // 기존에 기본값이었던 엔티티를 0으로 수정
+        ScheduleItem existingDefaultItem = scheduleItemRepository.findByScheduleAndDefaultItem(scheduleItem.getSchedule(), 1);
+        existingDefaultItem.setDefaultItem(0);
+        scheduleItemRepository.save(existingDefaultItem);
+
+        // 바꿀 옵션을 기본값으로 설정
+        scheduleItem.setDefaultItem(1);
+        scheduleItemRepository.save(scheduleItem);
 
     }
 }
