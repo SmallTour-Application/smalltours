@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PackageReviewWriteRequestDTO {
 
-    @ApiParam("패키지 ID")
-    private int packageId;
+    @ApiParam("결제 ID")
+    private int paymentId;
 
     @ApiParam("리뷰 내용")
     private String content;

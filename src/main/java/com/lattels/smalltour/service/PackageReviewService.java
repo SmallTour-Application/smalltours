@@ -5,9 +5,11 @@ import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.ToursDTO;
 import com.lattels.smalltour.dto.packagereview.*;
 import com.lattels.smalltour.model.Member;
+import com.lattels.smalltour.model.Payment;
 import com.lattels.smalltour.model.Reviews;
 import com.lattels.smalltour.model.Tours;
 import com.lattels.smalltour.persistence.MemberRepository;
+import com.lattels.smalltour.persistence.PaymentRepository;
 import com.lattels.smalltour.persistence.ReviewsRepository;
 import com.lattels.smalltour.persistence.ToursRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,8 @@ public class PackageReviewService {
     private final ReviewsRepository reviewsRepository;
     private final ToursRepository toursRepository;
     private final MemberRepository memberRepository;
+
+    private final PaymentRepository paymentRepository;
 
     /**
      * 해당 패키지의 리뷰 목록을 불러옵니다.
@@ -95,8 +99,6 @@ public class PackageReviewService {
      * @return 생성된 리뷰 ID
      */
     public int writeReview(Authentication authentication, PackageReviewWriteRequestDTO packageReviewWriteRequestDTO) {
-        int packageId = packageReviewWriteRequestDTO.getPackageId();
-
         // 회원 ID 불러오기
         int memberId = Integer.parseInt(authentication.getPrincipal().toString());
 
@@ -104,18 +106,20 @@ public class PackageReviewService {
         Member member = memberRepository.findByMemberId(memberId);
         Preconditions.checkNotNull(member, "회원을 찾을 수 없습니다. (회원 ID: %s)", memberId);
 
-        // 패키지 존재 여부 체크
-        Tours tours = toursRepository.findById(packageId).orElse(null);
-        Preconditions.checkNotNull(tours, "패키지를 찾을 수 없습니다. (패키지 ID: %s)", packageId);
+        // 결제 존재 여부 체크
+        int paymentId = packageReviewWriteRequestDTO.getPaymentId();
+        Payment payment = paymentRepository.findById(paymentId).orElse(null);
+        Preconditions.checkNotNull(payment, "결제를 찾을 수 없습니다. (결제 ID: %s)", paymentId);
 
         // 이미 패키지에 리뷰를 작성했는지 체크
-        boolean reviewAlreadyExists = reviewsRepository.existsByToursIdAndMemberId(packageId, memberId);
-        Preconditions.checkArgument(!reviewAlreadyExists, "이미 해당 회원이 해당 패키지에 작성한 리뷰가 존재합니다. (패키지 ID: %s, 회원 ID: %s)", packageId, memberId);
+        boolean reviewAlreadyExists = reviewsRepository.existsByMemberIdAndPaymentId(memberId, memberId);
+        Preconditions.checkArgument(!reviewAlreadyExists, "이미 해당 회원이 해당 결제에 대해 작성한 리뷰가 존재합니다. (회원 ID: %s, 결제 ID: %s)", memberId, paymentId);
 
         // 리뷰 저장
         Reviews reviews = Reviews.builder()
                 .member(member)
-                .tours(tours)
+                .payment(payment)
+                .tours(payment.getTours())
                 .rating(packageReviewWriteRequestDTO.getRating())
                 .content(packageReviewWriteRequestDTO.getContent())
                 .createdDay(LocalDateTime.now())

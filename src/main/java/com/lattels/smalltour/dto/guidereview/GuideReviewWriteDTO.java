@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GuideReviewWriteDTO {
 
-    @ApiParam("리뷰 대상 가이드 ID")
-    private int guideId;
+    @ApiParam("결제 ID")
+    private int paymentId;
 
     @ApiParam("리뷰 평점")
     private int rating;

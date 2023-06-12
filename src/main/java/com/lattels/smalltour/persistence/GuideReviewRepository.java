@@ -53,6 +53,11 @@ public interface GuideReviewRepository extends JpaRepository<GuideReview, Intege
      */
     boolean existsByReviewerIdAndGuideId(@Param("reviewerId") int reviewerId, @Param("guideId") int guideId);
 
+    /**
+     * 리뷰 작성자가 해당 결제에 대한 댓글을 작성했는지 여부를 반환합니다.
+     */
+    boolean existsByReviewerIdAndPaymentId(@Param("reviewerId") int reviewerId, @Param("paymentId") int paymentId);
+
 
     //가이드 리뷰 가져오기
 
