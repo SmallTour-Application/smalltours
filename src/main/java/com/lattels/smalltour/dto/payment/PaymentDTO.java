@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -18,6 +20,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentDTO {
+
+
+
 
     @ApiParam("결제 ID")
     private int paymentId;
@@ -67,9 +72,9 @@ public class PaymentDTO {
     @ApiParam("가이드 리뷰 작성 가능 여부")
     private boolean canGuideReview;
 
-    public PaymentDTO(Payment payment, boolean canReview, boolean canGuideReview) {
+    public PaymentDTO(Payment payment, String thumbUrl,boolean canReview, boolean canGuideReview) {
         this.paymentId = payment.getId();
-        this.thumb = payment.getTours().getThumb();
+        this.thumb = thumbUrl;
         this.packageId = payment.getTours().getId();
         this.packageName = payment.getTours().getTitle();
         this.packageSubTitle = payment.getTours().getSubTitle();

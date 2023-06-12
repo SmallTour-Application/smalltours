@@ -1,5 +1,6 @@
 package com.lattels.smalltour.controller;
 
+import com.lattels.smalltour.dto.payment.PaymentDTO;
 import com.lattels.smalltour.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,7 @@ public class ImgController {
     private final MemberGuideService memberGuideService;
 
     private final MainService mainService;
+    private final PaymentService paymentService;
 
 
 
@@ -326,6 +328,27 @@ public class ImgController {
         }
     }
 
+
+
+    /* paymentDTO */
+    @GetMapping(value = "/payment/tourThumb/{fileOriginName}")
+    public ResponseEntity<Resource> getpaymentTourImg(@PathVariable("fileOriginName") String fileName) throws Exception{
+        try{
+            String path = paymentService.getTourDirectoryPath().getPath();
+            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            log.info("이미지 가져오기..." + path + "\\" +fileName);
+            if(!resource.exists()){
+                throw new Exception();
+            }
+            HttpHeaders header = new HttpHeaders();
+            Path filePath = null;
+            filePath = Paths.get(path+fileName);
+            header.add("Content-Type", Files.probeContentType(filePath)); // filePath의 마임타입 체크해서 header에 추가
+            return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
+        }catch(Exception e){
+            throw new Exception();
+        }
+    }
 
 
 

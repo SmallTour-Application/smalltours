@@ -6,12 +6,14 @@ import com.lattels.smalltour.model.*;
 import com.lattels.smalltour.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -31,6 +33,26 @@ public class PaymentService {
     private final ReviewsRepository reviewsRepository;
     private final GuideReviewRepository guideReviewRepository;
     private final GuideLockRepository guideLockRepository;
+
+
+
+    @Value("${server.domain}")
+    private String domain;
+
+    @Value("${server.port}")
+    private String port;
+
+    @Value("${file.path.tours.images}")
+    private String filePathToursImages;
+
+    public File getTourDirectoryPath() {
+        File file = new File(filePathToursImages);
+        file.mkdirs();
+
+        return file;
+    }
+
+
 
     /**
      * 패키지를 결제합니다.
@@ -195,7 +217,10 @@ public class PaymentService {
         // 페이지에 맞는 내 결제 내역 불러오기
         List<Payment> payments = paymentRepository.findAllByMemberIdOrderByPaymentDayDesc(memberId, pageable);
         List<PaymentDTO> paymentDTOS = payments.stream()
-                .map(payment -> new PaymentDTO(payment, canReview(payment), canGuideReview(payment)))
+                .map(payment -> {
+                    String thumbUrl = domain+port+"/img/payment/tourThumb/" + payment.getTours().getThumb();
+                    return new PaymentDTO(payment, thumbUrl, canReview(payment), canGuideReview(payment));
+                })
                 .collect(Collectors.toList());
 
         // DTO 반환
@@ -280,9 +305,11 @@ public class PaymentService {
         }
 
         List<PaymentDTO> paymentDTOS = payments.stream()
-                .map(payment -> new PaymentDTO(payment, canReview(payment), canGuideReview(payment)))
+                .map(payment -> {
+                    String thumbUrl = domain + port + "/img/payment/tourThumb/" + payment.getTours().getThumb();
+                    return new PaymentDTO(payment, thumbUrl, canReview(payment), canGuideReview(payment));
+                })
                 .collect(Collectors.toList());
-
         // DTO 반환
         return PaymentListDTO.builder()
                 .count(paymentCount)
@@ -336,7 +363,10 @@ public class PaymentService {
 
         // DTO로 변환
         List<PaymentDTO> paymentDTOS = payments.stream()
-                .map(payment -> new PaymentDTO(payment, canReview(payment), canGuideReview(payment)))
+                .map(payment -> {
+                    String thumbUrl = domain + port + "/img/payment/tourThumb/" + payment.getTours().getThumb();
+                    return new PaymentDTO(payment, thumbUrl, canReview(payment), canGuideReview(payment));
+                })
                 .collect(Collectors.toList());
 
         // DTO 반환
