@@ -30,6 +30,8 @@ public class MyPackageDTO {
     @ApiParam("등록일")
     private LocalDateTime createdDay;
 
+    private String thumb;
+
     public MyPackageDTO(Tours tours) {
         this.packageId = tours.getId();
         this.packageName = tours.getTitle();
