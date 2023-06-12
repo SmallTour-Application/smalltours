@@ -59,6 +59,11 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
     boolean existsByToursIdAndMemberId(int tourId, int memberId);
 
     /**
+     * 해당 회원이 해당 결제에 대한 리뷰를 작성했는지 반환합니다.
+     */
+    boolean existsByMemberIdAndPaymentId(int memberId, int paymentId);
+
+    /**
      * 회원이 작성한 리뷰 개수를 반환합니다.
      */
     long countAllByMemberId(int memberId);

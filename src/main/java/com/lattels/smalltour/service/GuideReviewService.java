@@ -5,8 +5,11 @@ import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.guidereview.*;
 import com.lattels.smalltour.model.GuideReview;
 import com.lattels.smalltour.model.Member;
+import com.lattels.smalltour.model.Payment;
+import com.lattels.smalltour.model.Tours;
 import com.lattels.smalltour.persistence.GuideReviewRepository;
 import com.lattels.smalltour.persistence.MemberRepository;
+import com.lattels.smalltour.persistence.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +32,9 @@ public class GuideReviewService {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     /**
      * 해당 가이드에 맞는 최근 가이드 리뷰 목록을 불러옵니다.
@@ -59,8 +65,6 @@ public class GuideReviewService {
 
     /**
      * 내가 작성한 가이드 리뷰 목록을 불러옵니다.
-     * @param guideId 가이드 ID
-     * @param pageable 페이지
      * @return 가이드 리뷰 목록
      */
     public MyGuideReviewListDTO getMyGuideReviews(Authentication authentication, int page, int countPerPage) {
@@ -100,19 +104,20 @@ public class GuideReviewService {
         Member reviewer = memberRepository.findByMemberId(reviewerId);
         Preconditions.checkNotNull(reviewer, "회원을 찾을 수 없습니다. (회원 ID: %s)", reviewerId);
 
-        // 가이드 회원 존재 여부 체크
-        int guideId = guideReviewWriteDTO.getGuideId();
-        Member guide = memberRepository.findByMemberId(guideId);
-        Preconditions.checkNotNull(guide, "회원을 찾을 수 없습니다. (회원 ID: %s)", guideId);
+        // 결제 존재 여부 체크
+        int paymentId = guideReviewWriteDTO.getPaymentId();
+        Payment payment = paymentRepository.findById(paymentId).orElse(null);
+        Preconditions.checkNotNull(payment, "결제를 찾을 수 없습니다. (결제 ID: %s)", paymentId);
 
         // 이미 작성한 리뷰 존재 여부 체크
-        boolean reviewAlreadyExists = guideReviewRepository.existsByReviewerIdAndGuideId(reviewerId, guideId);
-        Preconditions.checkArgument(!reviewAlreadyExists, "이미 해당 회원이 해당 가이드에게 작성한 리뷰가 존재합니다. (회원 ID: %s, 가이드 ID: %s)", reviewerId, guideId);
+        boolean reviewAlreadyExists = guideReviewRepository.existsByReviewerIdAndPaymentId(reviewerId, paymentId);
+        Preconditions.checkArgument(!reviewAlreadyExists, "이미 해당 회원이 해당 결제에 대해 작성한 리뷰가 존재합니다. (회원 ID: %s, 결제 ID: %s)", reviewerId, paymentId);
 
         // 리뷰 정보 저장
         GuideReview guideReview = GuideReview.builder()
                 .reviewer(reviewer)
-                .guide(guide)
+                .payment(payment)
+                .guide(payment.getTours().getGuide())
                 .rating(guideReviewWriteDTO.getRating())
                 .content(guideReviewWriteDTO.getContent())
                 .createdDay(LocalDateTime.now())
@@ -137,8 +142,8 @@ public class GuideReviewService {
         Preconditions.checkArgument(reviewerId == guideReview.getReviewer().getId(), "해당 리뷰의 작성자가 아닙니다. (리뷰 ID: %s, 실제 작성자 ID: %s, 새로운 작성자 ID: %s)", guideReview.getId(), guideReview.getReviewer().getId(), reviewerId);
 
         // 리뷰 저장
-        guideReview.setRating(guideReview.getRating());
-        guideReview.setContent(guideReview.getContent());
+        guideReview.setRating(guideReviewUpdateDTO.getRating());
+        guideReview.setContent(guideReviewUpdateDTO.getContent());
 
         guideReviewRepository.save(guideReview);
     }
