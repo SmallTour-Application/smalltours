@@ -46,10 +46,6 @@ public class ScheduleItemDTO {
         @ApiModelProperty(value = "가격", example = "1")
         private int price;
 
-        @PositiveOrZero(message = "0 또는 양수만 가능합니다.")
-        @ApiModelProperty(value = "고정 옵션 (0: 고정, 1: X)", example = "1")
-        private int defaultItem;
-
         @ApiModelProperty(value = "경도", example = "12.12")
         private double locationX;
 

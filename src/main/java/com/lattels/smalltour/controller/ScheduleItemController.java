@@ -57,4 +57,16 @@ public class ScheduleItemController {
 
     }
 
+
+    /*
+    * 일정 아이템 기본값 변경*/
+    @PostMapping(value = "/default_item")
+    @ApiOperation(value = "일정 옵션 기본값 수정")
+    public ResponseEntity<Object> setDefaultItem(@ApiIgnore Authentication authentication, @Valid @RequestBody ScheduleItemDTO.IdRequestDTO idRequestDTO) {
+
+        scheduleItemService.setDefaultItem(Integer.parseInt(authentication.getPrincipal().toString()), idRequestDTO);
+        return ResponseEntity.ok().build();
+
+    }
+
 }
