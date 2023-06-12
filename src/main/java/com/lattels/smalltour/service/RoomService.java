@@ -148,7 +148,7 @@ public class RoomService {
         // RoomEntity 값이 있다면 DTO에 저장
         RoomDTO.ViewResponseDTO viewResponseDTO = (room == null) ? null : new RoomDTO.ViewResponseDTO(room);
         // 이미지 설정
-        viewResponseDTO.setImage(domain + port + "/img/tours/room/" + viewResponseDTO.getImage());
+        if (viewResponseDTO != null) viewResponseDTO.setImage(domain + port + "/img/tours/room/" + viewResponseDTO.getImage());
         // 반환
         return viewResponseDTO;
 
