@@ -310,10 +310,15 @@ public class ToursService {
         }
 
         // 패키지를 DTO로 변환
-        List<MyPackageDTO> myPackageDTOS = tours.stream()
-                .map(tour -> new MyPackageDTO(tour))
-                .collect(Collectors.toList());
-
+//        List<MyPackageDTO> myPackageDTOS = tours.stream()
+//                .map(tour -> new MyPackageDTO(tour))
+//                .collect(Collectors.toList());
+        List<MyPackageDTO> myPackageDTOS = new ArrayList<>();
+        for (Tours tours1 : tours) {
+            MyPackageDTO myPackageDTO = new MyPackageDTO(tours1);
+            myPackageDTO.setThumb(domain + port + "/img/tours/" + tours1.getThumb());
+            myPackageDTOS.add(myPackageDTO);
+        }
         // DTO 반환
         return MyPackageListDTO.builder()
                 .count(packageCount)
