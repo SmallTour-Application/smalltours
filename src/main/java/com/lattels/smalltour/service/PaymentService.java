@@ -230,6 +230,46 @@ public class PaymentService {
                 .build();
     }
 
+    /*paymentId입력시 해당 결제 사람정보 ,6월13일- 추가*/
+    public PaymentMemberInfoDTO getPaymentMemberInfo(Authentication authentication, int paymentId) {
+        // 회원 ID 불러오기
+        int memberId = Integer.parseInt(authentication.getPrincipal().toString());
+
+        // 회원 존재 여부 체크
+        Member searcher = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다. (회원 ID: " + memberId + ")"));
+
+        // 검색을 하는 사람이 가이드인지 확인
+        if (searcher.getRole() != 2) {
+            throw new IllegalArgumentException("가이드만이 이 정보를 검색할 수 있습니다. (회원 ID: " + memberId + ")");
+        }
+
+        // paymentId로 Payment 찾기
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new IllegalArgumentException("찾을 수 없는 결제 ID입니다. (결제 ID: " + paymentId + ")"));
+
+        // 결제한 사람이 회원인지 확인
+        Member member = payment.getMember();
+        if (member.getRole() != 0) {
+            throw new IllegalArgumentException("결제한 사람이 회원이 아닙니다. (결제 ID: " + paymentId + ")");
+        }
+
+
+        // 출발일 가져오기
+        LocalDate departureDay = payment.getDepartureDay();
+        int people = payment.getPeople();
+
+        // PaymentMemberInfoDTO 객체 생성하여 반환
+        return PaymentMemberInfoDTO.builder()
+                .memberId(memberId)
+                .memberName(member.getName())
+                .tel(member.getTel())
+                .people(people)
+                .departureDay(departureDay)
+                .build();
+    }
+
+
     /**
      * 패키지 기본 가격과 일정 가격의 합을 반환합니다.
      * @param paymentCheckRequestDTO 패키지 가격 확인 요청 DTO
