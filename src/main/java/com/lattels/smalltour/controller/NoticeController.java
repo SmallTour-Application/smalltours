@@ -41,7 +41,7 @@ public class NoticeController {
 
     }
 
-    // 글
+    // 글 수정
     @PostMapping(value = "/update")
     @ApiOperation(value = "공지 글 수정")
     public ResponseEntity<Object> updateNotice(@ApiIgnore Authentication authentication, @Valid @RequestBody NoticeDTO.UpdateRequestDTO updateRequestDTO) {
