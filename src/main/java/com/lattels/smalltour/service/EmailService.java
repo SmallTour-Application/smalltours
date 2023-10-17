@@ -1,3 +1,4 @@
+
 package com.lattels.smalltour.service;
 
 import com.lattels.smalltour.model.EmailToken;
@@ -35,4 +36,5 @@ public class EmailService {
         }
     }
 }
+
 

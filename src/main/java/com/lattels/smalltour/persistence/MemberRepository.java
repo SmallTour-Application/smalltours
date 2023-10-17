@@ -31,9 +31,11 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
     Optional<Member> findByGuideId(@Param("guideId") int guideId);
 
 
-
     @Query(value = "SELECT * FROM member where id = :id", nativeQuery = true)
     Member findByMemberId(@Param("id") int id);
+
+
+
 
 
     // 아이디로 비밀번호 가져오기
@@ -83,6 +85,38 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
     Page<Member> findGuidesByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     Optional<Member> findByIdAndRole(int id, int role);
+
+    @Query(value = "SELECT * FROM member WHERE role IN (0,1,2)", nativeQuery = true)
+    List<Member> findByMembersId();
+
+    @Query(value = "SELECT * FROM member WHERE role IN (0,1,2)", nativeQuery = true)
+    Member findByMemberId();
+
+    @Query(value = "SELECT * FROM member m WHERE m.role IN (0,1,2) AND id = :memberId", nativeQuery = true)
+    Member findByMemberInfoId(@Param("memberId") int memberId);
+
+    @Query("SELECT m FROM Member m WHERE m.id = :adminId AND m.role = 3")
+    Optional<Member> findByAdminId(@Param("adminId")int adminId);
+
+
+    // 아이디로 블랙리스트 값 가져오기
+    @Query(value = "SELECT black_list FROM member WHERE id = :id", nativeQuery = true)
+    int findBlackListMemberId(@Param("id") int id);
+
+
+    // 아이디로 우수가이드 값 가져오기
+    @Query(value = "SELECT greate FROM member WHERE id = :id", nativeQuery = true)
+    int findGreatMemberId(@Param("id") int id);
+
+    //입력한 email값에 대응하는 memberId를가져오게함
+    @Query(value = "SELECT * FROM member m WHERE m.id = :id AND m.role IN (0,2)", nativeQuery = true)
+    Member findByReciverMemberId(@Param("id") int id);
+
+    @Query(value = "SELECT * FROM member m WHERE m.role = 0", nativeQuery = true)
+    List<Member> findByMemberAll();
+
+    @Query(value = "SELECT * FROM member m WHERE m.role = 2", nativeQuery = true)
+    List<Member> findByGuideAll();
 }
 
 

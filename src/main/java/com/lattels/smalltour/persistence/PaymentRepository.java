@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -112,6 +113,24 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     long getVolumeByDate(@Param("tours") Tours tours,
                        @Param("startDate") LocalDateTime startDate,
                        @Param("endDate") LocalDateTime endDate);
+
+    //memberId로 payment찾기 + 결제성공
+    @Query(value = "SELECT * FROM payment p " +
+            "JOIN member m ON p.member_id = m.id " +
+            "WHERE m.role = 0 AND p.state = 1 ",nativeQuery = true)
+    List<Payment> findByPaymentMemberId(Pageable pageable);
+
+    //memberId로 payment찾기 + 결제취소
+    @Query(value = "SELECT * FROM payment p " +
+            "JOIN member m ON p.member_id = m.id " +
+            "WHERE m.role = 0 AND p.state = 2 ",nativeQuery = true)
+    List<Payment> findByPaymentCancelMemberId(Pageable pageable);
+
+    //memberId로 payment찾기 + 결제환불
+    @Query(value = "SELECT * FROM payment p " +
+            "JOIN member m ON p.member_id = m.id " +
+            "WHERE m.role = 0 AND p.state = 3 ",nativeQuery = true)
+    List<Payment> findByPaymentRefundMemberId(Pageable pageable);
 
 
 }
