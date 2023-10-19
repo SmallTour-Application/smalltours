@@ -1,5 +1,9 @@
 package com.lattels.smalltour.security;
 
+import com.lattels.smalltour.model.LogMember;
+import com.lattels.smalltour.model.Member;
+import com.lattels.smalltour.persistence.LogMemberRepository;
+import com.lattels.smalltour.persistence.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -17,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Component
@@ -24,6 +29,43 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private TokenProvider tokenProvider; // 사용자 정보를 받아 JWT를 생성하는 클래스
     // 토큰을 디코딩 및 파싱하고 위조 여부를 확인 후 subject를 리턴하는 기능 포함
+    @Autowired
+    private LogProvider logProvider;
+    @Autowired
+    private LogMemberRepository logMemberRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+    /**
+     *
+     * logMember 저장할 메서드
+     */
+    public void infoFilter(HttpServletRequest request, int userId){
+        try{
+            String clientIp = logProvider.getClientIp(request);
+            String browsers = logProvider.Browser(request);
+            String os = logProvider.Os(request);
+            String device = logProvider.Device(request);
+
+
+            Member member = memberRepository.findByMemberId(userId);
+
+            LogMember logMember = LogMember.builder()
+                    .member(member)
+                    .loginDateTime(LocalDateTime.now())
+                    .browser(browsers)
+                    .os(os)
+                    .connectionType(device)
+                    .ip(clientIp)
+                    .state(0)
+                    .build();
+
+            logMemberRepository.save(logMember);
+            System.out.println(logMember + "logMember");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+    }
 
     // doFilter 대신 스프링에선 doFilterInternal를 오버라이딩. 하지만 내부에서 토큰을 파싱해 인증한다는 점은 같음.
     @Override
@@ -54,6 +96,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
                     securityContext.setAuthentication(authentication);
                     SecurityContextHolder.setContext(securityContext);
+
                 }
             }
         } catch(Exception ex){

@@ -26,6 +26,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 
+	implementation 'eu.bitwalker:UserAgentUtils:1.21'//user-agent-utils 라이브러리
+
 
 	implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '3.0.8'
 

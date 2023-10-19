@@ -330,6 +330,28 @@ public class AdminService {
         }
     }
 
+
+
+    /**
+     * 회원삭제
+     */
+    public void deleteMember(final int adminId, int memberId) {
+        checkAdmin(adminId);
+        try {
+            Optional<Member> member = memberRepository.findById(memberId);
+            if (!member.isPresent()) {
+                throw new IllegalArgumentException("해당 회원이 삭제되었거나 없습니다.");
+            } else if (member.get().getRole() == 3) {
+                throw new IllegalArgumentException("해당 회원은 관리자입니다.");
+            } else {
+                memberRepository.deleteById(memberId);
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("BoardService.deleteBoard() : 에러 발생", e);
+        }
+    }
+
 /*    //블랙리스트 설정
     @Transactional
     public int updateBlackList(final int adminId, final int memberId, final int blackList){
@@ -393,23 +415,4 @@ public class AdminService {
 
     }*/
 
-    /**
-     * 회원삭제
-     */
-    public void deleteMember(final int adminId, int memberId) {
-        checkAdmin(adminId);
-        try {
-            Optional<Member> member = memberRepository.findById(memberId);
-            if (!member.isPresent()) {
-                throw new IllegalArgumentException("해당 회원이 삭제되었거나 없습니다.");
-            } else if (member.get().getRole() == 3) {
-                throw new IllegalArgumentException("해당 회원은 관리자입니다.");
-            } else {
-                memberRepository.deleteById(memberId);
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException("BoardService.deleteBoard() : 에러 발생", e);
-        }
-    }
 }
