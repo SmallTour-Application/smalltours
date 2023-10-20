@@ -1,33 +1,18 @@
 package com.lattels.smalltour.controller.admin;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lattels.smalltour.dto.ResponseDTO;
 import com.lattels.smalltour.dto.admin.member.EmailAllSendMessageDTO;
 import com.lattels.smalltour.dto.admin.member.EmailMessageDTO;
-import com.lattels.smalltour.dto.admin.member.ListMemberDTO;
-import com.lattels.smalltour.dto.payment.PaymentMemberListDTO;
-import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.persistence.MemberRepository;
-import com.lattels.smalltour.service.EmailMessageService;
-import com.lattels.smalltour.service.EmailService;
+import com.lattels.smalltour.service.admin.EmailMessageService;
 import com.lattels.smalltour.service.MemberFavoriteStatusService;
-import com.lattels.smalltour.service.admin.AdminPaymentService;
-import com.lattels.smalltour.service.admin.AdminService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Slf4j
 @RestController
