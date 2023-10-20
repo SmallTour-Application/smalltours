@@ -1,12 +1,19 @@
 package com.lattels.smalltour.service.admin;
 
 
+import com.lattels.smalltour.dto.MemberDTO;
+import com.lattels.smalltour.dto.admin.member.AdminAddMemberDTO;
 import com.lattels.smalltour.dto.admin.member.ListMemberDTO;
+import com.lattels.smalltour.dto.admin.search.AdminSearchDTO;
+import com.lattels.smalltour.dto.search.SearchGuideDTO;
 import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +21,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -62,6 +70,21 @@ public class AdminService {
         if(admin.getRole() != 3){
             throw new RuntimeException("관리자만 접근 가능합니다.");
         }
+    }
+
+
+    //닉네임 중복 체크
+    private boolean checkNickname(final String nickname) {
+        if(nickname == null || nickname.equals("")){
+            log.warn("MemberService.checkNickname() : nickname 값이 이상해요");
+            throw new RuntimeException("MemberService.checkNickname() : nickname 값이 이상해요");
+        }
+
+        int count = memberRepository.findByNickname(nickname);
+        if(count > 0){
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -352,67 +375,160 @@ public class AdminService {
         }
     }
 
-/*    //블랙리스트 설정
-    @Transactional
-    public int updateBlackList(final int adminId, final int memberId, final int blackList){
 
+    /**
+     * 회원 검색(이름 or 이메일 or 전화번호)
+     */
+    public ResponseEntity<AdminSearchDTO> adminSearch(int adminId, String memberName, String memberEmail, String memberTel,LocalDate birthDay,int page, int size){
         checkAdmin(adminId);
 
-        if(memberId < 1){
-            log.warn("adminMemberService.updateSettingList() : Id 값이 이상해요");
-            throw new RuntimeException("adminMemberService.updateSettingList() : Id 값이 이상해요");
-        }
-        if(blackList < 0 || blackList > 2){
-            log.warn("잘못된 입력값입니다.");
-            throw new RuntimeException("0: 블랙리스트 지정  1:일반 ");
-        }
+        //페이지 번호를 1부터 시작하도록 조정
+        page = Math.max(page - 1, 0);
 
-        try{
-            final Member member = memberRepository.findByMemberId(memberId);
-            member.setBlackList(blackList);
-            memberRepository.save(member); // 수정
-            // 현재 저장되어 있는 값 가져오기
-            final int setting = memberRepository.findBlackListMemberId(memberId);
-            return setting;
+        AdminSearchDTO adminSearch = AdminSearchDTO.builder()
+                .contentMember(new ArrayList<>())
+                .build();
 
-        }catch(Exception e){
-            e.printStackTrace();
-            throw new RuntimeException("0~1가능. 블랙리스트 혹은 취소 ");
+        List<Member> member = memberRepository.findByMemberSearchId(memberName,memberEmail,memberTel,birthDay,PageRequest.of(page,size));
+        if(member.isEmpty()){
+            throw new IllegalArgumentException("멤버가 없습니다.");
+        }else if(member.get(0).getRole() == 3){
+            throw new IllegalArgumentException("해당 회원은 관리자입니다.");
         }
 
+        for(Member members : member){
+            if(members.getRole() != 3){
+                adminSearch.getContentMember().add(
+                        AdminSearchDTO.ContentMember.builder()
+                                .id(members.getId())
+                                .memberName(members.getName())
+                                .memberEmail(members.getEmail())
+                                .memberTel(members.getTel())
+                                .birthDay(members.getBirthDay())
+                                .joinDay(members.getJoinDay())
+                                .role(members.getRole())
+                                .build()
+                );
+            }
+        }
+        adminSearch.setCount(member.size());
+        return new ResponseEntity<>(adminSearch, HttpStatus.OK);
     }
 
-
-    //우수가이드 설정(role=2 인계정만)
-    @Transactional
-    public int updateGreateGuide(final int adminId, final int memberId, final int guideId){
-
+    /**
+     * 회원 추가
+     */
+    // 새 계정 생성 - 이메일 중복 검사
+    public AdminAddMemberDTO adminAddMember(int adminId,AdminAddMemberDTO.AddMember addMemberDTO){
         checkAdmin(adminId);
-
-        if(memberId < 1){
-            log.warn("adminMemberService.updateSettingList() : Id 값이 이상해요");
-            throw new RuntimeException("adminMemberService.updateSettingList() : Id 값이 이상해요");
-        }
-        if(guideId != 2){
-            log.warn("잘못된 입력값입니다.");
-            throw new RuntimeException("2:우수가이드");
+        if(addMemberDTO == null || addMemberDTO.getEmail() == null){
+            log.warn("MemberService.add() : memberEntity에 email이 없습니다.");
+            throw new RuntimeException("MemberService.add() : member에 email이 없습니다.");
         }
 
-        try{
-           Member member = memberRepository.findByGuideId(memberId)
-                   .orElseThrow(() -> new IllegalArgumentException("가이드가 없습니다.: " + guideId));;
+        final String email = addMemberDTO.getEmail();
+        if(memberRepository.existsByEmail(email)){
+            log.warn("MemberService.add() : 해당 email이 이미 존재합니다.");
+            throw new RuntimeException("MemberService.add() : 해당 email이 이미 존재합니다.");
+        }
+        // 닉네임 중복 체크
+        boolean check = checkNickname(addMemberDTO.getNickName());
+        if(!check){
+            log.warn("MemberService.add() : 중복되는 닉네임입니다.");
+            throw new RuntimeException("MemberService.add() : 중복되는 닉네임입니다.");
+        }
 
-            member.setGreat(guideId);
-            memberRepository.save(member); // 수정
-            // 현재 저장되어 있는 값 가져오기
-            final int setting = memberRepository.findGreatMemberId(memberId);
-            return setting;
+        try {
+            Member member = Member.builder()
+                    .email(addMemberDTO.getEmail())
+                    .password(passwordEncoder.encode(addMemberDTO.getPassword()))
+                    .name(addMemberDTO.getName())
+                    .tel(addMemberDTO.getTel())
+                    .nickname(addMemberDTO.getNickName())
+                    .birthDay(addMemberDTO.getBirthDay())
+                    .joinDay(LocalDateTime.now()) // 현재 시간
+                    .gender(addMemberDTO.getGender())
+                    .role(addMemberDTO.getRole())
+                    .state(1)
+                    .build();
 
-        }catch(Exception e){
+            int memberId = memberRepository.save(member).getId();
+
+            // 이미지가 있는 경우
+            if (addMemberDTO.checkProfileImgRequestNull() && !addMemberDTO.getProfileImgRequest().isEmpty()) {
+
+                MultipartFile multipartFile = addMemberDTO.getProfileImgRequest().get(0);
+
+                if (!multipartFile.isEmpty()) {
+                    LocalDateTime now = LocalDateTime.now();
+                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                    String current_date = now.format(dateTimeFormatter);
+
+
+                    //String absolutePath = filePath +File.separator + "member";
+                    String absolutePath = "C:" +File.separator + "smallTour" + File.separator + "member";
+                    String path = absolutePath;
+                    File file = new File(path);
+
+                    if (!file.exists()) {
+                        boolean wasSuccessful = file.mkdirs();
+
+                        if (!wasSuccessful) {
+                            log.warn("file : was not successful");
+                        }
+                    }
+                    while (true) {
+                        String originalFileExtension;
+                        String contentType = multipartFile.getContentType();
+
+                        if (ObjectUtils.isEmpty(contentType)) {
+                            break;
+                        } else {
+                            if (contentType.contains("image/jpeg")) {
+                                originalFileExtension = ".jpg";
+                            } else if (contentType.contains("image/png")) {
+                                originalFileExtension = ".png";
+                            } else {
+                                log.warn("MemberService.add() : 지원하지 않는 이미지 형식입니다.");
+                                break;
+                            }
+                        }
+
+                        String new_file_name = String.valueOf(memberId);
+                        member.setProfile(new_file_name + originalFileExtension);
+                        memberRepository.save(member);
+
+                        file = new File(absolutePath + File.separator + new_file_name + originalFileExtension);
+                        multipartFile.transferTo(file); //지정된 경로에 파일 저장
+
+                        file.setWritable(true);
+                        file.setReadable(true);
+                        break;
+                    }
+                }
+            }
+            //entity -> DTO
+            //MemberDTO responseMemberDTO = new MemberDTO(member);
+            AdminAddMemberDTO addDTO = AdminAddMemberDTO.builder()
+                    .id(memberId)
+                    .email(member.getEmail())
+                    .password(passwordEncoder.encode(member.getPassword()))
+                    .name(member.getName())
+                    .tel(member.getTel())
+                    .nickName(member.getNickname())
+                    .birthDay(member.getBirthDay())
+                    .joinDay(LocalDateTime.now()) // 현재 시간
+                    .gender(member.getGender())
+                    .profile(member.getProfile())
+                    .role(member.getRole())
+                    .state(member.getState())
+                    .build();
+            return addDTO;
+
+        } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("0~1가능. 블랙리스트 혹은 취소 ");
+            throw new RuntimeException("MemberService.add() : 에러 발생.");
         }
-
-    }*/
+    }
 
 }

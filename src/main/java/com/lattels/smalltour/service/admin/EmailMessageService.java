@@ -1,5 +1,5 @@
 
-package com.lattels.smalltour.service;
+package com.lattels.smalltour.service.admin;
 
 
 import com.lattels.smalltour.dto.admin.member.EmailAllSendMessageDTO;
@@ -9,6 +9,7 @@ import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.persistence.EmailMessageRepository;
 
 import com.lattels.smalltour.persistence.MemberRepository;
+import com.lattels.smalltour.service.EmailSenderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

@@ -4,16 +4,24 @@ package com.lattels.smalltour.controller.admin;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.ResponseDTO;
+import com.lattels.smalltour.dto.ToursDTO;
+import com.lattels.smalltour.dto.admin.member.AdminAddMemberDTO;
 import com.lattels.smalltour.dto.admin.member.ListMemberDTO;
+import com.lattels.smalltour.dto.admin.search.AdminSearchDTO;
 import com.lattels.smalltour.dto.payment.PaymentMemberListDTO;
+import com.lattels.smalltour.dto.search.SearchGuideDTO;
+import com.lattels.smalltour.service.EmailTokenService;
 import com.lattels.smalltour.service.admin.AdminPaymentService;
 import com.lattels.smalltour.service.admin.AdminService;
 import com.lattels.smalltour.service.MemberFavoriteStatusService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +29,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,6 +44,9 @@ public class AdminMemberController {
     private final PasswordEncoder passwordEncoder;
 
     private final AdminPaymentService adminPaymentService;
+
+    private final EmailTokenService emailTokenService;
+
 
     private static final int NUMBER_OF_PAYMENT_PER_PAGE = 10;
 
@@ -199,4 +212,37 @@ public class AdminMemberController {
         adminService.deleteMember(adminId, memberId);
         return ResponseEntity.ok("삭제완료");
     }
+
+    @PostMapping("/search/member")
+    public ResponseEntity<AdminSearchDTO> searchMembers(
+            @ApiIgnore Authentication authentication,
+            @RequestParam(required = false) String memberName,
+            @RequestParam(required = false) String memberEmail,
+            @RequestParam(required = false) String memberTel,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate birthDay,
+            @RequestParam(value = "size", defaultValue = "0") int size,
+            @RequestParam(value = "page", defaultValue = "1") int page) {
+        int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+        return adminService.adminSearch(adminId,memberName,memberEmail,memberTel,birthDay, page,size);
+    }
+
+
+    @PostMapping("/add/member")
+    public ResponseEntity<?> registerMember(@ApiIgnore Authentication authentication, AdminAddMemberDTO.AddMember addMemberDTO) {
+
+        try {
+            int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+            AdminAddMemberDTO registeredMember = adminService.adminAddMember(adminId,addMemberDTO);
+            AdminAddMemberDTO responseMemberDTO = AdminAddMemberDTO.builder()
+                    .email(registeredMember.getEmail())
+                    .nickName(registeredMember.getNickName())
+                    .build();
+            return ResponseEntity.ok().body(responseMemberDTO);
+        } catch (Exception e) {
+            ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
+            return ResponseEntity.badRequest().body(responseDTO);
+        }
+
+    }
+
 }

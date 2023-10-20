@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -117,6 +118,12 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 
     @Query(value = "SELECT * FROM member m WHERE m.role = 2", nativeQuery = true)
     List<Member> findByGuideAll();
+
+    @Query(value = "SELECT * FROM member m WHERE m.name =:name OR m.email =:email OR m.tel =:tel OR m.birth_day =:birthDay AND role IN (0,1,2)", nativeQuery = true)
+    List<Member> findByMemberSearchId(@Param("name") String name, @Param("email") String email, @Param("tel") String tel,@Param("birthDay")LocalDate birthDay,Pageable pageable);
+
+    @Query(value = "SELECT * FROM member m WHERE m.name =:name", nativeQuery = true)
+    Member findByMemberName(@Param("name") String name);
 }
 
 
