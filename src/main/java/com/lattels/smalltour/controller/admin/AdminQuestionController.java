@@ -28,10 +28,10 @@ public class AdminQuestionController {
 
     @ApiOperation("질문 목록 조회")
     @GetMapping("/list")
-    public ResponseEntity<AdminQuestionListDTO> getQuestionList(@ApiIgnore Authentication authentication, int page) {
+    public ResponseEntity<AdminQuestionListDTO> getQuestionList(@ApiIgnore Authentication authentication,int isAnswer,int page) {
         int adminId = Integer.parseInt(authentication.getPrincipal().toString());
         // 질문 목록 조회
-        AdminQuestionListDTO questionListDTO = adminQuestionService.getQuestionList(adminId, page - 1, 10);
+        AdminQuestionListDTO questionListDTO = adminQuestionService.getQuestionList(adminId, isAnswer,page - 1, 10);
 
         return ResponseEntity.ok(questionListDTO);
     }

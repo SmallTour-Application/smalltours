@@ -24,7 +24,10 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
      */
     long countByMemberId(int memberId);
 
-    @Query(value = "SELECT * FROM question q JOIN member m on q.member_id = m.id order by q.created_day desc",nativeQuery = true)
+    @Query(value = "SELECT q.* FROM question q JOIN member m on q.member_id = m.id WHERE q.id IN (SELECT a.question_id FROM answer a) order by q.created_day desc",nativeQuery = true)
+    Page<Question> findMemberQuestionAnswer(Pageable pageable);
+
+    @Query(value = "SELECT q.* FROM question q JOIN member m on q.member_id = m.id WHERE q.id NOT IN (SELECT a.question_id FROM answer a) order by q.created_day desc",nativeQuery = true)
     Page<Question> findMemberQuestion(Pageable pageable);
 
 }

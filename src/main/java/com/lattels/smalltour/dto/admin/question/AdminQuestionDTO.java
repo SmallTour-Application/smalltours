@@ -40,8 +40,10 @@ public class AdminQuestionDTO {
     @ApiParam("질문 내용")
     private String content;
 
-    @ApiParam("질문 답변")
+
+    @ApiParam("질문 답변 여부")
     private String answer;
+
 
     @ApiParam("공개여부")
     private boolean isPublic;
@@ -59,7 +61,7 @@ public class AdminQuestionDTO {
         this.nickname = question.getMember().getNickname();
         this.title = question.getTitle();
         this.content = question.getContent();
-        this.answer = question.getAnswer().isEmpty() ? null : question.getAnswer().get(0).getContent();
+        this.answer = question.getAnswer().isEmpty() ? "미처리" : "처리됨";
         this.createdDay = question.getCreatedDay();
         this.isPublic = question.isPublic();
     }

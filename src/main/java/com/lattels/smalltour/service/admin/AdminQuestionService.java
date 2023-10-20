@@ -5,8 +5,10 @@ import com.google.common.base.Preconditions;
 import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.admin.question.AdminQuestionDTO;
 import com.lattels.smalltour.dto.admin.question.AdminQuestionListDTO;
+import com.lattels.smalltour.model.Answer;
 import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.model.Question;
+import com.lattels.smalltour.persistence.AnswerRepository;
 import com.lattels.smalltour.persistence.MemberRepository;
 import com.lattels.smalltour.persistence.QuestionRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,6 +33,7 @@ import java.util.stream.Collectors;
 public class AdminQuestionService {
     private final MemberRepository memberRepository;
     private final QuestionRepository questionRepository;
+    private final AnswerRepository answerRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -68,21 +72,35 @@ public class AdminQuestionService {
     /**
      * 전체 질문 게시글 가져오기
      */
-    public AdminQuestionListDTO getQuestionList(int adminId, int page, int count){
+    public AdminQuestionListDTO getQuestionList(int adminId, int isAnswer,int page, int count){
         checkAdmin(adminId);
         Pageable pageable = PageRequest.of(page,count);
 
-        int questionCount = Long.valueOf(questionRepository.count()).intValue();
+        if(isAnswer == 0){ //답변이 존재하는 질문내역
+            int questionCount = Long.valueOf(questionRepository.count()).intValue();
 
-        Page<Question> questions = questionRepository.findMemberQuestion(pageable);
-        List<AdminQuestionDTO> questionDTOS = questions.stream()
-                .map(question -> new AdminQuestionDTO(question))
-                .collect(Collectors.toList());
+            Page<Question> questions = questionRepository.findMemberQuestionAnswer(pageable);
+            List<AdminQuestionDTO> questionDTOS = questions.stream()
+                    .map(question -> new AdminQuestionDTO(question))
+                    .collect(Collectors.toList());
 
-       return AdminQuestionListDTO.builder()
-               .count(questionCount)
-               .content(questionDTOS)
-               .build();
+            return AdminQuestionListDTO.builder()
+                    .count(questionCount)
+                    .content(questionDTOS)
+                    .build();
+        }else{ //답변이 존재하지않음
+            int questionCount = Long.valueOf(questionRepository.count()).intValue();
+
+            Page<Question> questions = questionRepository.findMemberQuestion(pageable);
+            List<AdminQuestionDTO> questionDTOS = questions.stream()
+                    .map(question -> new AdminQuestionDTO(question))
+                    .collect(Collectors.toList());
+
+            return AdminQuestionListDTO.builder()
+                    .count(questionCount)
+                    .content(questionDTOS)
+                    .build();
+        }
 
     }
 
