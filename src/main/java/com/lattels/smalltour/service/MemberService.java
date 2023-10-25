@@ -4,6 +4,8 @@ package com.lattels.smalltour.service;
 import com.lattels.smalltour.dto.FavoriteTourDTO;
 import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.favoriteGuideDTO;
+import com.lattels.smalltour.exception.ErrorCode;
+import com.lattels.smalltour.exception.ResponseMessageException;
 import com.lattels.smalltour.model.FavoriteGuide;
 import com.lattels.smalltour.model.FavoriteTour;
 import com.lattels.smalltour.model.Member;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -373,4 +376,32 @@ public class MemberService {
         return favoriteTourDTOList;
     }
 
+    /*
+    * 권한 업데이트
+    */
+    public void updateMemberRole(Authentication authentication, MemberDTO.RoleUpdateRequestDTO roleUpdateRequestDTO) {
+
+        int memberId = Integer.parseInt(authentication.getPrincipal().toString());
+        Member member = memberRepository.findByMemberId(memberId);
+        Member guide = memberRepository.findByMemberId(roleUpdateRequestDTO.getMemberId());
+        // 등록된 회원인지 검사
+        if (member == null) {
+            throw new ResponseMessageException(ErrorCode.USER_UNREGISTERED);
+        }
+        // 관리자 회원인지 검사
+        if (member.getRole() != MemberDTO.MemberRole.ADMIN) {
+            throw new ResponseMessageException(ErrorCode.ADMIN_INVALID_PERMISSION);
+        }
+        // 받아온 아이디가 존재하는 유저 아이디인지 검사
+        if (guide == null) {
+            throw new ResponseMessageException(ErrorCode.USER_UNREGISTERED);
+        }
+        // 수정하려는 권한이 이미 할당되어 있다면
+        if (guide.getRole() == roleUpdateRequestDTO.getRole()) {
+            throw new ResponseMessageException(ErrorCode.ALREADY_SAVED_ROLE);
+        }
+        guide.setRole(roleUpdateRequestDTO.getRole());
+        memberRepository.save(guide);
+
+    }
 }

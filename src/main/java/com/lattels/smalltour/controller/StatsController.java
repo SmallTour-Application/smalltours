@@ -1,6 +1,8 @@
 package com.lattels.smalltour.controller;
 
 import com.lattels.smalltour.dto.StatsDTO;
+import com.lattels.smalltour.exception.ErrorCode;
+import com.lattels.smalltour.exception.ResponseMessageException;
 import com.lattels.smalltour.service.StatsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,6 +37,38 @@ public class StatsController {
 
         StatsDTO.StatsResponseDTO statsResponseDTO = statsService.viewStats(Integer.parseInt(authentication.getPrincipal().toString()), dateRequestDTO);
         return ResponseEntity.ok().body(statsResponseDTO);
+
+    }
+
+    /*
+    * 월별 가입 수 가져오기
+    */
+    /*@PostMapping(value = "/member-per-month")
+    @ApiOperation(value = "월별 가입 수")
+    public ResponseEntity<StatsDTO.MemberPerMonthDTO> getMemberPerMonth(@ApiIgnore Authentication authentication) {
+
+        try {
+            StatsDTO.MemberPerMonthDTO MemberPerMonthDTO = statsService.getMemberPerMonth(authentication);
+            return ResponseEntity.ok().body(MemberPerMonthDTO);
+        } catch (Exception e) {
+            throw new ResponseMessageException(ErrorCode.INVALID_PARAMETER);
+        }
+
+    }*/
+
+    /*
+    * 현재 총 회원 수
+    */
+    @PostMapping(value = "/total-members")
+    @ApiOperation(value = "현재 총 회원 수")
+    public ResponseEntity<StatsDTO.TotalMembersDTO> getTotalMembers(@ApiIgnore Authentication authentication) {
+
+        try {
+            StatsDTO.TotalMembersDTO totalMembers = statsService.getTotalMembers(authentication);
+            return ResponseEntity.ok().body(totalMembers);
+        } catch (Exception e) {
+            throw new ResponseMessageException(ErrorCode.INVALID_PARAMETER);
+        }
 
     }
 

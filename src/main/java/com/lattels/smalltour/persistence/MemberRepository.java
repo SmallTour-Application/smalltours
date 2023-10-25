@@ -124,6 +124,12 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 
     @Query(value = "SELECT * FROM member m WHERE m.name =:name", nativeQuery = true)
     Member findByMemberName(@Param("name") String name);
+
+    /*
+     * 권한에 맞는 회원 수 가져오기
+     */
+    @Query(value = "SELECT COUNT(m) FROM Member m WHERE m.role = :role AND m.state = 1")
+    int countByMemberRole(@Param("role") int role);
 }
 
 

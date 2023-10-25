@@ -4,12 +4,15 @@ import com.google.common.base.Preconditions;
 import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.StatsDTO;
 import com.lattels.smalltour.dto.ToursDTO;
+import com.lattels.smalltour.exception.ErrorCode;
+import com.lattels.smalltour.exception.ResponseMessageException;
 import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.model.Tours;
 import com.lattels.smalltour.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -111,4 +114,59 @@ public class StatsService {
 
         return statsResponseDTO;
     }
+
+    /*
+    * 월별 가입 수 가져오기
+    */
+   /* public StatsDTO.MemberPerMonthDTO getMemberPerMonth(Authentication authentication) {
+
+        int memberId = Integer.parseInt(authentication.getPrincipal().toString());
+        Member member = memberRepository.findByMemberId(memberId);
+        // 등록된 회원인지 검사
+        if (member == null) {
+            throw new ResponseMessageException(ErrorCode.USER_UNREGISTERED);
+        }
+        // 관리자 회원인지 검사
+        if (member.getRole() != MemberDTO.MemberRole.ADMIN) {
+            throw new ResponseMessageException(ErrorCode.ADMIN_INVALID_PERMISSION);
+        }
+
+
+    }*/
+
+    /*
+    * 현재 총 회원수 가져오기
+    */
+    public StatsDTO.TotalMembersDTO getTotalMembers(Authentication authentication) {
+
+        int memberId = Integer.parseInt(authentication.getPrincipal().toString());
+        Member member = memberRepository.findByMemberId(memberId);
+        // 등록된 회원인지 검사
+        if (member == null) {
+            throw new ResponseMessageException(ErrorCode.USER_UNREGISTERED);
+        }
+        // 관리자 회원인지 검사
+        if (member.getRole() != MemberDTO.MemberRole.ADMIN) {
+            throw new ResponseMessageException(ErrorCode.ADMIN_INVALID_PERMISSION);
+        }
+
+        StatsDTO.TotalMembersDTO totalMembersDTO = new StatsDTO.TotalMembersDTO();
+        // 권한에 맞는 회원 수 받아서 DTO에 저장
+        int travelerCnt = memberRepository.countByMemberRole(MemberDTO.MemberRole.TRAVELER);
+        totalMembersDTO.setTraveler(travelerCnt);
+
+        int unregisteredGuideCnt = memberRepository.countByMemberRole(MemberDTO.MemberRole.UNREGISTERED_GUIDE);
+        totalMembersDTO.setUnregisteredGuide(unregisteredGuideCnt);
+
+        int guideCnt = memberRepository.countByMemberRole(MemberDTO.MemberRole.GUIDE);
+        totalMembersDTO.setGuide(guideCnt);
+
+        int totalCnt = travelerCnt + unregisteredGuideCnt + guideCnt;
+        totalMembersDTO.setTotal(totalCnt);
+
+        //반환
+        return totalMembersDTO;
+
+    }
+
 }
