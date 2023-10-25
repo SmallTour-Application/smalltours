@@ -1,12 +1,18 @@
 package com.lattels.smalltour.service;
 
+import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.NoticeDTO;
+import com.lattels.smalltour.exception.ErrorCode;
+import com.lattels.smalltour.exception.ResponseMessageException;
+import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.model.Notice;
+import com.lattels.smalltour.persistence.MemberRepository;
 import com.lattels.smalltour.persistence.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,63 +26,77 @@ public class NoticeService {
 
     private final NoticeRepository noticeRepository;
 
+    private final MemberRepository memberRepository;
+
     // 공지 작성
-    public void writeNotice(int memberId, NoticeDTO.WriteRequestDTO writeRequestDTO) {
+    public void writeNotice(Authentication authentication, NoticeDTO.WriteRequestDTO writeRequestDTO) {
 
-        try {
+        Member member = memberRepository.findByMemberId(Integer.parseInt(authentication.getPrincipal().toString()));
 
-            Notice notice = Notice.builder()
-                    .memberId(memberId)
-                    .title(writeRequestDTO.getTitle())
-                    .content(writeRequestDTO.getContent())
-                    .createdDay(LocalDateTime.now())
-                    .view(0)
-                    .build();
-            // 엔티티 저장
-            noticeRepository.save(notice);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("NoticeService.writeNotice() : 에러 발생");
+        // 등록된 회원인지 검사
+        if (member == null) {
+            throw new ResponseMessageException(ErrorCode.USER_UNREGISTERED);
         }
+        // 관리자 회원인지 검사
+        if (member.getRole() != MemberDTO.MemberRole.ADMIN) {
+            throw new ResponseMessageException(ErrorCode.ADMIN_INVALID_PERMISSION);
+        }
+
+        Notice notice = Notice.builder()
+                .memberId(member.getId())
+                .title(writeRequestDTO.getTitle())
+                .content(writeRequestDTO.getContent())
+                .createdDay(LocalDateTime.now())
+                .view(0)
+                .build();
+        // 엔티티 저장
+        noticeRepository.save(notice);
 
     }
 
     // 공지 글 수정
-    public void updateNotice(int memberId, NoticeDTO.UpdateRequestDTO updateRequestDTO) {
+    public void updateNotice(Authentication authentication, NoticeDTO.UpdateRequestDTO updateRequestDTO) {
 
-        try {
+        Member member = memberRepository.findByMemberId(Integer.parseInt(authentication.getPrincipal().toString()));
 
-            // 받아온 BoardDTO의 Id에 맞는 엔티티 가져옴
-            Notice notice = noticeRepository.findByIdAndMemberId(updateRequestDTO.getId(), memberId);
-            // 수정 값 입력
-            notice.setTitle(updateRequestDTO.getTitle());
-            notice.setContent(updateRequestDTO.getContent());
-            notice.setUpdatedDay(LocalDateTime.now());
-            // 저장
-            noticeRepository.save(notice);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("NoticeService.updateNotice() : 에러 발생");
+        // 등록된 회원인지 검사
+        if (member == null) {
+            throw new ResponseMessageException(ErrorCode.USER_UNREGISTERED);
         }
+        // 관리자 회원인지 검사
+        if (member.getRole() != MemberDTO.MemberRole.ADMIN) {
+            throw new ResponseMessageException(ErrorCode.ADMIN_INVALID_PERMISSION);
+        }
+
+        // 받아온 BoardDTO의 Id에 맞는 엔티티 가져옴
+        Notice notice = noticeRepository.findByIdAndMemberId(updateRequestDTO.getId(), member.getId());
+        // 수정 값 입력
+        notice.setTitle(updateRequestDTO.getTitle());
+        notice.setContent(updateRequestDTO.getContent());
+        notice.setUpdatedDay(LocalDateTime.now());
+        // 저장
+        noticeRepository.save(notice);
 
     }
 
     // 공지 글 삭제
-    public void deleteNotice(int memberId, NoticeDTO.IdRequestDTO idRequestDTO) {
+    public void deleteNotice(Authentication authentication, NoticeDTO.IdRequestDTO idRequestDTO) {
 
-        try {
+        Member member = memberRepository.findByMemberId(Integer.parseInt(authentication.getPrincipal().toString()));
 
-            // 받아온 BoardDTO의 Id에 맞는 엔티티 가져옴
-            Notice notice = noticeRepository.findByIdAndMemberId(idRequestDTO.getId(), memberId);
-            // 삭제
-            noticeRepository.delete(notice);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("NoticeService.deleteNotice() : 에러 발생");
+        // 등록된 회원인지 검사
+        if (member == null) {
+            throw new ResponseMessageException(ErrorCode.USER_UNREGISTERED);
         }
+        // 관리자 회원인지 검사
+        if (member.getRole() != MemberDTO.MemberRole.ADMIN) {
+            throw new ResponseMessageException(ErrorCode.ADMIN_INVALID_PERMISSION);
+        }
+
+        // 받아온 BoardDTO의 Id에 맞는 엔티티 가져옴
+        Notice notice = noticeRepository.findByIdAndMemberId(idRequestDTO.getId(), member.getId());
+        // 삭제
+        noticeRepository.delete(notice);
 
     }
 

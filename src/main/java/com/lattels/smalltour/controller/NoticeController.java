@@ -1,6 +1,8 @@
 package com.lattels.smalltour.controller;
 
 import com.lattels.smalltour.dto.NoticeDTO;
+import com.lattels.smalltour.exception.ErrorCode;
+import com.lattels.smalltour.exception.ResponseMessageException;
 import com.lattels.smalltour.service.NoticeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,10 +35,10 @@ public class NoticeController {
     public ResponseEntity<Object> writeNotice(@ApiIgnore Authentication authentication, @Valid @RequestBody NoticeDTO.WriteRequestDTO writeRequestDTO) {
 
         try {
-            noticeService.writeNotice(Integer.parseInt(authentication.getPrincipal().toString()), writeRequestDTO);
+            noticeService.writeNotice(authentication, writeRequestDTO);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            throw new ResponseMessageException(ErrorCode.INVALID_PARAMETER);
         }
 
     }
@@ -47,10 +49,10 @@ public class NoticeController {
     public ResponseEntity<Object> updateNotice(@ApiIgnore Authentication authentication, @Valid @RequestBody NoticeDTO.UpdateRequestDTO updateRequestDTO) {
 
         try {
-            noticeService.updateNotice(Integer.parseInt(authentication.getPrincipal().toString()), updateRequestDTO);
+            noticeService.updateNotice(authentication, updateRequestDTO);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            throw new ResponseMessageException(ErrorCode.INVALID_PARAMETER);
         }
 
     }
@@ -61,10 +63,10 @@ public class NoticeController {
     public ResponseEntity<Object> deleteNotice(@ApiIgnore Authentication authentication, @Valid @RequestBody NoticeDTO.IdRequestDTO idRequestDTO) {
 
         try {
-            noticeService.deleteNotice(Integer.parseInt(authentication.getPrincipal().toString()), idRequestDTO);
+            noticeService.deleteNotice(authentication, idRequestDTO);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            throw new ResponseMessageException(ErrorCode.INVALID_PARAMETER);
         }
 
     }

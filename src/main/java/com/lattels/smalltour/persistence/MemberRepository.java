@@ -1,5 +1,6 @@
 package com.lattels.smalltour.persistence;
 
+import com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO;
 import com.lattels.smalltour.model.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -130,6 +132,22 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
      */
     @Query(value = "SELECT COUNT(m) FROM Member m WHERE m.role = :role AND m.state = 1")
     int countByMemberRole(@Param("role") int role);
+
+    /*
+    * 이름에 맞는 Member 리스트 가져오기
+    */
+    @Query(value = "SELECT m FROM Member m WHERE m.name = :name")
+    List<Member> findAllByName(@Param("name") String name);
+
+    /*
+     * 1년간의 월별 가입자 수 가져오기
+     */
+    @Query(value = "SELECT new com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO(m.joinDay, count(m)) " +
+            "FROM Member m " +
+            "WHERE m.joinDay >= :date " +
+            "GROUP BY m.joinDay ")
+    List<TotalCntPerMonthDTO> countMemberPerMonth(@Param("date") LocalDateTime date);
+
 }
 
 

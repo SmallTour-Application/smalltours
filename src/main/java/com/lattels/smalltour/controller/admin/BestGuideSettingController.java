@@ -2,7 +2,6 @@ package com.lattels.smalltour.controller.admin;
 
 import com.lattels.smalltour.dto.BestGuideDTO;
 import com.lattels.smalltour.dto.MemberDTO;
-import com.lattels.smalltour.dto.StatsDTO;
 import com.lattels.smalltour.exception.ErrorCode;
 import com.lattels.smalltour.exception.ResponseMessageException;
 import com.lattels.smalltour.service.BestGuideService;
