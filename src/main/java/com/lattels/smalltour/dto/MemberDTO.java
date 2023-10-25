@@ -8,6 +8,8 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,7 +27,6 @@ public class MemberDTO {
         private String password;
 
     }
-
     @Getter
     @NoArgsConstructor
     public static class UpdateTel{
@@ -184,6 +185,32 @@ public class MemberDTO {
     // 파일 null 체크
     public boolean checkProfileImgRequestNull() {
         return this.profileImgRequest != null;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @ApiModel(value = "Member ID 요청 DTO")
+    public static class IdRequestDTO {
+
+        @Positive(message = "양수만 가능합니다.")
+        @ApiModelProperty(value = "유저 ID", example = "1")
+        private int memberId;
+
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @ApiModel(value = "권한 업데이트 요청 DTO")
+    public static class RoleUpdateRequestDTO {
+
+        @Positive(message = "양수만 가능합니다.")
+        @ApiModelProperty(value = "유저 ID", example = "1")
+        private int memberId;
+
+        @PositiveOrZero(message = "양수만 가능합니다.")
+        @ApiModelProperty(value = "권한", example = "1")
+        private int role;
+
     }
 
     /**

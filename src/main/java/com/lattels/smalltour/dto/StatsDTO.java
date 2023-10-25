@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import org.springframework.util.ObjectUtils;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -85,4 +87,46 @@ public class StatsDTO {
         }
 
     }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @ApiModel(value = "현재 총 회원 수 응답 DTO")
+    public static class TotalMembersDTO {
+
+        @PositiveOrZero(message = "양수와 0만 가능합니다.")
+        @ApiModelProperty(value = "여행자 수", example = "1")
+        private int traveler;
+
+        @PositiveOrZero(message = "양수와 0만 가능합니다.")
+        @ApiModelProperty(value = "미등록 가이드 수", example = "1")
+        private int unregisteredGuide;
+
+        @PositiveOrZero(message = "양수와 0만 가능합니다.")
+        @ApiModelProperty(value = "가이드 수", example = "1")
+        private int guide;
+
+        @PositiveOrZero(message = "양수와 0만 가능합니다.")
+        @ApiModelProperty(value = "총합", example = "1")
+        private int total;
+
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @ApiModel(value = "월별 가입 수 응답 DTO")
+    public static class MemberPerMonthDTO {
+
+        @Positive(message = "양수만 가능합니다.")
+        @ApiModelProperty(value = "월", example = "1")
+        private int month;
+
+        @PositiveOrZero(message = "양수와 0만 가능합니다.")
+        @ApiModelProperty(value = "가입자 수", example = "1")
+        private int memberCnt;
+
+    }
+
+
 }
