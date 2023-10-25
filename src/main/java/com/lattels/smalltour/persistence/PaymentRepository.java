@@ -1,13 +1,13 @@
 package com.lattels.smalltour.persistence;
 
-import com.lattels.smalltour.model.Member;
+import com.lattels.smalltour.dto.stats.TotalVolumePercentageDTO;
+import com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO;
 import com.lattels.smalltour.model.Payment;
 import com.lattels.smalltour.model.Tours;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -131,6 +131,34 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
             "JOIN member m ON p.member_id = m.id " +
             "WHERE m.role = 0 AND p.state = 3 ",nativeQuery = true)
     List<Payment> findByPaymentRefundMemberId(Pageable pageable);
+
+    /*
+     * 1년간의 월별 예약 수 가져오기
+     */
+    @Query(value = "SELECT new com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO(p.paymentDay, count(p)) " +
+            "FROM Payment p " +
+            "WHERE p.paymentDay >= :date AND p.state = 1 " +
+            "GROUP BY p.paymentDay ")
+    List<TotalCntPerMonthDTO> countPaymentPerMonth(@Param("date") LocalDateTime date);
+
+    /*
+     * 기간 동안의 판매량 비율
+     */
+    @Query(value = "SELECT new com.lattels.smalltour.dto.stats.TotalVolumePercentageDTO(p.tours.id, p.tours.title, p.tours.guide.name, p.tours.guide.nickname, p.tours.price, count(p) ) " +
+            "FROM Payment p " +
+            "WHERE p.paymentDay >= :startDate AND p.paymentDay <= :endDate " +
+            "AND p.state = 1 " +
+            "GROUP BY p.tours.id ")
+    List<TotalVolumePercentageDTO> totalVolumePercentage(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate );
+
+    /*
+     * 기간 동안의 총 판매량
+     */
+    @Query(value = "SELECT count(p) " +
+            "FROM Payment p " +
+            "WHERE p.paymentDay >= :startDate AND p.paymentDay <= :endDate " +
+            "AND p.state = 1 ")
+    long totalCnt(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate );
 
 
 }

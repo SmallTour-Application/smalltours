@@ -2,8 +2,9 @@ package com.lattels.smalltour.service;
 
 import com.google.common.base.Preconditions;
 import com.lattels.smalltour.dto.MemberDTO;
-import com.lattels.smalltour.dto.StatsDTO;
-import com.lattels.smalltour.dto.ToursDTO;
+import com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO;
+import com.lattels.smalltour.dto.stats.StatsDTO;
+import com.lattels.smalltour.dto.stats.TotalVolumePercentageDTO;
 import com.lattels.smalltour.exception.ErrorCode;
 import com.lattels.smalltour.exception.ResponseMessageException;
 import com.lattels.smalltour.model.Member;
@@ -118,7 +119,7 @@ public class StatsService {
     /*
     * 월별 가입 수 가져오기
     */
-   /* public StatsDTO.MemberPerMonthDTO getMemberPerMonth(Authentication authentication) {
+    public List<TotalCntPerMonthDTO> getMemberPerMonth(Authentication authentication) {
 
         int memberId = Integer.parseInt(authentication.getPrincipal().toString());
         Member member = memberRepository.findByMemberId(memberId);
@@ -131,8 +132,73 @@ public class StatsService {
             throw new ResponseMessageException(ErrorCode.ADMIN_INVALID_PERMISSION);
         }
 
+        LocalDate currentDate = LocalDate.now();
+        LocalDate startDate = currentDate.minusYears(1);
+        List<TotalCntPerMonthDTO> responseDTOList = memberRepository.countMemberPerMonth(startDate.atStartOfDay());
 
-    }*/
+        int i = -1;
+        boolean isMatch = false;
+        while (!startDate.isAfter(currentDate)) {
+            i++;
+            isMatch = false;
+            String date = startDate.getYear() + "-" + startDate.getMonthValue();
+            for (TotalCntPerMonthDTO dto : responseDTOList) {
+                if (date.equals(dto.getMonth())) {
+                    isMatch = true;
+                    continue;
+                }
+            }
+            if (isMatch == false) {
+                responseDTOList.add(i, new TotalCntPerMonthDTO(startDate, 0));
+            }
+            startDate = startDate.plusMonths(1);
+        }
+
+        return responseDTOList;
+
+    }
+
+    /*
+    * 월별 예약 수 가져오기
+    */
+    public List<TotalCntPerMonthDTO> getPaymentPerMonth(Authentication authentication) {
+
+        int memberId = Integer.parseInt(authentication.getPrincipal().toString());
+        Member member = memberRepository.findByMemberId(memberId);
+        // 등록된 회원인지 검사
+        if (member == null) {
+            throw new ResponseMessageException(ErrorCode.USER_UNREGISTERED);
+        }
+        // 관리자 회원인지 검사
+        if (member.getRole() != MemberDTO.MemberRole.ADMIN) {
+            throw new ResponseMessageException(ErrorCode.ADMIN_INVALID_PERMISSION);
+        }
+
+        LocalDate currentDate = LocalDate.now();
+        LocalDate startDate = currentDate.minusYears(1);
+        List<TotalCntPerMonthDTO> responseDTOList = paymentRepository.countPaymentPerMonth(startDate.atStartOfDay());
+
+        int i = -1;
+        boolean isMatch = false;
+        while (!startDate.isAfter(currentDate)) {
+            i++;
+            isMatch = false;
+            String date = startDate.getYear() + "-" + startDate.getMonthValue();
+            for (TotalCntPerMonthDTO dto : responseDTOList) {
+                if (date.equals(dto.getMonth())) {
+                    isMatch = true;
+                    continue;
+                }
+            }
+            if (isMatch == false) {
+                responseDTOList.add(i, new TotalCntPerMonthDTO(startDate, 0));
+            }
+            startDate = startDate.plusMonths(1);
+        }
+
+        return responseDTOList;
+
+    }
 
     /*
     * 현재 총 회원수 가져오기
@@ -169,4 +235,42 @@ public class StatsService {
 
     }
 
+    /*
+     * 기간 동안의 판매 비율 가져오기
+     */
+    public StatsDTO.TotalVolumePercentageResponseDTO getTotalVolumePercentageList(Authentication authentication, StatsDTO.DateRequestDTO requestDTO) {
+
+        int memberId = Integer.parseInt(authentication.getPrincipal().toString());
+        Member member = memberRepository.findByMemberId(memberId);
+        // 등록된 회원인지 검사
+        if (member == null) {
+            throw new ResponseMessageException(ErrorCode.USER_UNREGISTERED);
+        }
+        // 관리자 회원인지 검사
+        if (member.getRole() != MemberDTO.MemberRole.ADMIN) {
+            throw new ResponseMessageException(ErrorCode.ADMIN_INVALID_PERMISSION);
+        }
+
+        LocalDateTime startDate = requestDTO.getStartDate().atStartOfDay();
+        LocalDateTime endDate = requestDTO.getEndDate().atStartOfDay();
+        List<TotalVolumePercentageDTO> totalVolumePercentageDTOList = paymentRepository.totalVolumePercentage(startDate, endDate);
+
+        long longTotalVolume = paymentRepository.totalCnt(startDate, endDate);
+        int totalVolume = (int) longTotalVolume;
+
+        // 퍼센테이지 구하기
+        for (TotalVolumePercentageDTO totalVolumePercentageDTO : totalVolumePercentageDTOList) {
+//            totalVolume += totalVolumePercentageDTO.getSalesVolume();
+            double percentage = ((double) totalVolumePercentageDTO.getSalesVolume() / totalVolume) * 100;
+            // 저장
+            totalVolumePercentageDTO.setPercentage(Math.round(percentage*100)/100.0);
+        }
+
+        StatsDTO.TotalVolumePercentageResponseDTO responseDTO = new StatsDTO.TotalVolumePercentageResponseDTO();
+        responseDTO.setTotalSalesVolume(totalVolume);
+        responseDTO.setTotalVolumePercentageDTOList(totalVolumePercentageDTOList);
+
+        return responseDTO;
+
+    }
 }

@@ -404,4 +404,34 @@ public class MemberService {
         memberRepository.save(guide);
 
     }
+
+    /*
+    * 이름으로 유저 리스트 가져오기
+    */
+    public List<MemberDTO.RoleSettingResponseDTO> getMemberList(Authentication authentication, MemberDTO.NameRequestDTO nameRequestDTO) {
+
+        Member member = memberRepository.findByMemberId(Integer.parseInt(authentication.getPrincipal().toString()));
+
+        // 등록된 회원인지 검사
+        if (member == null) {
+            throw new ResponseMessageException(ErrorCode.USER_UNREGISTERED);
+        }
+        // 관리자 회원인지 검사
+        if (member.getRole() != MemberDTO.MemberRole.ADMIN) {
+            throw new ResponseMessageException(ErrorCode.ADMIN_INVALID_PERMISSION);
+        }
+
+        // 받아온 이름으로 MemberList 가져오기
+        List<Member> members = memberRepository.findAllByName(nameRequestDTO.getName());
+        // 반환할 DTO List 생성
+        List<MemberDTO.RoleSettingResponseDTO> responseDTOList = new ArrayList<>();
+
+        for (Member member1 : members) {
+            MemberDTO.RoleSettingResponseDTO responseDTO = new MemberDTO.RoleSettingResponseDTO(member1);
+            responseDTOList.add(responseDTO);
+        }
+
+        return responseDTOList;
+
+    }
 }

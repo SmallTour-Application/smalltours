@@ -1,4 +1,5 @@
-package com.lattels.smalltour.controller;
+/*
+package com.lattels.smalltour.exception;
 
 import com.lattels.smalltour.dto.ResponseDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -13,9 +14,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ControllerAspect {
 
-    /**
+    */
+/**
      * 컨트롤러 오류 발생 시 오류 메시지를 반환시킵니다.
-     */
+     *//*
+
     @Around("within(com.lattels.smalltour.controller.*)")
     public Object exception(ProceedingJoinPoint joinPoint) throws Throwable {
         try {
@@ -26,4 +29,4 @@ public class ControllerAspect {
         }
     }
 
-}
+}*/

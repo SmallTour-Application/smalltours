@@ -8,6 +8,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
@@ -46,6 +47,17 @@ public class MemberDTO {
     @NoArgsConstructor
     public static class UpdateNickName{
         private String nickname;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @ApiModel(value = "이름 요청 DTO")
+    public static class NameRequestDTO {
+
+        @NotBlank(message = "필수 입력값입니다.")
+        @ApiModelProperty(value = "이름", example = "name")
+        private String name;
+
     }
 
     @Getter
@@ -211,6 +223,55 @@ public class MemberDTO {
         @ApiModelProperty(value = "권한", example = "1")
         private int role;
 
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @ApiModel(value = "권한설정 페이지 회원 리스트 DTO")
+    public static class RoleSettingResponseDTO {
+
+        @Positive(message = "양수만 가능합니다.")
+        @ApiModelProperty(value = "유저 ID", example = "1")
+        private int memberId;
+
+        @PositiveOrZero(message = "0과 양수만 가능합니다.")
+        @ApiModelProperty(value = "권한", example = "1")
+        private int role;
+
+        @NotBlank(message = "필수 입력값입니다.")
+        @ApiModelProperty(value = "이름", example = "name")
+        private String name;
+
+        @NotBlank(message = "필수 입력값입니다.")
+        @ApiModelProperty(value = "닉네임", example = "nickname")
+        private String nickname;
+
+        @NotBlank(message = "필수 입력값입니다.")
+        @ApiModelProperty(value = "이메일", example = "ex@gmail.com")
+        private String email;
+
+        @NotBlank(message = "필수 입력값입니다.")
+        @ApiModelProperty(value = "전화번호", example = "010-0000-0000")
+        private String tel;
+
+        @ApiModelProperty(value = "가입일", example = "")
+        private LocalDateTime joinDay;
+
+        @PositiveOrZero(message = "0과 양수만 가능합니다.")
+        @ApiModelProperty(value = "상태", example = "1")
+        private int state;
+
+        public RoleSettingResponseDTO(Member member) {
+            this.memberId = member.getId();
+            this.role = member.getRole();
+            this.name = member.getName();
+            this.nickname = member.getNickname();
+            this.email = member.getEmail();
+            this.tel = member.getTel();
+            this.joinDay = member.getJoinDay();
+            this.state = member.getState();
+        }
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.lattels.smalltour.dto;
+package com.lattels.smalltour.dto.stats;
 
 import com.lattels.smalltour.model.Tours;
 import io.swagger.annotations.ApiModel;
@@ -115,16 +115,13 @@ public class StatsDTO {
     @Getter
     @Setter
     @NoArgsConstructor
-    @ApiModel(value = "월별 가입 수 응답 DTO")
-    public static class MemberPerMonthDTO {
+    @ApiModel(value = "판매 비율 응답 DTO")
+    public static class TotalVolumePercentageResponseDTO {
 
-        @Positive(message = "양수만 가능합니다.")
-        @ApiModelProperty(value = "월", example = "1")
-        private int month;
+        @ApiModelProperty(value = "총 판매량", example = "1")
+        private int totalSalesVolume;
 
-        @PositiveOrZero(message = "양수와 0만 가능합니다.")
-        @ApiModelProperty(value = "가입자 수", example = "1")
-        private int memberCnt;
+        List<TotalVolumePercentageDTO> totalVolumePercentageDTOList;
 
     }
 
