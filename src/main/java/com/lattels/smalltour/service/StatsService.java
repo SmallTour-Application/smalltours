@@ -301,7 +301,6 @@ public class StatsService {
         Setting setting = settings.get(0);
 
         siteProfitDTO.setToursProfit((int) ((siteProfitDTO.getToursProfit()/setting.getPackageCommission()) * 100));
-        siteProfitDTO.setUpperPaymentProfit((int) ((siteProfitDTO.getUpperPaymentProfit()/setting.getUpperPaymentPrice()) * 100));
         int totalProfit = siteProfitDTO.getToursProfit() + siteProfitDTO.getUpperPaymentProfit();
         siteProfitDTO.setTotalProfit(totalProfit);
         return siteProfitDTO;
