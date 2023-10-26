@@ -1,5 +1,6 @@
 package com.lattels.smalltour.controller;
 
+import com.lattels.smalltour.dto.stats.SiteProfitDTO;
 import com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO;
 import com.lattels.smalltour.dto.stats.StatsDTO;
 import com.lattels.smalltour.exception.ErrorCode;
@@ -101,6 +102,23 @@ public class StatsController {
 
         try {
             StatsDTO.TotalVolumePercentageResponseDTO responseDTO = statsService.getTotalVolumePercentageList(authentication, requestDTO);
+            return ResponseEntity.ok().body(responseDTO);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseMessageException(ErrorCode.INVALID_PARAMETER);
+        }
+
+    }
+
+    /*
+    * 기간 동안의 사이트 수익 가져오기
+    */
+    @PostMapping(value = "/site-profit")
+    @ApiOperation(value = "기간 동안의 사이트 수익 가져오기")
+    public ResponseEntity<SiteProfitDTO> getSiteProfit(@ApiIgnore Authentication authentication, @RequestBody StatsDTO.DateRequestDTO requestDTO) {
+
+        try {
+            SiteProfitDTO responseDTO = statsService.getSiteProfit(authentication, requestDTO);
             return ResponseEntity.ok().body(responseDTO);
         } catch (Exception e) {
             e.printStackTrace();

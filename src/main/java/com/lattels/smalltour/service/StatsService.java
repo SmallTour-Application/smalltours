@@ -2,12 +2,14 @@ package com.lattels.smalltour.service;
 
 import com.google.common.base.Preconditions;
 import com.lattels.smalltour.dto.MemberDTO;
+import com.lattels.smalltour.dto.stats.SiteProfitDTO;
 import com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO;
 import com.lattels.smalltour.dto.stats.StatsDTO;
 import com.lattels.smalltour.dto.stats.TotalVolumePercentageDTO;
 import com.lattels.smalltour.exception.ErrorCode;
 import com.lattels.smalltour.exception.ResponseMessageException;
 import com.lattels.smalltour.model.Member;
+import com.lattels.smalltour.model.Setting;
 import com.lattels.smalltour.model.Tours;
 import com.lattels.smalltour.persistence.*;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,8 @@ public class StatsService {
     private final GuideReviewRepository guideReviewRepository;
 
     private final ReviewsRepository reviewsRepository;
+
+    private final SettingRepository settingRepository;
 
     @Value("${server.domain}")
     private String domain;
@@ -260,7 +264,6 @@ public class StatsService {
 
         // 퍼센테이지 구하기
         for (TotalVolumePercentageDTO totalVolumePercentageDTO : totalVolumePercentageDTOList) {
-//            totalVolume += totalVolumePercentageDTO.getSalesVolume();
             double percentage = ((double) totalVolumePercentageDTO.getSalesVolume() / totalVolume) * 100;
             // 저장
             totalVolumePercentageDTO.setPercentage(Math.round(percentage*100)/100.0);
@@ -271,6 +274,37 @@ public class StatsService {
         responseDTO.setTotalVolumePercentageDTOList(totalVolumePercentageDTOList);
 
         return responseDTO;
+
+    }
+
+    /*
+    * 기간 동안의 사이트 수익 가져오기
+    */
+    public SiteProfitDTO getSiteProfit(Authentication authentication, StatsDTO.DateRequestDTO requestDTO) {
+
+        int memberId = Integer.parseInt(authentication.getPrincipal().toString());
+        Member member = memberRepository.findByMemberId(memberId);
+        // 등록된 회원인지 검사
+        if (member == null) {
+            throw new ResponseMessageException(ErrorCode.USER_UNREGISTERED);
+        }
+        // 관리자 회원인지 검사
+        if (member.getRole() != MemberDTO.MemberRole.ADMIN) {
+            throw new ResponseMessageException(ErrorCode.ADMIN_INVALID_PERMISSION);
+        }
+
+        LocalDateTime startDate = requestDTO.getStartDate().atStartOfDay();
+        LocalDateTime endDate = requestDTO.getEndDate().atStartOfDay();
+        SiteProfitDTO siteProfitDTO = paymentRepository.getSiteProfit(startDate, endDate);
+
+        List<Setting> settings = settingRepository.findAll();
+        Setting setting = settings.get(0);
+
+        siteProfitDTO.setToursProfit((int) ((siteProfitDTO.getToursProfit()/setting.getPackageCommission()) * 100));
+        siteProfitDTO.setUpperPaymentProfit((int) ((siteProfitDTO.getUpperPaymentProfit()/setting.getUpperPaymentPrice()) * 100));
+        int totalProfit = siteProfitDTO.getToursProfit() + siteProfitDTO.getUpperPaymentProfit();
+        siteProfitDTO.setTotalProfit(totalProfit);
+        return siteProfitDTO;
 
     }
 }

@@ -1,6 +1,5 @@
 package com.lattels.smalltour.controller;
 
-import com.lattels.smalltour.dto.StatsDTO;
 import com.lattels.smalltour.dto.ToursDTO;
 import com.lattels.smalltour.service.FavoriteService;
 import io.swagger.annotations.Api;
