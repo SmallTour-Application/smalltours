@@ -51,14 +51,8 @@ public class SettingService {
         else {
 
             Setting setting = new Setting();
-            if (!(settingDTO.getUpperPaymentPrice()).equals("")) {
-                setting.setUpperPaymentPrice(Integer.parseInt(settingDTO.getUpperPaymentPrice()));
-            }
             if (!(settingDTO.getPackageCommission()).equals("")) {
                 setting.setPackageCommission(Double.parseDouble(settingDTO.getPackageCommission()));
-            }
-            if (!(settingDTO.getBannerCommission()).equals("")) {
-                setting.setBannerCommission(Double.parseDouble(settingDTO.getBannerCommission()));
             }
             settingRepository.save(setting);
         }
@@ -82,14 +76,8 @@ public class SettingService {
         }
 
         Setting setting = settingRepository.findById(settingDTO.getId());
-        if (!(settingDTO.getUpperPaymentPrice()).equals("")) {
-            setting.setUpperPaymentPrice(Integer.parseInt(settingDTO.getUpperPaymentPrice()));
-        }
         if (!(settingDTO.getPackageCommission()).equals("")) {
             setting.setPackageCommission(Double.parseDouble(settingDTO.getPackageCommission()));
-        }
-        if (!(settingDTO.getBannerCommission()).equals("")) {
-            setting.setBannerCommission(Double.parseDouble(settingDTO.getBannerCommission()));
         }
 
         settingRepository.save(setting);

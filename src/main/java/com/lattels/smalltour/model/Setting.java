@@ -20,14 +20,7 @@ public class Setting {
     @Column(name = "id")
     private int id; // 사용자에게 고유하게 부여되는 값
 
-    @Column(name = "upper_payment_price")
-    private int upperPaymentPrice;
-
     @Column(name = "package_commission")
     private double packageCommission;
-
-    @Column(name = "banner_commission")
-    private double bannerCommission;
-
 
 }
