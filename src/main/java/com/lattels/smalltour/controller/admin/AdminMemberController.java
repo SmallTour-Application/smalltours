@@ -219,7 +219,7 @@ public class AdminMemberController {
             @RequestParam(required = false) String memberName,
             @RequestParam(required = false) String memberEmail,
             @RequestParam(required = false) String memberTel,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate birthDay,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate birthDay,
             @RequestParam(value = "size", defaultValue = "0") int size,
             @RequestParam(value = "page", defaultValue = "1") int page) {
         int adminId = Integer.parseInt(authentication.getPrincipal().toString());
