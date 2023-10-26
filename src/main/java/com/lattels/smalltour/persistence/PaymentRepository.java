@@ -1,5 +1,6 @@
 package com.lattels.smalltour.persistence;
 
+import com.lattels.smalltour.dto.stats.SiteProfitDTO;
 import com.lattels.smalltour.dto.stats.TotalVolumePercentageDTO;
 import com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO;
 import com.lattels.smalltour.model.Payment;
@@ -152,7 +153,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     List<TotalVolumePercentageDTO> totalVolumePercentage(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate );
 
     /*
-     * 기간 동안의 총 판매량
+     * 기간 동안의 판매 수
      */
     @Query(value = "SELECT count(p) " +
             "FROM Payment p " +
@@ -160,5 +161,13 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
             "AND p.state = 1 ")
     long totalCnt(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate );
 
+    /*
+    * 기간 동안의 사이트 수익
+    */
+    @Query(value = "SELECT new com.lattels.smalltour.dto.stats.SiteProfitDTO((SELECT sum(up.item.price) FROM UpperPayment up WHERE up.payDay >= :startDate AND up.payDay <= :endDate), SUM(p.price)) " +
+            "FROM Payment p " +
+            "WHERE p.paymentDay >= :startDate AND p.paymentDay <= :endDate " +
+            "AND p.state = 1 ")
+    SiteProfitDTO getSiteProfit(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
 }
