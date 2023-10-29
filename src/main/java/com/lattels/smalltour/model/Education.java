@@ -37,4 +37,9 @@ public class Education {
     @Column(name = "title")
     private String title;
 
+    @Column(name = "upload_day")
+    private LocalDate uploadDay;
+
+    @Column(name = "state")
+    private int state; //0:수강종료 1:수강가능
 }

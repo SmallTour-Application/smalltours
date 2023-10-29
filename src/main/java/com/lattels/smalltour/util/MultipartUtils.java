@@ -21,6 +21,14 @@ public class MultipartUtils {
 //            "image/gif"
     );
 
+
+    private static final List<String> ALLOWED_VIDEO_TYPES = Arrays.asList(
+            "video/mp4",
+            "video/avi",
+            "video/mkv"
+    );
+
+
     /**
      * MultipartFile이 이미지 형식인지 확인합니다.
      */
@@ -56,6 +64,42 @@ public class MultipartUtils {
         File newFile = new File(directory, fileName + "." + fileExtension);
 
         // 파일 저장
+        multipartFile.transferTo(newFile);
+
+        log.info(multipartFile.getOriginalFilename() + " -> " + fileName + " 저장 완료 (" + newFile.getAbsolutePath() + ")");
+
+        return newFile;
+    }
+
+
+    public static File saveVideo(MultipartFile multipartFile, File directory, String fileName) throws Exception {
+        return saveFile(multipartFile, directory, fileName, ALLOWED_VIDEO_TYPES, "비디오 파일");
+    }
+
+    private static File saveFile(MultipartFile multipartFile, File directory, String fileName,
+                                 List<String> allowedTypes, String fileTypeDescription) throws Exception {
+        log.info(multipartFile.getOriginalFilename() + " -> " + fileName + " 저장 시작");
+
+        String contentType = multipartFile.getContentType();
+        if (contentType == null || !allowedTypes.contains(contentType)) {
+            throw new IllegalArgumentException(fileTypeDescription + "이 아닙니다. (파일명: " + multipartFile.getOriginalFilename() + ")");
+        }
+
+        String fileExtension = contentType.substring(contentType.lastIndexOf("/") + 1);
+
+        if (!directory.exists() && !directory.mkdirs()) {
+            throw new Exception("디렉토리 생성 실패: " + directory.getAbsolutePath());
+        }
+
+        File newFile = new File(directory, fileName + "." + fileExtension);
+
+        // 동일한 이름의 파일이 존재하는 경우 이름을 변경
+        int count = 1;
+        while (newFile.exists()) {
+            newFile = new File(directory, fileName + "_" + count + "." + fileExtension);
+            count++;
+        }
+
         multipartFile.transferTo(newFile);
 
         log.info(multipartFile.getOriginalFilename() + " -> " + fileName + " 저장 완료 (" + newFile.getAbsolutePath() + ")");

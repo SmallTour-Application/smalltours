@@ -42,4 +42,7 @@ public class LogMember {
 
     @Column(name = "state")
     private int state; //0:성공 1:실패
+
+    @Column(name = "region")
+    private String region;
 }
