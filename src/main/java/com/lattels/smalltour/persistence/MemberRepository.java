@@ -148,6 +148,8 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
             "GROUP BY m.joinDay ")
     List<TotalCntPerMonthDTO> countMemberPerMonth(@Param("date") LocalDateTime date);
 
+    @Query(value = "SELECT count(*) FROM member m WHERE m.role = 2", nativeQuery = true)
+    Integer findByCountId();
 }
 
 

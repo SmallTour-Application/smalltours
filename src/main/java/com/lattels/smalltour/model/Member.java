@@ -51,7 +51,7 @@ public class Member {
     private String profile; // 프로필 이미지가 들어있는 경로
 
     @Column(name = "role")
-    private int role; // 0:학생, 1:선생, 2:관리자
+    private int role; // 0:회원, 1:미등록 가이드 2:가이드 2:관리자
 
     @Column(name = "state")
     private int state;

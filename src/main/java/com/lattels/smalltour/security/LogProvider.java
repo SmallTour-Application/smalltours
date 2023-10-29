@@ -2,7 +2,9 @@
 package com.lattels.smalltour.security;
 
 
-import com.lattels.smalltour.persistence.LogMemberRepository;
+import com.lattels.smalltour.dto.LogMemberDTO;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.reactive.function.client.WebClient;
 import eu.bitwalker.useragentutils.BrowserType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,36 @@ import java.util.Map;
 @Slf4j
 @Service
 public class LogProvider {
-    public String getClientIp(HttpServletRequest httpServletRequest){
+    @Value("${secretIpInfoKey}")
+    private String API_KEY;
+    private final WebClient webClient = WebClient.create("https://ipinfo.io");
+
+    public String getPublicIp(HttpServletRequest httpServletRequest){
+        return webClient.get()
+                .uri("/ip")
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+    }
+
+    //공용 ip주소를 이용해서, 어느 지역인지 알아내는 메서드
+    //내 개인 로컬 ip로하면 구할수없어서 공용 ip를 채택함
+    public LogMemberDTO getRegion(HttpServletRequest httpServletRequest) throws Exception{
+
+        WebClient webClient = WebClient.create();
+        String clinetIp =  getPublicIp(httpServletRequest);
+        String apiUrl = "https://ipinfo.io/" + clinetIp + "/json?token=" + API_KEY;
+
+        LogMemberDTO response = webClient.get()
+                .uri(apiUrl)
+                .retrieve()
+                .bodyToMono(LogMemberDTO.class)
+                .block();
+
+        return response;
+    }
+
+   /* public String getClientIp(HttpServletRequest httpServletRequest){
         String clientIp = httpServletRequest.getHeader("X-FORWARDED-FOR");
         if (clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
             clientIp = httpServletRequest.getHeader("Proxy-Client-IP");
@@ -34,7 +65,7 @@ public class LogProvider {
 
         System.out.println(clientIp);
         return clientIp;
-    }
+    }*/
 
     public String Browser(HttpServletRequest httpServletRequest) {
         System.out.println("Browser method invoked.");
@@ -95,31 +126,6 @@ public class LogProvider {
     }
 
 
-
-   /* public Map<String,String> Browser(HttpServletRequest httpServletRequest) {
-        String userAgentString = httpServletRequest.getHeader("user-Agent");
-        UserAgent userAgent = UserAgent.parseUserAgentString(userAgentString);
-        // 브라우저 정보 추출
-        Browser browser = userAgent.getBrowser();
-
-
-
-        Map<String, String> result = new HashMap<>();
-        result.put("Browser", browser.getName());
-
-        return result;
-    }*/
-   /* public Map<String, String> Os(HttpServletRequest httpServletRequest) {
-        String userAgentString = httpServletRequest.getHeader("user-Agent");
-        UserAgent userAgent = UserAgent.parseUserAgentString(userAgentString);
-        // 운영체제 정보 추출
-        OperatingSystem os = userAgent.getOperatingSystem();
-
-        Map<String, String> result = new HashMap<>();
-        result.put("OS", os.getName());
-
-        return result;
-    }*/
 
 }
 
