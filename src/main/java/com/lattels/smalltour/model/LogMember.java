@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -45,4 +46,8 @@ public class LogMember {
 
     @Column(name = "region")
     private String region;
+
+
+    @Column(name = "loginDay")
+    private LocalDateTime loginDay;
 }
