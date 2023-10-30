@@ -30,12 +30,27 @@ public class AdminTrafficController {
 
     @PostMapping(value = "/search/region/month")
     @ApiOperation(value = "로그인 지역 날짜로 검색")
-    public ResponseEntity<Object> searchTrafficMonth(@ApiIgnore Authentication authentication,
+    public ResponseEntity<Object> searchTrafficRegionMonth(@ApiIgnore Authentication authentication,
                                                      @RequestParam(required = false)int month,
                                                      @RequestParam(required = false)int year) {
         try {
             int adminId = Integer.parseInt(authentication.getPrincipal().toString());
-            AdminTrafficSearchDTO ad = adminTrafficService.trafficSearchDTO(adminId,month,year);
+            AdminTrafficSearchDTO ad = adminTrafficService.trafficSearchRegionDTO(adminId,month,year);
+            return ResponseEntity.ok(ad);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping(value = "/search/browser/month")
+    @ApiOperation(value = "로그인한 브라우저 날짜로 검색")
+    public ResponseEntity<Object> searchTrafficBrowserMonth(@ApiIgnore Authentication authentication,
+                                                     @RequestParam(required = false)int month,
+                                                     @RequestParam(required = false)int year) {
+        try {
+            int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+            AdminTrafficSearchDTO ad = adminTrafficService.trafficSearchBrowserDTO(adminId,month,year);
             return ResponseEntity.ok(ad);
         } catch (Exception e) {
             e.printStackTrace();

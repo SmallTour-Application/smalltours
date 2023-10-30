@@ -21,6 +21,16 @@ public interface LogMemberRepository extends JpaRepository<LogMember, Integer> {
     Integer findByCountRegion(@Param("month") int month,@Param("year") int year);
 
 
+    @Query(value = "SELECT lm.browser, count(lm.browser) FROM LogMember lm WHERE MONTH(lm.loginDateTime) =:month AND YEAR(lm.loginDateTime) =:year GROUP BY lm.browser")
+    List<Object[]> findBySearchBrowserDay(@Param("month") int month,@Param("year") int year);
+
+    @Query(value = "SELECT count(lm.browser) FROM LogMember lm WHERE MONTH(lm.loginDateTime) =:month AND YEAR(lm.loginDateTime) =:year")
+    Integer findByCountBrowser(@Param("month") int month,@Param("year") int year);
+
+
+
+
+
 
 
 }

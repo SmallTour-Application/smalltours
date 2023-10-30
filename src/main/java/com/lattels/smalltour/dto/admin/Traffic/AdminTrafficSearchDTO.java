@@ -16,6 +16,7 @@ import java.util.List;
 public class AdminTrafficSearchDTO {
     private int count; // 검색결과 갯수
     private List<Region> regions;
+    private List<Browser> browsers;
 
 
     @Data
@@ -31,8 +32,9 @@ public class AdminTrafficSearchDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class broswer {
-        private String broswer;
+    public static class Browser {
+        private String browser;
+        private int count; //브라우저 별 횟수
     }
 
 }
