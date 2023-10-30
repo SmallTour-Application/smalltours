@@ -33,7 +33,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AdminService {
     private final MemberRepository memberRepository;
-
     private final PasswordEncoder passwordEncoder;
 
     @Value("${file.path}")
@@ -530,5 +529,6 @@ public class AdminService {
             throw new RuntimeException("MemberService.add() : 에러 발생.");
         }
     }
+
 
 }

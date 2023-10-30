@@ -3,6 +3,7 @@ package com.lattels.smalltour.service.admin;
 
 import com.google.common.base.Preconditions;
 import com.lattels.smalltour.dto.admin.education.EducationDTO;
+import com.lattels.smalltour.dto.admin.education.EducationGuideDTO;
 import com.lattels.smalltour.dto.admin.education.EducationVideoDTO;
 import com.lattels.smalltour.model.Education;
 import com.lattels.smalltour.model.Member;
@@ -52,11 +53,6 @@ public class AdminVideoService {
     private String ffprobePath;
 
 
-    @Value("${server.domain}")
-    private String domain;
-
-    @Value("${server.port}")
-    private String port;
 
     @Value("${file.path.education}")
     private String educationFilePath;
@@ -236,11 +232,12 @@ public class AdminVideoService {
 
     }
 
-    public EducationDTO commonGuideEducationLog(int adminId, int page, int countPerPage, int state){
+    //교육 영상 게시판 목록
+    public EducationDTO commonEducationLog(int adminId, int page, int countPerPage, int state){
         int i = 1;
         checkAdmin(adminId);
         //강좌갯수
-        int educationLogCount = educationRepository.countState();
+        int educationLogCount = educationRepository.countState(state);
 
         // 페이지
         Pageable pageable = PageRequest.of(page, countPerPage);
@@ -268,16 +265,12 @@ public class AdminVideoService {
                 .build();
     }
 
-
-
-
-
     //수강중인경우
-    public EducationDTO getGuideEducationList(int adminId, int page, int countPerPage,int state){
-        return commonGuideEducationLog(adminId,page,countPerPage,state);
+    public EducationDTO getEducationList(int adminId, int page, int countPerPage,int state){
+        return commonEducationLog(adminId,page,countPerPage,state);
     }
 
-    //수강 상태 변경(0:수강 종료 1: 수강가능)
+    //강좌 수강 상태 변경(0:수강 종료 1: 수강가능)
     public void updatestatus(int adminId,int educationId,int state){
         checkAdmin(adminId);
         //education가져오기
@@ -292,6 +285,4 @@ public class AdminVideoService {
         Education education = educationRepository.findById(educationId);
         educationRepository.delete(education);
     }
-
-
 }
