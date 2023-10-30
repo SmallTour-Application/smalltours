@@ -47,7 +47,4 @@ public class LogMember {
     @Column(name = "region")
     private String region;
 
-
-    @Column(name = "loginDay")
-    private LocalDateTime loginDay;
 }
