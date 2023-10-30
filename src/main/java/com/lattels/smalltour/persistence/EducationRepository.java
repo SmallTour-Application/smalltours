@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,6 +55,15 @@ public interface EducationRepository extends JpaRepository<Education, Integer> {
     List<Object[]> findByGuideEducationContent(Pageable pageable,@Param("state") int state);
 
 
-    @Query(value = "SELECT count(*) FROM education",nativeQuery = true)
-    int countState();
+    @Query(value = "SELECT count(*) FROM education e WHERE e.state =:state ",nativeQuery = true)
+    int countState(@Param("state") int state);
+
+
+    @Query(value = "SELECT e.title,e.start_day,e.end_day,el.state,el.completed_date FROM education e JOIN education_log el ON el.education_id = e.id JOIN member m ON el.guide_id = m.id WHERE el.state =:state AND el.guide_id=:guideId"
+            , nativeQuery = true)
+    List<Object[]> findByGuideEducationGuideContent(Pageable pageable,@Param("state") int state,@Param("guideId") int guideId);
+
+    @Query(value = "SELECT count(*) FROM education_log el JOIN member m ON el.guide_id = m.id WHERE el.state =:state AND el.guide_id =:guideId",nativeQuery = true)
+    int countStateEducationLog(@Param("state") int state,@Param("guideId") int memberId);
+
 }

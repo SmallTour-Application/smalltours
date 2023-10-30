@@ -2,6 +2,7 @@ package com.lattels.smalltour.controller.admin;
 
 
 import com.lattels.smalltour.dto.admin.education.EducationDTO;
+import com.lattels.smalltour.dto.admin.education.EducationGuideDTO;
 import com.lattels.smalltour.dto.admin.education.EducationVideoDTO;
 import com.lattels.smalltour.service.admin.AdminVideoService;
 import io.swagger.annotations.ApiOperation;
@@ -42,7 +43,7 @@ public class AdminVideoController {
     @PostMapping("/education/view/list")
     public ResponseEntity<?> getVideoList(@ApiIgnore Authentication authentication, int page,@RequestParam int state) {
         int adminId = Integer.parseInt(authentication.getPrincipal().toString());
-        EducationDTO educationLogVideoDTO = adminVideoService.getGuideEducationList(adminId, page - 1, 10,state);
+        EducationDTO educationLogVideoDTO = adminVideoService.getEducationList(adminId, page - 1, 10,state);
         return ResponseEntity.ok(educationLogVideoDTO);
     }
 
@@ -80,4 +81,5 @@ public class AdminVideoController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 }
