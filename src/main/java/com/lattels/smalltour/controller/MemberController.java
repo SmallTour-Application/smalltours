@@ -162,16 +162,16 @@ public class MemberController {
 
     // 좋아요 추가
     @PostMapping("/heart/add")
-    public ResponseEntity<?> addFavoriteGuide(@ApiIgnore Authentication authentication, @RequestBody favoriteGuideDTO.favoriteDTO favoriteDTO) {
+    public ResponseEntity<?> addFavoriteGuide(@ApiIgnore Authentication authentication,  @RequestParam int guideId) {
         int memberId = Integer.parseInt(authentication.getPrincipal().toString());
-        memberFavoriteStatusService.addFavoriteGuide(memberId, favoriteDTO);
+        memberFavoriteStatusService.addFavoriteGuide(memberId, guideId);
         return ResponseEntity.ok().body("좋아요 눌렀습니다.");
     }
 
     @PostMapping("/heart/cancel")
-    public ResponseEntity<?> cancelFavoriteGuide(@ApiIgnore Authentication authentication, @RequestBody favoriteGuideDTO.favoriteDTO favoriteDTO){
+    public ResponseEntity<?> cancelFavoriteGuide(@ApiIgnore Authentication authentication, @RequestParam int guideId){
         int memberId = Integer.parseInt(authentication.getPrincipal().toString());
-        memberFavoriteStatusService.cancelFavoriteGuide(memberId,favoriteDTO);
+        memberFavoriteStatusService.cancelFavoriteGuide(memberId,guideId);
         return ResponseEntity.ok().body("좋아요를 취소했습니다.");
     }
 

@@ -2,6 +2,7 @@ package com.lattels.smalltour.service.admin;
 
 
 import com.lattels.smalltour.dto.MemberDTO;
+import com.lattels.smalltour.dto.admin.Traffic.AdminFavoriteGuideCountUpdateDTO;
 import com.lattels.smalltour.dto.admin.member.AdminAddMemberDTO;
 import com.lattels.smalltour.dto.admin.member.ListMemberDTO;
 import com.lattels.smalltour.dto.admin.search.AdminSearchDTO;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +37,7 @@ import java.util.Optional;
 public class AdminService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FavoriteGuideRepository favoriteGuideRepository;
 
     @Value("${file.path}")
     private String filePath;
@@ -528,6 +532,100 @@ public class AdminService {
             e.printStackTrace();
             throw new RuntimeException("MemberService.add() : 에러 발생.");
         }
+    }
+
+    /**
+     년/월/이름 입력하면 해당 정보가져옴
+     년 월 입력해서 difference를 알 수 있음
+     controller에 month, year, name을 입력 안할시에는 날짜같은경우는 현재 시간 LocalDateTime.now()를 기준으로 검색되고, name이 null일경우는 모든 내역 출력되게함
+     */
+    public AdminFavoriteGuideCountUpdateDTO countFavoriteGuideUpdate(int adminId, Integer month, Integer year, int page, int size, int sort, String name){
+        checkAdmin(adminId);
+
+        if(month > 12 || month < 1){
+            throw new IllegalArgumentException("월 의 범위를 벗어났습니다.");
+        }
+
+        String yearStr = String.valueOf(year);
+        if(!yearStr.matches("[0-9]{4}")) { // 정확히 4자리 숫자로만 구성되어 있는지 검사
+            throw new IllegalArgumentException("년도는 4자리 숫자로 구성되어야 합니다.");
+        }
+
+
+        //페이지 번호를 1부터 시작하도록 조정
+        page = Math.max(page - 1, 0);
+        /**
+         * 컬럼 별칭은 sort 불가능, natvieQuery로해서 안됨 , JPQL로 바꿔야 함(JPQL에서는 from절 서브쿼리 사용 안됨 )
+         */
+
+        Pageable pageable;
+        switch(sort){
+            case 1:
+                // Pageable 객체 생성
+                pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC,"name"));
+                break;
+            case 2:
+                // Pageable 객체 생성
+                pageable = PageRequest.of(page, size,Sort.by(Sort.Direction.DESC,"name"));
+                break;
+            default:
+                throw new IllegalArgumentException("정렬 방법을 입력하세요");
+        }
+
+
+        // 이전 월과 년을 계산합니다.
+        LocalDate date = LocalDate.of(year, month, 1);
+        LocalDate previousMonth = date.minusMonths(1);
+        int previousMonthValue = previousMonth.getMonthValue();
+        int previousYear = previousMonth.getYear();
+
+
+        //favoriteGuide테이블에 총 가이드 수
+        Integer countGuide = favoriteGuideRepository.findByCountGuide();
+
+        List<Object[]> favoriteGuide = favoriteGuideRepository.findLikesDifferenceAndTotalByMonthAndYear(month, year, previousMonthValue, previousYear,name, pageable);
+        List<AdminFavoriteGuideCountUpdateDTO.FavoriteGuideCount> adminFavoriteGuideLog = new ArrayList<>();
+        for(Object[] fg : favoriteGuide){
+            String differenceMessage = "";
+            int difference = Integer.parseInt(String.valueOf(fg[5]));
+
+            if(Integer.parseInt(String.valueOf(fg[5])) > 0){
+                differenceMessage = difference + "명의 좋아요 수가 저번달이랑 비교해서 증가 하였습니다.";
+            }else if(Integer.parseInt(String.valueOf(fg[5])) < 0){
+                differenceMessage = -difference + "명의 좋아요 수가 저번달이랑 비교해서 감소 하였습니다.";
+            }else{
+                differenceMessage = "저번달이랑 비교해서 변동이 없습니다.";
+            }
+
+
+            int totalCancel = Integer.parseInt(String.valueOf(fg[3]));
+            int totalCount = Integer.parseInt(String.valueOf(fg[4]));
+
+            // 피연산자 중 하나를 float로 캐스팅하여 실수 나눗셈을 수행하고 결과를 백분율로 변환해야함.
+            float percentage = (totalCount > 0) ? (float) totalCancel / totalCount * 100 : 0;
+            int intPercentage = (int) percentage;
+
+
+            AdminFavoriteGuideCountUpdateDTO.FavoriteGuideCount fgc = AdminFavoriteGuideCountUpdateDTO.FavoriteGuideCount.builder()
+                    .guideId(Integer.parseInt(String.valueOf(fg[0])))
+                    .likeCount(Integer.parseInt(String.valueOf(fg[2])))
+                    .guideName(String.valueOf(fg[1]))
+                    .difference(differenceMessage)
+                    .cancel(Integer.parseInt(String.valueOf(fg[3])))
+                    .cancelPercentge(intPercentage + "%")   //취소율, 취소된 횟수 / 총 갯수(좋아요 + 취소)
+                    .build();
+            adminFavoriteGuideLog.add(fgc);
+        }
+
+
+        if(favoriteGuide.isEmpty()){
+            throw new IllegalArgumentException("해당 날짜에 대한 기록이 없습니다.");
+        }
+
+        return AdminFavoriteGuideCountUpdateDTO.builder()
+                .count(countGuide)
+                .favoriteGuideCount(adminFavoriteGuideLog)
+                .build();
     }
 
 

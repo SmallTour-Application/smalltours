@@ -1,19 +1,28 @@
 package com.lattels.smalltour.service.admin;
 
 
+import com.lattels.smalltour.dto.admin.Traffic.AdminFavoriteGuideCountUpdateDTO;
 import com.lattels.smalltour.dto.admin.Traffic.AdminTrafficSearchDTO;
+import com.lattels.smalltour.dto.search.SearchGuideDTO;
+import com.lattels.smalltour.model.FavoriteGuide;
 import com.lattels.smalltour.model.LogMember;
 import com.lattels.smalltour.model.Member;
+import com.lattels.smalltour.persistence.FavoriteGuideRepository;
 import com.lattels.smalltour.persistence.LogMemberRepository;
 import com.lattels.smalltour.persistence.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -21,6 +30,7 @@ import java.util.List;
 public class AdminTrafficService {
     private final MemberRepository memberRepository;
     private final LogMemberRepository logMemberRepository;
+
 
     /**
      * 관리자 인지 체크
@@ -73,7 +83,6 @@ public class AdminTrafficService {
     public AdminTrafficSearchDTO trafficSearchBrowserDTO(int adminId,int month,int year){
         checkAdmin(adminId,month,year);
 
-
         Integer countMonth = logMemberRepository.findByCountRegion(month,year);
         List<Object[]> logMember = logMemberRepository.findBySearchBrowserDay(month,year);
 
@@ -95,4 +104,8 @@ public class AdminTrafficService {
                 .browsers(adminTrafficSearchDTO)
                 .build();
     }
+
+
 }
+
+
