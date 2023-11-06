@@ -1,6 +1,7 @@
 package com.lattels.smalltour.controller.admin;
 
 
+import com.lattels.smalltour.dto.admin.Traffic.AdminFavoriteGuideCountUpdateDTO;
 import com.lattels.smalltour.dto.admin.Traffic.AdminTrafficSearchDTO;
 import com.lattels.smalltour.dto.admin.education.EducationDTO;
 import com.lattels.smalltour.dto.admin.education.EducationVideoDTO;

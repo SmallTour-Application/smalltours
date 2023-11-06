@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.ResponseDTO;
 import com.lattels.smalltour.dto.ToursDTO;
+import com.lattels.smalltour.dto.admin.Traffic.AdminFavoriteGuideCountUpdateDTO;
 import com.lattels.smalltour.dto.admin.member.AdminAddMemberDTO;
 import com.lattels.smalltour.dto.admin.member.ListMemberDTO;
 import com.lattels.smalltour.dto.admin.search.AdminSearchDTO;
@@ -243,6 +244,44 @@ public class AdminMemberController {
             return ResponseEntity.badRequest().body(responseDTO);
         }
 
+    }
+
+
+
+
+    @GetMapping(value = "/search/favorite/guide")
+    @ApiOperation(value = "가이드 좋아요 수 변동")
+    public ResponseEntity<Object> searchFavoriteGuideChange(@ApiIgnore Authentication authentication,
+                                                            @RequestParam(value = "month", required = false) Integer month,
+                                                            @RequestParam(value = "year", required = false) Integer year,
+                                                            @RequestParam(value = "page", defaultValue = "1") int page,
+                                                            @RequestParam(value = "size", defaultValue = "10") int size,
+                                                            @RequestParam(value = "sort", defaultValue = "1") int sort,
+                                                            @RequestParam(value = "name", required = false) String name) {
+        try {
+            int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+
+            // 현재 날짜 기준으로 month와 year가 없으면 설정
+            if (month == null || month <= 0) {
+                month = LocalDate.now().getMonthValue();
+            }
+            if (year == null || year <= 0) {
+                year = LocalDate.now().getYear();
+            }
+            if(name == null){
+                name = "";
+            }
+            if(sort <=0){
+                throw new IllegalArgumentException("제대로 된 값을 입력하세요. 1:이름 오림차순 2: 내름차순");
+            }
+
+            // 서비스 메소드 호출
+            AdminFavoriteGuideCountUpdateDTO ad = adminService.countFavoriteGuideUpdate(adminId, month, year, page, size,sort,name);
+            return ResponseEntity.ok(ad);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -16,6 +17,8 @@ import java.io.Serializable;
 @IdClass(FavoriteGuide.FavoriteGuideID.class)
 @Table(name = "favorite_guide")
 public class FavoriteGuide {
+
+
     @Id
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -25,6 +28,15 @@ public class FavoriteGuide {
     @ManyToOne
     @JoinColumn(name = "guide_id")
     private Member guide;
+
+    @Column(name = "date_pressed")
+    private LocalDateTime datePressed;
+
+    @Column(name = "date_cancel")
+    private LocalDateTime dateCancel;
+
+    @Column(name = "state")
+    private int state;
 
 
     /*
