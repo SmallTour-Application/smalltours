@@ -17,6 +17,18 @@ import java.util.List;
 
 public interface PaymentRepository extends JpaRepository<Payment, Integer> {
 
+    //countAllByToursId
+    int countAllByToursId(int toursId);
+
+    //findByMemberId
+    List<Payment> findByMemberId(int memberId, Pageable pageable);
+
+    //findByMemberIdAndState
+    List<Payment> findByMemberIdAndState(int memberId, int state, Pageable pageable);
+
+    //countByMemberIdAndState
+    int countByMemberIdAndState(int memberId, int state);
+
     //tourId결제하는데 member가 회원인지 아닌지 확인(role = 0)
     @Query("SELECT COUNT(p) > 0 FROM Payment p WHERE p.tours.id = :tourId AND p.member.id = :memberId AND p.member.role = 0")
     boolean existsByMemberIdAndTourId(@Param("memberId") int memberId, @Param("tourId") int tourId);

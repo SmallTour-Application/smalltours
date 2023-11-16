@@ -17,6 +17,16 @@ import java.util.List;
 
 public interface GuideReviewRepository extends JpaRepository<GuideReview, Integer> {
 
+    // 해당 member가 작성한 가이드 리뷰 리스트를 가져옵니다. with pageable
+    @Query("SELECT gr FROM GuideReview gr JOIN gr.reviewer m WHERE m.id = :memberId AND m.role = 0")
+    List<GuideReview> findByReviewerIdOrderByCreatedDayDesc(@Param("memberId") int memberId, Pageable pageable);
+
+    // 해당 member가 작성한 가이드 리뷰 갯수를 가져옵니다
+    @Query("SELECT count(gr) FROM GuideReview gr JOIN gr.reviewer m WHERE m.id = :memberId AND m.role = 0")
+    int countByReviewerId(@Param("memberId") int memberId);
+
+
+
     /**
      * 가이드와 페이지에 맞는 최근 가이드 리뷰를 불러옵니다.
      */

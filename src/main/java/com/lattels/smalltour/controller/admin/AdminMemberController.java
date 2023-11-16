@@ -10,10 +10,16 @@ import com.lattels.smalltour.dto.ToursDTO;
 import com.lattels.smalltour.dto.admin.Traffic.AdminFavoriteGuideCountUpdateDTO;
 import com.lattels.smalltour.dto.admin.member.AdminAddMemberDTO;
 import com.lattels.smalltour.dto.admin.member.ListMemberDTO;
+import com.lattels.smalltour.dto.admin.payment.AdminPaymentListDTO;
+import com.lattels.smalltour.dto.admin.review.AdminReviewDTO;
 import com.lattels.smalltour.dto.admin.search.AdminSearchDTO;
+import com.lattels.smalltour.dto.admin.tours.AdminToursDTO;
+import com.lattels.smalltour.dto.payment.PaymentMemberInfoDTO;
 import com.lattels.smalltour.dto.payment.PaymentMemberListDTO;
 import com.lattels.smalltour.dto.search.SearchGuideDTO;
 import com.lattels.smalltour.service.EmailTokenService;
+import com.lattels.smalltour.service.admin.AdminGuideService;
+import com.lattels.smalltour.service.admin.AdminMemberService;
 import com.lattels.smalltour.service.admin.AdminPaymentService;
 import com.lattels.smalltour.service.admin.AdminService;
 import com.lattels.smalltour.service.MemberFavoriteStatusService;
@@ -22,6 +28,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -47,6 +55,10 @@ public class AdminMemberController {
     private final AdminPaymentService adminPaymentService;
 
     private final EmailTokenService emailTokenService;
+
+    private final AdminMemberService adminMemberService;
+
+    private final AdminGuideService adminGuideService;
 
 
     private static final int NUMBER_OF_PAYMENT_PER_PAGE = 10;
@@ -282,6 +294,61 @@ public class AdminMemberController {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+
+
+    }
+
+    // 특정 멤버의 결제정보 가져오기
+    @GetMapping("/payment/member")
+    public ResponseEntity<?> getPaymentMember(@ApiIgnore Authentication authentication, @RequestParam int memberId, Pageable pageable, @RequestParam int state) {
+        try {
+            int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+            AdminPaymentListDTO.MemberPaymentListDTO responseMemberDTO = adminPaymentService.getPaymentMemberInfo(authentication, memberId, pageable, state);
+            return ResponseEntity.ok().body(responseMemberDTO);
+        } catch (Exception e) {
+            ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
+            return ResponseEntity.badRequest().body(responseDTO);
+        }
+    }
+
+    // 특정 멤버의 리뷰 리스트 가져오기
+    @GetMapping("/review/member")
+    public ResponseEntity<?> getReviewMember(@ApiIgnore Authentication authentication, @RequestParam int memberId, Pageable pageable) {
+        try {
+            int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+            AdminReviewDTO.ReviewListDTO responseMemberDTO = adminMemberService.getReviewsByMemberId(memberId, pageable);
+            return ResponseEntity.ok().body(responseMemberDTO);
+        } catch (Exception e) {
+            ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
+            return ResponseEntity.badRequest().body(responseDTO);
+        }
+    }
+
+    // 특정 멤버의 가이드 리뷰 리스트 가져오기
+    @GetMapping("/review/guide")
+    public ResponseEntity<?> getReviewGuide(@ApiIgnore Authentication authentication, @RequestParam int memberId, Pageable pageable) {
+        try {
+            int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+            AdminReviewDTO.ReviewListDTO responseMemberDTO = adminMemberService.getGuideReview(memberId, pageable);
+            return ResponseEntity.ok().body(responseMemberDTO);
+        } catch (Exception e) {
+            ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
+            return ResponseEntity.badRequest().body(responseDTO);
+        }
+    }
+
+    // 특정 멤버가 올린 tour 리스트 가져오기
+    @GetMapping("/tours/member")
+    public ResponseEntity<?> getToursByMemberId(@ApiIgnore Authentication authentication, @RequestParam int memberId, Pageable pageable) {
+        try {
+            int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+            AdminToursDTO.ToursDTOList responseMemberDTO = adminGuideService.getToursByMemberId(memberId, pageable);
+            return ResponseEntity.ok().body(responseMemberDTO);
+        } catch (Exception e) {
+            ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
+            return ResponseEntity.badRequest().body(responseDTO);
+        }
+
     }
 
 }

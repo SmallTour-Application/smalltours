@@ -24,6 +24,9 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
     @Query("SELECT AVG(r.rating) FROM Reviews r JOIN r.tours t JOIN r.member m JOIN Payment p ON p.tours.id = t.id AND p.member.id = m.id WHERE t.id = :tourId AND m.role = 0 AND p.state = 1")
     Float findAverageRatingByTourId(@Param("tourId") int tourId);
 
+    //countByMemberId jpa로
+    //해당 회원이 작성한 리뷰 개수
+    int countByMemberId(int memberId);
 
 
     @Query("SELECT r FROM Reviews r JOIN r.payment p WHERE r.tours.guide.id = :guideId AND r.payment.id = p.id AND r.payment.tours.id = r.tours.id")
