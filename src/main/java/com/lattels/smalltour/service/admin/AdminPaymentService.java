@@ -2,6 +2,7 @@ package com.lattels.smalltour.service.admin;
 
 
 import com.lattels.smalltour.dto.admin.member.ListMemberDTO;
+import com.lattels.smalltour.dto.admin.payment.AdminPaymentListDTO;
 import com.lattels.smalltour.dto.payment.PaymentMemberInfoDTO;
 import com.lattels.smalltour.dto.payment.PaymentMemberListDTO;
 import com.lattels.smalltour.model.Member;
@@ -140,6 +141,63 @@ public class AdminPaymentService {
     /*사이트내 회원들 여행완료 (role = 0)
      *  아직 기준이 없음
      *  */
+
+    // 특정 멤버의 결제정보 가져오기
+    public AdminPaymentListDTO.MemberPaymentListDTO getPaymentMemberInfo(Authentication authentication, int memberId, Pageable pageable, int state) {
+        checkAdmin(authentication);
+        // 멤버 정보 가져오기
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
+        // 멤버의 id와 state로 결제정보 가져오기
+        List<Payment> payment = paymentRepository.findByMemberIdAndState(memberId, state, pageable);
+        // 총 몇개인지 가져오기
+        int totalCnt = paymentRepository.countByMemberIdAndState(memberId, state);
+        // paymentmemberinfolistdto 객체 생성
+        AdminPaymentListDTO.MemberPaymentListDTO memberPaymentListDTO = AdminPaymentListDTO.MemberPaymentListDTO.
+                builder()
+                // 전체갯수
+                .totalCnt(totalCnt).build();
+
+        // paymentMemberInfoDTO list 생성
+        List<AdminPaymentListDTO.MemberPaymentDTO> paymentMemberInfoDTOList = new ArrayList<>();
+        int counter = 1;
+        // 결제한 사람이 회원인지 확인
+        for (Payment payments : payment) {
+            // 출발일 가져오기
+            LocalDate departureDay = payments.getDepartureDay();
+            int people = payments.getPeople();
+            // 상품명 가져오기
+            String tourName = payments.getTours().getTitle();
+            // 상품 아이디 가져오기
+            int tourId = payments.getTours().getId();
+
+            AdminPaymentListDTO.MemberPaymentDTO paymentMemberInfoDTO =  AdminPaymentListDTO.MemberPaymentDTO.builder()
+                    // 결제금액
+                    .price(payment.get(0).getPrice())
+                    // 결제인원
+                    .people(payment.get(0).getPeople())
+                    // 결제일
+                    .paymentDay(payment.get(0).getPaymentDay())
+                    //결과(state)
+                    .state(payment.get(0).getState())
+                    .memberId(member.getId())
+                    .email(member.getEmail())
+                    .name(member.getName())
+                    //상품명
+                    .toursTitle(tourName)
+                    //상품아이디
+                    .toursId(tourId)
+                    .build();
+            // PaymentMemberInfoDTO 객체 생성하여 반환
+            paymentMemberInfoDTOList.add(paymentMemberInfoDTO);
+            counter++;
+        }
+
+        // memberPaymentListDTO에 paymentMemberInfoDTOList 추가
+        memberPaymentListDTO.setPaymentList(paymentMemberInfoDTOList);
+
+        //리턴
+        return memberPaymentListDTO;
+    }
  
 
 }

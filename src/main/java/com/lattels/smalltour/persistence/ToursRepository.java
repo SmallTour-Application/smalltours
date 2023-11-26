@@ -20,6 +20,13 @@ import java.util.Optional;
 
 public interface ToursRepository extends JpaRepository<Tours, Integer> {
 
+    //findByMemberId with pageable
+    //해당 멤버가 올린 tour 리스트 가져오기
+    @Query("SELECT t FROM Tours t JOIN t.guide m WHERE m.id = :memberId AND m.role = 0")
+    List<Tours> findByMemberId(@Param("memberId") int memberId, Pageable pageable);
+
+
+
     List<Tours> findAll();
 
     /**
