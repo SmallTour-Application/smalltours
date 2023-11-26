@@ -42,4 +42,7 @@ public class Reviews {
     @Column(name = "created_day")
     private LocalDateTime createdDay;
 
+    @Column(name = "state")
+    private int state;
+
 }

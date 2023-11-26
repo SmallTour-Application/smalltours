@@ -7,6 +7,7 @@ import com.lattels.smalltour.persistence.LogMemberRepository;
 import com.lattels.smalltour.persistence.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -36,11 +37,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private LogMemberRepository logMemberRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private LogBatchProcessor logBatchProcessor;
     /**
      *
      * logMember 저장할 메서드
+     * @Async 비동기 처리해서 사용자 인증과, 로그 저장 작업을 동시해 진행(기존 로그인 2초 -> 4초로 늘어나서 해당 어노테이션 사용시 다시 2초로 단축)
+     *logBatchProcessor 클래스 사용(메모리에 저장후 일정 시간 지나면 DB에 일괄 저장)
      */
+    @Async
     public void infoFilter(HttpServletRequest request, int userId){
+
         try{
             String clientIp = logProvider.getPublicIp(request);
             String browsers = logProvider.Browser(request);
@@ -62,7 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .region(region.getRegion())
                     .build();
 
-            logMemberRepository.save(logMember);
+            logBatchProcessor.addLog(logMember);
             System.out.println(logMember + "logMember");
         }catch(Exception e){
             e.printStackTrace();

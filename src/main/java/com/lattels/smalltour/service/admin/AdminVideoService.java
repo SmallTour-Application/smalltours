@@ -265,12 +265,12 @@ public class AdminVideoService {
                 .build();
     }
 
-    //수강중인경우
+    //state에 따라 교육관리 게시판 상태가 0:수강종료(불가능) 1:수강중 2:일시중지
     public EducationDTO getEducationList(int adminId, int page, int countPerPage,int state){
         return commonEducationLog(adminId,page,countPerPage,state);
     }
 
-    //강좌 수강 상태 변경(0:수강 종료 1: 수강가능)
+    //강좌 수강 상태 변경(0:수강 종료 1: 수강가능 2: 일시중지)
     public void updatestatus(int adminId,int educationId,int state){
         checkAdmin(adminId);
         //education가져오기

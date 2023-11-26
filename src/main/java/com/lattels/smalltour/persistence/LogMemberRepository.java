@@ -17,12 +17,29 @@ public interface LogMemberRepository extends JpaRepository<LogMember, Integer> {
     @Query(value = "SELECT lm.region, count(lm.region) FROM LogMember lm WHERE MONTH(lm.loginDateTime) =:month AND YEAR(lm.loginDateTime) =:year GROUP BY lm.region")
     List<Object[]> findBySearchRegionDay(@Param("month") int month,@Param("year") int year);
 
+    @Query(value = "SELECT lm.region,count(lm.region) FROM LogMember lm GROUP BY lm.region")
+    List<Object[]> findBySearchRegion();
+
     @Query(value = "SELECT count(lm.region) FROM LogMember lm WHERE MONTH(lm.loginDateTime) =:month AND YEAR(lm.loginDateTime) =:year")
-    Integer findByCountRegion(@Param("month") int month,@Param("year") int year);
+    Integer findByCountRegionDay(@Param("month") int month,@Param("year") int year);
+
+    @Query(value = "SELECT count(lm.region) FROM LogMember lm")
+    Integer findByCountRegion();
+
+    @Query(value = "SELECT count(lm.browser) FROM LogMember lm WHERE MONTH(lm.loginDateTime) =:month AND YEAR(lm.loginDateTime) =:year")
+    Integer findByCountBrowserDay(@Param("month") int month,@Param("year") int year);
+
+    @Query(value = "SELECT count(lm.browser) FROM LogMember lm")
+    Integer findByCountBrowser();
 
 
     @Query(value = "SELECT lm.browser, count(lm.browser) FROM LogMember lm WHERE MONTH(lm.loginDateTime) =:month AND YEAR(lm.loginDateTime) =:year GROUP BY lm.browser")
     List<Object[]> findBySearchBrowserDay(@Param("month") int month,@Param("year") int year);
+
+    @Query(value = "SELECT lm.browser, count(lm.browser) FROM LogMember lm GROUP BY lm.browser")
+    List<Object[]> findBySearchBrowser();
+
+
 
     @Query(value = "SELECT count(lm.browser) FROM LogMember lm WHERE MONTH(lm.loginDateTime) =:month AND YEAR(lm.loginDateTime) =:year")
     Integer findByCountBrowser(@Param("month") int month,@Param("year") int year);

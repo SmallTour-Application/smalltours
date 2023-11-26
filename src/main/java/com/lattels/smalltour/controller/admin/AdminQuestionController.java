@@ -7,6 +7,7 @@ import com.lattels.smalltour.service.admin.AdminQuestionService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,10 +29,14 @@ public class AdminQuestionController {
 
     @ApiOperation("질문 목록 조회")
     @GetMapping("/list")
-    public ResponseEntity<AdminQuestionListDTO> getQuestionList(@ApiIgnore Authentication authentication,int isAnswer,int page) {
+    public ResponseEntity<AdminQuestionListDTO> getQuestionList(@ApiIgnore Authentication authentication, int isAnswer, int page,
+                                                                @RequestParam(required = false) String title,
+                                                                @RequestParam(required = false)Integer month,
+                                                                @RequestParam(required = false)Integer year) {
         int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+
         // 질문 목록 조회
-        AdminQuestionListDTO questionListDTO = adminQuestionService.getQuestionList(adminId, isAnswer,page - 1, 10);
+        AdminQuestionListDTO questionListDTO = adminQuestionService.getQuestionList(adminId, isAnswer,page - 1, 10,title,month,year);
 
         return ResponseEntity.ok(questionListDTO);
     }

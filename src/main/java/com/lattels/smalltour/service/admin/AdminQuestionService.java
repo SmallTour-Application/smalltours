@@ -23,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -72,14 +73,28 @@ public class AdminQuestionService {
     /**
      * 전체 질문 게시글 가져오기
      */
-    public AdminQuestionListDTO getQuestionList(int adminId, int isAnswer,int page, int count){
+    public AdminQuestionListDTO getQuestionList(int adminId, int isAnswer,int page, int count,String title,Integer month, Integer year){
         checkAdmin(adminId);
         Pageable pageable = PageRequest.of(page,count);
+
+        // month와 year 유효성 검사
+        if (month != null && (month < 1 || month > 12)) {
+            throw new IllegalArgumentException("월의 범위를 벗어났습니다. (1~12 사이의 값을 입력해주세요)");
+        }
+        if (year != null && (year < 1900 || year > 2100)) {
+            throw new IllegalArgumentException("연도의 범위를 벗어났습니다. (1900~2100 사이의 값을 입력해주세요)");
+        }
 
         if(isAnswer == 0){ //답변이 존재하는 질문내역
             int questionCount = Long.valueOf(questionRepository.count()).intValue();
 
-            Page<Question> questions = questionRepository.findMemberQuestionAnswer(pageable);
+
+            Page<Question> questions = questionRepository.findMemberQuestionAnswer(pageable,title,month,year);
+
+            if (questions.isEmpty()) {
+                throw new IllegalArgumentException("해당 제목을 가진 질문이 없습니다.");
+            }
+
             List<AdminQuestionDTO> questionDTOS = questions.stream()
                     .map(question -> new AdminQuestionDTO(question))
                     .collect(Collectors.toList());
@@ -91,7 +106,7 @@ public class AdminQuestionService {
         }else{ //답변이 존재하지않음
             int questionCount = Long.valueOf(questionRepository.count()).intValue();
 
-            Page<Question> questions = questionRepository.findMemberQuestion(pageable);
+            Page<Question> questions = questionRepository.findMemberQuestion(pageable,title,month,year);
             List<AdminQuestionDTO> questionDTOS = questions.stream()
                     .map(question -> new AdminQuestionDTO(question))
                     .collect(Collectors.toList());

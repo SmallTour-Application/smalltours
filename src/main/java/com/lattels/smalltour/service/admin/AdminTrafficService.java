@@ -3,6 +3,7 @@ package com.lattels.smalltour.service.admin;
 
 import com.lattels.smalltour.dto.admin.Traffic.AdminFavoriteGuideCountUpdateDTO;
 import com.lattels.smalltour.dto.admin.Traffic.AdminTrafficSearchDTO;
+import com.lattels.smalltour.dto.admin.search.AdminSearchDTO;
 import com.lattels.smalltour.dto.search.SearchGuideDTO;
 import com.lattels.smalltour.model.FavoriteGuide;
 import com.lattels.smalltour.model.LogMember;
@@ -54,11 +55,37 @@ public class AdminTrafficService {
     }
 
 
-    public AdminTrafficSearchDTO trafficSearchRegionDTO(int adminId, int month, int year){
-        checkAdmin(adminId,month,year);
+    /**
+     트래픽(브라우저 + 지역)
+     */
+    public AdminTrafficSearchDTO trafficBrowserAndRegion(int adminId,Integer month, Integer year){
+        AdminTrafficSearchDTO browser = trafficSearchBrowserDTO(adminId,month,year);
+        AdminTrafficSearchDTO region = trafficSearchRegionDTO(adminId,month,year);
 
-        Integer countMonth = logMemberRepository.findByCountRegion(month,year);
-        List<Object[]> logMember = logMemberRepository.findBySearchRegionDay(month,year);
+        return AdminTrafficSearchDTO.builder()
+                .count(browser.getCount()) //횟수는 브라우저 갯수나 지역 갯수나 동일해서 둘 중 아무거나 사용해도 상관 없음.
+                .regions(region.getRegions())
+                .browsers(browser.getBrowsers())
+                .build();
+    }
+
+    public AdminTrafficSearchDTO trafficSearchRegionDTO(int adminId, Integer month, Integer year){
+        Member admin = memberRepository.findById(adminId).orElseThrow(() -> new RuntimeException("관리자를 찾을수없습니다."));
+        if(admin.getRole() != 3){
+            throw new RuntimeException("관리자만 접근 가능합니다.");
+        }
+
+        Integer countMonth;
+        List<Object[]> logMember;
+        // 현재 날짜 기준으로 month와 year가 없으면 설정
+        if (month == null || month <= 0 || month >= 13 || year == null || year <= 0) {
+            logMember = logMemberRepository.findBySearchRegion();
+            countMonth = logMemberRepository.findByCountRegion();
+        }else{
+            logMember = logMemberRepository.findBySearchRegionDay(month,year);
+            countMonth = logMemberRepository.findByCountRegionDay(month, year);
+
+        }
 
         if(logMember.isEmpty()){
             throw new IllegalArgumentException("해당 날짜에 대한 기록이 없습니다.");
@@ -66,25 +93,39 @@ public class AdminTrafficService {
 
         List<AdminTrafficSearchDTO.Region> adminTrafficRegion = new ArrayList<>();
         for(Object[] logMembers : logMember){
-
             AdminTrafficSearchDTO.Region region = AdminTrafficSearchDTO.Region.builder()
                     .region(String.valueOf(logMembers[0]))
                     .count(Integer.parseInt(String.valueOf(logMembers[1])))
                     .build();
             adminTrafficRegion.add(region);
         }
+
         return AdminTrafficSearchDTO.builder()
                 .count(countMonth)
                 .regions(adminTrafficRegion)
+                .browsers(new ArrayList<>())
                 .build();
 
     }
 
-    public AdminTrafficSearchDTO trafficSearchBrowserDTO(int adminId,int month,int year){
-        checkAdmin(adminId,month,year);
+    public AdminTrafficSearchDTO trafficSearchBrowserDTO(int adminId,Integer month,Integer year){
+        Member admin = memberRepository.findById(adminId).orElseThrow(() -> new RuntimeException("관리자를 찾을수없습니다."));
+        if(admin.getRole() != 3){
+            throw new RuntimeException("관리자만 접근 가능합니다.");
+        }
 
-        Integer countMonth = logMemberRepository.findByCountRegion(month,year);
-        List<Object[]> logMember = logMemberRepository.findBySearchBrowserDay(month,year);
+        List<Object[]> logMember;
+        Integer countMonth;
+        // 현재 날짜 기준으로 month와 year가 없으면 설정
+        if (month == null || month <= 0 || year == null || year <= 0) {
+            logMember = logMemberRepository.findBySearchBrowser();
+            countMonth = logMemberRepository.findByCountBrowser();
+        } else {
+            logMember = logMemberRepository.findBySearchBrowserDay(month, year);
+            countMonth = logMemberRepository.findByCountBrowserDay(month, year);
+        }
+
+
 
         if(logMember.isEmpty()){
             throw new IllegalArgumentException("해당 날짜에 대한 기록이 없습니다.");
@@ -99,9 +140,12 @@ public class AdminTrafficService {
                     .build();
             adminTrafficSearchDTO.add(browser);
         }
+
+
         return AdminTrafficSearchDTO.builder()
                 .count(countMonth)
                 .browsers(adminTrafficSearchDTO)
+                .regions(new ArrayList<>())
                 .build();
     }
 
