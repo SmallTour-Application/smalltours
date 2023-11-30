@@ -23,6 +23,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -60,7 +61,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             LogMember logMember = LogMember.builder()
                     .member(member)
-                    .loginDateTime(LocalDateTime.now())
+                    .loginDateTime(LocalDate.now())
                     .browser(browsers)
                     .os(os)
                     .connectionType(device)

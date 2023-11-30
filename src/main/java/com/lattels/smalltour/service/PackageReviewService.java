@@ -123,6 +123,7 @@ public class PackageReviewService {
                 .rating(packageReviewWriteRequestDTO.getRating())
                 .content(packageReviewWriteRequestDTO.getContent())
                 .createdDay(LocalDateTime.now())
+                .state(1)
                 .build();
 
         reviewsRepository.save(reviews);

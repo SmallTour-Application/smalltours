@@ -201,4 +201,55 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     @Query("UPDATE Tours t SET t.approvals = 3 WHERE t.id = :id")
     void deleteTourById(@Param("id") int id);
 
+
+    @Query(value = "SELECT t.id, t.title,t.guide_id, AVG(r.rating) AS average_rating, t.duration, t.price, t.max_group_size," +
+            "CASE WHEN EXISTS (SELECT * " +
+            "FROM guide_lock gl " +
+            "WHERE gl.guide_id = m.id " +
+            "AND :checkDate BETWEEN gl.start_day AND gl.end_day) THEN '예약불가' ELSE '예약가능' END AS status " +
+            "FROM tours t " +
+            "JOIN member m ON t.guide_id = m.id " +
+            "JOIN reviews r ON r.tour_id = t.id " +
+            "WHERE :tourId IS NULL OR t.id =:tourId " +
+            "GROUP BY t.id", nativeQuery = true)
+    Page<Object[]> findTourWithAvgRatingAndGuideLock(@Param("tourId") Integer tourId,
+                                                     @Param("checkDate") LocalDate checkDate,
+                                                     Pageable pageable);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Tours t SET t.title = :title, t.duration = :duration, t.price = :price , t.maxGroupSize = :maxGroupSize WHERE t.id = :id")
+    void updateTourDetails(@Param("id") int id,
+                           @Param("title") String title,
+                           @Param("duration") int duration,
+                           @Param("price") int price,
+                           @Param("maxGroupSize") int maxGroupSize);
+
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Tours t SET t.duration = :duration WHERE t.id = :id")
+    void updateTourDuration(@Param("id") int id, @Param("duration") int duration);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Tours t SET t.price = :price WHERE t.id = :id")
+    void updateTourPrice(@Param("id") int id, @Param("price") int price);
+
+
+    @Query(value = "SELECT t.id, t.title,t.guide_id, AVG(r.rating) AS average_rating, t.duration, t.price, t.max_group_size," +
+            "CASE WHEN EXISTS (SELECT * " +
+            "FROM guide_lock gl " +
+            "WHERE gl.guide_id = m.id " +
+            "AND :checkDate BETWEEN gl.start_day AND gl.end_day) THEN '예약불가' ELSE '예약가능' END AS status, t.thumb " +
+            "FROM tours t " +
+            "JOIN member m ON t.guide_id = m.id " +
+            "JOIN reviews r ON r.tour_id = t.id " +
+            "WHERE t.id =:tourId " +
+            "GROUP BY t.id", nativeQuery = true)
+    Page<Object[]> findTourImgWithAvgRatingAndGuideLock(@Param("tourId") Integer tourId,
+                                                     @Param("checkDate") LocalDate checkDate,
+                                                     Pageable pageable);
+
+
 }

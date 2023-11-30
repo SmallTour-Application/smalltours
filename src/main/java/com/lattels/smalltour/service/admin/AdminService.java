@@ -539,7 +539,7 @@ public class AdminService {
      년 월 입력해서 difference를 알 수 있음
      controller에 month, year, name을 입력 안할시에는 날짜같은경우는 현재 시간 LocalDateTime.now()를 기준으로 검색되고, name이 null일경우는 모든 내역 출력되게함
      */
-    public AdminFavoriteGuideCountUpdateDTO countFavoriteGuideUpdate(int adminId, Integer month, Integer year, int page, int size, int sort, String name){
+    public AdminFavoriteGuideCountUpdateDTO countFavoriteGuideStatus(int adminId, Integer month, Integer year, int page, int size, int sort, String name){
         checkAdmin(adminId);
 
         if(month > 12 || month < 1){

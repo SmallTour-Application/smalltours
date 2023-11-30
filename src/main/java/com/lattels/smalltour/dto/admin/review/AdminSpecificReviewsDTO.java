@@ -9,7 +9,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminReviewsDTO {
+public class AdminSpecificReviewsDTO {
     private long count; // 검색결과 갯수
     private List<ContentReview> contentReviews;
 

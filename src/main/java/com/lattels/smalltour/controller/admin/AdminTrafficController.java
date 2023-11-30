@@ -32,12 +32,12 @@ public class AdminTrafficController {
     @PostMapping(value = "/search/region/month")
     @ApiOperation(value = "로그인 지역 날짜로 검색")
     public ResponseEntity<Object> searchTrafficRegionMonth(@ApiIgnore Authentication authentication,
-                                                     @RequestParam(required = false)Integer month,
-                                                     @RequestParam(required = false)Integer year) {
+                                                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDay,
+                                                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDay) {
         try {
 
             int adminId = Integer.parseInt(authentication.getPrincipal().toString());
-            AdminTrafficSearchDTO ad = adminTrafficService.trafficSearchRegionDTO(adminId,month,year);
+            AdminTrafficSearchDTO ad = adminTrafficService.trafficSearchRegionDTO(adminId,startDay,endDay);
             return ResponseEntity.ok(ad);
         } catch (Exception e) {
             e.printStackTrace();
@@ -48,12 +48,12 @@ public class AdminTrafficController {
     @PostMapping(value = "/search/browser/month")
     @ApiOperation(value = "로그인한 브라우저 날짜로 검색")
     public ResponseEntity<Object> searchTrafficBrowserMonth(@ApiIgnore Authentication authentication,
-                                                     @RequestParam(required = false)Integer month,
-                                                     @RequestParam(required = false)Integer year) {
+                                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDay,
+                                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDay) {
         try {
 
             int adminId = Integer.parseInt(authentication.getPrincipal().toString());
-            AdminTrafficSearchDTO ad = adminTrafficService.trafficSearchBrowserDTO(adminId,month,year);
+            AdminTrafficSearchDTO ad = adminTrafficService.trafficSearchBrowserDTO(adminId,startDay,endDay);
             return ResponseEntity.ok(ad);
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,12 +65,12 @@ public class AdminTrafficController {
     @PostMapping(value = "/search/traffic/all")
     @ApiOperation(value = "브라우저 + 로그인 지역 결과")
     public ResponseEntity<Object> searchTrafficBrowserANDRegionMonth(@ApiIgnore Authentication authentication,
-                                                            @RequestParam(required = false)Integer month,
-                                                            @RequestParam(required = false)Integer year) {
+                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDay,
+                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDay) {
         try {
 
             int adminId = Integer.parseInt(authentication.getPrincipal().toString());
-            AdminTrafficSearchDTO ad = adminTrafficService.trafficBrowserAndRegion(adminId,month,year);
+            AdminTrafficSearchDTO ad = adminTrafficService.trafficBrowserAndRegion(adminId,startDay,endDay);
             return ResponseEntity.ok(ad);
         } catch (Exception e) {
             e.printStackTrace();

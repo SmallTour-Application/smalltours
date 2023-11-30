@@ -57,7 +57,7 @@ public class MemberFavoriteStatusService {
                 .guide(guide)
                 .datePressed(LocalDateTime.now())
                 .dateCancel(null)
-                 .state(1)
+                .state(1)
                 .build();
 
         // 좋아요 누르기

@@ -2,15 +2,10 @@ package com.lattels.smalltour.service.admin;
 
 
 import com.google.common.base.Preconditions;
-import com.lattels.smalltour.dto.admin.question.AdminQuestionDTO;
-import com.lattels.smalltour.dto.admin.question.AdminQuestionListDTO;
 import com.lattels.smalltour.dto.admin.review.AdminDetailReviewDTO;
-import com.lattels.smalltour.dto.admin.review.AdminReviewDTO;
-import com.lattels.smalltour.dto.admin.review.AdminReviewsDTO;
+import com.lattels.smalltour.dto.admin.review.AdminSpecificReviewsDTO;
 import com.lattels.smalltour.model.Member;
-import com.lattels.smalltour.model.Question;
 import com.lattels.smalltour.model.Reviews;
-import com.lattels.smalltour.persistence.AnswerRepository;
 import com.lattels.smalltour.persistence.MemberRepository;
 import com.lattels.smalltour.persistence.QuestionRepository;
 import com.lattels.smalltour.persistence.ReviewsRepository;
@@ -25,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,7 +69,7 @@ public class AdminReviewService {
     /**
      * 리뷰 게시글 가져오기
      */
-    public AdminReviewsDTO getReviewList(int adminId,int page, int count,String title,Integer month, Integer year,String name,Integer state){
+    public AdminSpecificReviewsDTO getReviewList(int adminId, int page, int count, String title, Integer month, Integer year, String name, Integer state){
         checkAdmin(adminId);
         Pageable pageable = PageRequest.of(page,count);
 
@@ -99,11 +93,11 @@ public class AdminReviewService {
             reviewsCount = reviewsRepository.findReviewsCount(title, month, year, name,state);
         }
 
-        List<AdminReviewsDTO.ContentReview> contentReviews = new ArrayList<>();
+        List<AdminSpecificReviewsDTO.ContentReview> contentReviews = new ArrayList<>();
         for (Object[] review : reviewPage) {
             String status = (Integer) review[6] == 1 ? "작성완료" : "삭제됨";
 
-            AdminReviewsDTO.ContentReview contentReview = AdminReviewsDTO.ContentReview.builder()
+            AdminSpecificReviewsDTO.ContentReview contentReview = AdminSpecificReviewsDTO.ContentReview.builder()
                     .id((Integer) review[0])
                     .tourName((String) review[1])
                     .reviewContent((String) review[2])
@@ -115,7 +109,7 @@ public class AdminReviewService {
             contentReviews.add(contentReview);
         }
 
-        return AdminReviewsDTO.builder()
+        return AdminSpecificReviewsDTO.builder()
                 .count(reviewsCount)
                 .contentReviews(contentReviews)
                 .build();
@@ -159,7 +153,7 @@ public class AdminReviewService {
     /**
      * 특정 투어에 대한 리뷰 목록 가져오기
      */
-    public AdminReviewsDTO getTourReviews(int adminId, int tourId, int page, int count, Integer state) {
+    public AdminSpecificReviewsDTO getTourReviews(int adminId, int tourId, int page, int count, Integer state) {
         checkAdmin(adminId);
         Pageable pageable = PageRequest.of(page, count);
         Page<Reviews> reviewsPage;
@@ -172,8 +166,8 @@ public class AdminReviewService {
 
         long reviewsCount = reviewsPage.getTotalElements();
 
-        List<AdminReviewsDTO.ContentReview> contentReviews = reviewsPage.getContent().stream()
-                .map(review -> AdminReviewsDTO.ContentReview.builder()
+        List<AdminSpecificReviewsDTO.ContentReview> contentReviews = reviewsPage.getContent().stream()
+                .map(review -> AdminSpecificReviewsDTO.ContentReview.builder()
                         .id(review.getId())
                         .tourName(review.getTours().getTitle()) // 예시: 투어 제목
                         .reviewContent(review.getContent())
@@ -184,7 +178,7 @@ public class AdminReviewService {
                         .build())
                 .collect(Collectors.toList());
 
-        return AdminReviewsDTO.builder()
+        return AdminSpecificReviewsDTO.builder()
                 .count(reviewsCount)
                 .contentReviews(contentReviews)
                 .build();

@@ -1,16 +1,15 @@
 package com.lattels.smalltour.controller.admin;
 
 
-import com.lattels.smalltour.dto.admin.question.AdminQuestionListDTO;
-import com.lattels.smalltour.dto.admin.tour.AdminToursDTO;
+import com.lattels.smalltour.dto.admin.tours.AdminDetailImgPackageDTO;
+import com.lattels.smalltour.dto.admin.tours.AdminDetailPackageDTO;
+import com.lattels.smalltour.dto.admin.tours.AdminPackageDTO;
 import com.lattels.smalltour.service.admin.AdminPackageService;
-import com.lattels.smalltour.service.admin.AdminPaymentService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -27,18 +26,18 @@ public class AdminPackageController {
 
     @ApiOperation("패키지 목록 조회")
     @GetMapping("/list")
-    public ResponseEntity<AdminToursDTO> getToursList(@ApiIgnore Authentication authentication,
-                                                      @RequestParam(value = "tourId", required = false) Integer tourId,
-                                                      @RequestParam(required = false)String title,
-                                                      int page,
-                                                      @RequestParam(required = false)Integer month,
-                                                      @RequestParam(required = false)Integer year,
-                                                      @RequestParam(required = false)Integer state)
+    public ResponseEntity<AdminPackageDTO> getToursList(@ApiIgnore Authentication authentication,
+                                                        @RequestParam(value = "tourId", required = false) Integer tourId,
+                                                        @RequestParam(required = false)String title,
+                                                        int page,
+                                                        @RequestParam(required = false)Integer month,
+                                                        @RequestParam(required = false)Integer year,
+                                                        @RequestParam(required = false)Integer state)
     {
         int adminId = Integer.parseInt(authentication.getPrincipal().toString());
         // 질문 목록 조회
-        AdminToursDTO adminToursDTO = adminPackageService.getToursList(adminId, tourId,title,page - 1, 10,month,year,state);
-        return ResponseEntity.ok(adminToursDTO);
+        AdminPackageDTO adminPackageDTO = adminPackageService.getToursList(adminId, tourId,title,page - 1, 10,month,year,state);
+        return ResponseEntity.ok(adminPackageDTO);
     }
 
 
@@ -67,5 +66,44 @@ public class AdminPackageController {
         return ResponseEntity.ok().build();
     }
 
+
+    @ApiOperation("패키지 상세 목록 조회")
+    @GetMapping("/detail/list")
+    public ResponseEntity<AdminDetailPackageDTO> getToursList(@ApiIgnore Authentication authentication,
+                                                                         @RequestParam(value = "tourId", required = false) Integer tourId,
+                                                                         int page)
+    {
+        int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+        // 질문 목록 조회
+        AdminDetailPackageDTO adminDetailPackageDTO = adminPackageService.getToursDetailList(adminId, tourId,page - 1, 10);
+        return ResponseEntity.ok(adminDetailPackageDTO);
+    }
+
+    @ApiOperation(" 패키지 수정")
+    @PostMapping("/detail/update")
+    public ResponseEntity<?> updateContent(@ApiIgnore Authentication authentication,
+                                           @RequestParam(required = false) int tourId,
+                                           @RequestParam(required = false) String title,
+                                           @RequestParam(required = false) Integer duration,
+                                           @RequestParam(required = false) Integer price,
+                                           @RequestParam(required = false) Integer maxPeople,
+                                           int page) {
+        int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+        adminPackageService.updateDetailTour(adminId, tourId,title,duration,price,maxPeople,page-1,10);
+        return ResponseEntity.ok().build();
+    }
+
+
+    @ApiOperation("패키지 상세 목록 (이미지 포함) 조회")
+    @GetMapping("/detail/img")
+    public ResponseEntity<AdminDetailImgPackageDTO> getToursImg(@ApiIgnore Authentication authentication,
+                                                                @RequestParam(value = "tourId") Integer tourId,
+                                                                int page)
+    {
+        int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+        // 질문 목록 조회
+        AdminDetailImgPackageDTO adminDetailImgPackageDTO = adminPackageService.getToursDetailImg(adminId, tourId,page - 1, 10);
+        return ResponseEntity.ok(adminDetailImgPackageDTO);
+    }
 
 }

@@ -2,10 +2,7 @@ package com.lattels.smalltour.controller.admin;
 
 
 import com.lattels.smalltour.dto.admin.review.AdminDetailReviewDTO;
-import com.lattels.smalltour.dto.admin.review.AdminReviewDTO;
-import com.lattels.smalltour.dto.admin.review.AdminReviewsDTO;
-import com.lattels.smalltour.dto.admin.tour.AdminToursDTO;
-import com.lattels.smalltour.service.admin.AdminPackageService;
+import com.lattels.smalltour.dto.admin.review.AdminSpecificReviewsDTO;
 import com.lattels.smalltour.service.admin.AdminReviewService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -25,17 +22,17 @@ public class AdminReviewController {
 
     @ApiOperation("리뷰 목록 조회")
     @GetMapping("/list")
-    public ResponseEntity<AdminReviewsDTO> getReviewList(@ApiIgnore Authentication authentication,
-                                                        int page,
-                                                        @RequestParam(value = "title", required = false) String title,
-                                                        @RequestParam(required = false)Integer month,
-                                                        @RequestParam(required = false)Integer year,
-                                                        @RequestParam(required = false)String name,
-                                                        @RequestParam(required = false)Integer state)
+    public ResponseEntity<AdminSpecificReviewsDTO> getReviewList(@ApiIgnore Authentication authentication,
+                                                                 int page,
+                                                                 @RequestParam(value = "title", required = false) String title,
+                                                                 @RequestParam(required = false)Integer month,
+                                                                 @RequestParam(required = false)Integer year,
+                                                                 @RequestParam(required = false)String name,
+                                                                 @RequestParam(required = false)Integer state)
     {
         int adminId = Integer.parseInt(authentication.getPrincipal().toString());
         // 질문 목록 조회
-        AdminReviewsDTO adminReviewDTO = adminReviewService.getReviewList(adminId, page - 1,10,title,month,year,name,state);
+        AdminSpecificReviewsDTO adminReviewDTO = adminReviewService.getReviewList(adminId, page - 1,10,title,month,year,name,state);
         return ResponseEntity.ok(adminReviewDTO);
     }
 
@@ -59,14 +56,14 @@ public class AdminReviewController {
 
     @ApiOperation("특정 여행 리뷰 목록 조회")
     @GetMapping("/tour/list")
-    public ResponseEntity<AdminReviewsDTO> getTourReviewsList(@ApiIgnore Authentication authentication,
-                                                        @RequestParam(required = false)Integer tourId,
-                                                        @RequestParam(required = false)int page,
-                                                        @RequestParam(required = false)Integer state)
+    public ResponseEntity<AdminSpecificReviewsDTO> getTourReviewsList(@ApiIgnore Authentication authentication,
+                                                                      @RequestParam(required = false)Integer tourId,
+                                                                      @RequestParam(required = false)int page,
+                                                                      @RequestParam(required = false)Integer state)
     {
         int adminId = Integer.parseInt(authentication.getPrincipal().toString());
         // 질문 목록 조회
-        AdminReviewsDTO adminReviewDTO = adminReviewService.getTourReviews(adminId, tourId,page -1,10,state);
+        AdminSpecificReviewsDTO adminReviewDTO = adminReviewService.getTourReviews(adminId, tourId,page -1,10,state);
         return ResponseEntity.ok(adminReviewDTO);
     }
 
