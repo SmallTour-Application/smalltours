@@ -26,7 +26,6 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     List<Tours> findByMemberId(@Param("memberId") int memberId, Pageable pageable);
 
 
-
     List<Tours> findAll();
 
     /**

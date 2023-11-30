@@ -25,6 +25,11 @@ public interface GuideReviewRepository extends JpaRepository<GuideReview, Intege
     @Query("SELECT count(gr) FROM GuideReview gr JOIN gr.reviewer m WHERE m.id = :memberId AND m.role = 0")
     int countByReviewerId(@Param("memberId") int memberId);
 
+    /* findByGuideIdOrderByCreatedDayDesc **/
+    List<GuideReview> findByGuideIdAndStateOrderByCreatedDayDesc(int guideId, int state, Pageable pageable);
+
+    /*countByGuideId**/
+    int countByGuideIdAndState(int guideId, int state);
 
 
     /**

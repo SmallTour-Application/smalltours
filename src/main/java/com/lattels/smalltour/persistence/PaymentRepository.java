@@ -130,7 +130,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     //memberId로 payment찾기 + 결제성공
     @Query(value = "SELECT * FROM payment p " +
             "JOIN member m ON p.member_id = m.id " +
-            "WHERE m.role = 0 AND p.state = 1 ",nativeQuery = true)
+            "WHERE m.role = 0 AND p.state = 1 AND m.id = :memberId ",nativeQuery = true)
     List<Payment> findByPaymentMemberId(Pageable pageable);
 
     //memberId로 payment찾기 + 결제취소

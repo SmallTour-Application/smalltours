@@ -3,8 +3,10 @@ package com.lattels.smalltour.service.admin;
 import com.lattels.smalltour.dto.admin.review.AdminReviewDTO;
 import com.lattels.smalltour.model.GuideReview;
 import com.lattels.smalltour.model.Reviews;
+import com.lattels.smalltour.model.Tours;
 import com.lattels.smalltour.persistence.GuideReviewRepository;
 import com.lattels.smalltour.persistence.ReviewsRepository;
+import com.lattels.smalltour.persistence.ToursRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,85 @@ public class AdminMemberService {
 
     private final ReviewsRepository reviewRepository;
     private final GuideReviewRepository guideReviewRepository;
+    private final ToursRepository toursRepository;
+
+    // 특정 회원이 받은 가이드 리뷰 가져오기 getGuideReviewByReceiver
+    public AdminReviewDTO.ReviewListDTO getGuideReviewByReceiver(int memberId, Pageable pageable, int state) {
+        try{
+            List<GuideReview> guideReviews = guideReviewRepository.findByGuideIdAndStateOrderByCreatedDayDesc(memberId,state, pageable);
+            List<AdminReviewDTO.ReviewDTO> reviewDTOs = new ArrayList<>();
+            // 전체 검색결과
+            int totalCnt = guideReviewRepository.countByGuideIdAndState(memberId, state);
+            // DTO로 변환
+            AdminReviewDTO.ReviewListDTO reviewListDTO = AdminReviewDTO.ReviewListDTO.builder().totalCnt(totalCnt).build();
+
+            for (GuideReview review : guideReviews) {
+                // 작성자 이름 가져오기
+                String reviewerName = review.getReviewer().getName();
+                AdminReviewDTO.ReviewDTO reviewDTO = AdminReviewDTO.ReviewDTO.builder()
+                        .reviewId(review.getId())
+                        .memberId(review.getReviewer().getId())
+                        .guideId(review.getGuide().getId())
+                        .content(review.getContent())
+                        .score(review.getRating())
+                        .packageName(review.getPayment().getTours().getTitle())
+                        .reviewContent(review.getContent())
+                        .reviewDate(review.getCreatedDay())
+                        .paymentId(review.getPayment().getId())
+                        .guideName(review.getGuide().getName())
+                        .packageId(review.getPayment().getTours().getId())
+                        .state(review.getPayment().getState())
+                        .reviewerName(reviewerName)
+                        .build();
+                reviewDTOs.add(reviewDTO);
+            }
+            reviewListDTO.setReviewList(reviewDTOs);
+            return reviewListDTO;
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    // 특정 멤버가 만든 여행들에 대한 리뷰 페이징해서 가져오기
+    // getToursReview
+    public AdminReviewDTO.ReviewListDTO getToursReviewReceiver(int memberId, Pageable pageable, int state) {
+        try{
+            List<Reviews> reviews = reviewRepository.findAllByGuideIdAndStateOrderByCreatedDayDESC(memberId, state, pageable);
+            List<AdminReviewDTO.ReviewDTO> reviewDTOs = new ArrayList<>();
+            // 전체 검색결과
+            int totalCnt = reviewRepository.countByGuideIdAndState(memberId, state);
+            // DTO로 변환
+            AdminReviewDTO.ReviewListDTO reviewListDTO = AdminReviewDTO.ReviewListDTO.builder().totalCnt(totalCnt).build();
+            for (Reviews review : reviews) {
+                // 작성자 이름 가져오기
+                String reviewerName = review.getMember().getName();
+                AdminReviewDTO.ReviewDTO reviewDTO = AdminReviewDTO.ReviewDTO.builder()
+                        .reviewId(review.getId())
+                        .memberId(review.getMember().getId())
+                        .content(review.getContent())
+                        .score(review.getRating())
+                        .packageName(review.getPayment().getTours().getTitle())
+                        .reviewContent(review.getContent())
+                        .reviewDate(review.getCreatedDay())
+                        .paymentId(review.getPayment().getId())
+                        .packageId(review.getPayment().getTours().getId())
+                        .state(review.getPayment().getState())
+                        .reviewerName(reviewerName)
+                        .build();
+                reviewDTOs.add(reviewDTO);
+            }
+
+            reviewListDTO.setReviewList(reviewDTOs);
+            return reviewListDTO;
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
 
 
     // 특정 회원의 리뷰 목록 가져오기 + pageable
