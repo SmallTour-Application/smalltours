@@ -255,10 +255,7 @@ public class AdminMemberController {
             ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
             return ResponseEntity.badRequest().body(responseDTO);
         }
-
     }
-
-
 
 
     @GetMapping(value = "/search/favorite/guide")
@@ -274,6 +271,7 @@ public class AdminMemberController {
             int adminId = Integer.parseInt(authentication.getPrincipal().toString());
 
             // 현재 날짜 기준으로 month와 year가 없으면 설정
+            //년도만 입력하면,현재 날짜랑 -1 저번 달이랑 비교
             if (month == null || month <= 0) {
                 month = LocalDate.now().getMonthValue();
             }
@@ -288,7 +286,7 @@ public class AdminMemberController {
             }
 
             // 서비스 메소드 호출
-            AdminFavoriteGuideCountUpdateDTO ad = adminService.countFavoriteGuideUpdate(adminId, month, year, page, size,sort,name);
+            AdminFavoriteGuideCountUpdateDTO ad = adminService.countFavoriteGuideStatus(adminId, month, year, page, size,sort,name);
             return ResponseEntity.ok(ad);
         } catch (Exception e) {
             e.printStackTrace();

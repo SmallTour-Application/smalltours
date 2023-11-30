@@ -14,23 +14,37 @@ import java.util.List;
 public interface LogMemberRepository extends JpaRepository<LogMember, Integer> {
 
 
-    @Query(value = "SELECT lm.region, count(lm.region) FROM LogMember lm WHERE MONTH(lm.loginDateTime) =:month AND YEAR(lm.loginDateTime) =:year GROUP BY lm.region")
-    List<Object[]> findBySearchRegionDay(@Param("month") int month,@Param("year") int year);
-
-    @Query(value = "SELECT count(lm.region) FROM LogMember lm WHERE MONTH(lm.loginDateTime) =:month AND YEAR(lm.loginDateTime) =:year")
-    Integer findByCountRegion(@Param("month") int month,@Param("year") int year);
-
-
-    @Query(value = "SELECT lm.browser, count(lm.browser) FROM LogMember lm WHERE MONTH(lm.loginDateTime) =:month AND YEAR(lm.loginDateTime) =:year GROUP BY lm.browser")
-    List<Object[]> findBySearchBrowserDay(@Param("month") int month,@Param("year") int year);
-
-    @Query(value = "SELECT count(lm.browser) FROM LogMember lm WHERE MONTH(lm.loginDateTime) =:month AND YEAR(lm.loginDateTime) =:year")
-    Integer findByCountBrowser(@Param("month") int month,@Param("year") int year);
+    @Query("SELECT lm.region, COUNT(lm.region) " +
+            "FROM LogMember lm " +
+            "WHERE (:startDay IS NULL OR lm.loginDateTime >= :startDay) " +
+            "AND (:endDay IS NULL OR lm.loginDateTime <= :endDay) " +
+            "GROUP BY lm.region")
+    List<Object[]> findBySearchRegionDateRange(@Param("startDay") LocalDate startDay,
+                                               @Param("endDay") LocalDate endDay);
 
 
 
+    @Query(value = "SELECT COUNT(lm.region) FROM LogMember lm " +
+            "WHERE (:startDay IS NULL OR lm.loginDateTime >= :startDay) " +
+            "AND (:endDay IS NULL OR lm.loginDateTime <= :endDay)")
+    Integer countByRegionBetweenDates(@Param("startDay") LocalDate startDay,
+                                      @Param("endDay") LocalDate endDay);
 
 
 
+
+    @Query(value = "SELECT COUNT(lm.browser) FROM LogMember lm " +
+            "WHERE (:startDay IS NULL OR lm.loginDateTime >= :startDay) " +
+            "AND (:endDay IS NULL OR lm.loginDateTime <= :endDay)")
+    Integer countByBrowserBetweenDates(@Param("startDay") LocalDate startDay,
+                                       @Param("endDay") LocalDate endDay);
+
+    @Query(value = "SELECT lm.browser, COUNT(lm.region) " +
+            "FROM LogMember lm " +
+            "WHERE (:startDay IS NULL OR lm.loginDateTime >= :startDay) " +
+            "AND (:endDay IS NULL OR lm.loginDateTime <= :endDay) " +
+            "GROUP BY lm.browser")
+    List<Object[]> findBrowserUsageBetweenDates(@Param("startDay") LocalDate startDay,
+                                                @Param("endDay") LocalDate endDay);
 
 }

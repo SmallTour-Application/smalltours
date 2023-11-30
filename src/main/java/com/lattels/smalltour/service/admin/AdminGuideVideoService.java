@@ -79,7 +79,7 @@ public class AdminGuideVideoService {
     }
 
 
-    //교육 영상 상세 가이드 목록
+    // 가이드 교육 수강 현황(0:수강완료 1:미수강 2:수강중)
     public EducationGuideDTO GuideEducationLog(int adminId, int page, int countPerPage, int state , int guideId){
         int i = 1;
         checkAdmin(adminId);
@@ -91,7 +91,9 @@ public class AdminGuideVideoService {
 
         //강좌갯수
         int educationLogCount = educationRepository.countStateEducationLog(state,guideId);
-
+        if(educationLogCount == 0){
+            throw new IllegalArgumentException("현재 가이드에 해당하는 정보가 없습니다.");
+        }
         // 페이지
         Pageable pageable = PageRequest.of(page, countPerPage);
         //로그 불러오기

@@ -8,7 +8,6 @@ import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.persistence.LogMemberRepository;
 import com.lattels.smalltour.persistence.MemberRepository;
 import com.lattels.smalltour.security.JwtAuthenticationFilter;
-import com.lattels.smalltour.security.LogProvider;
 import com.lattels.smalltour.security.TokenProvider;
 import com.lattels.smalltour.service.EmailTokenService;
 import com.lattels.smalltour.service.UnauthMemberService;

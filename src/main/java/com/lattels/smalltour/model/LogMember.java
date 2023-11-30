@@ -8,6 +8,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -27,7 +28,7 @@ public class LogMember {
     private Member member;
 
     @Column(name = "login_date_time")
-    private LocalDateTime loginDateTime; //로그인 시간
+    private LocalDate loginDateTime; //로그인 시간
  
     @Column(name = "connection_type")
     private String connectionType;  //접속유형(웹,앱..)

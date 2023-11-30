@@ -25,15 +25,18 @@ import java.util.List;
 public class AdminGuideVideoController {
     private final AdminGuideVideoService adminGuideVideoService;
 
-    @ApiOperation("가이드 강좌 목록")
+    @ApiOperation("가이드 교육 현황 목록")
     @PostMapping("/education/view/list")
-    public ResponseEntity<?> getGuideVideoList(@ApiIgnore Authentication authentication, int page, @RequestParam int state, @RequestParam(required = false) int memberId) {
+    public ResponseEntity<?> getGuideVideoList(@ApiIgnore Authentication authentication,
+                                               int page,
+                                               @RequestParam int state,
+                                               @RequestParam(required = false) int memberId) {
         int adminId = Integer.parseInt(authentication.getPrincipal().toString());
         EducationGuideDTO educationLogGuideListDTO = adminGuideVideoService.getGuideEducationList(adminId, page - 1, 10, state, memberId);
         return ResponseEntity.ok(educationLogGuideListDTO);
     }
 
-    @ApiOperation("가이드 강좌 상태 수정")
+    @ApiOperation("교육 강좌 상태 수정")
     @PostMapping("/education/state/update")
     public ResponseEntity<?> getVideoUpdate(@ApiIgnore Authentication authentication,
                                             @RequestParam int educationId,

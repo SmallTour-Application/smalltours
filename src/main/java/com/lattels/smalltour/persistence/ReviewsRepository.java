@@ -4,11 +4,14 @@ import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.model.Reviews;
 
 import com.lattels.smalltour.model.Tours;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -89,5 +92,110 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
 
     @Query("SELECT AVG(r.rating) FROM Reviews r WHERE r.tours = :tours")
     String getRating(@Param("tours") Tours tours);
+
+
+    @Query(value = "SELECT r.id, t.title, r.content, r.created_day, r.member_id, m.name, r.state " +
+            "FROM reviews r " +
+            "JOIN payment p ON r.payment_id = p.id " +
+            "JOIN tours t ON r.tour_id = t.id " +
+            "JOIN member m ON r.member_id = m.id " +
+            "WHERE (:title IS NULL OR t.title LIKE CONCAT('%', :title, '%')) " +
+            "AND (:month IS NULL OR MONTH(r.created_day) = :month) " +
+            "AND (:year IS NULL OR YEAR(r.created_day) = :year) " +
+            "AND (:name IS NULL OR m.name LIKE CONCAT('%', :name, '%')) " +
+            "AND r.state =:state", nativeQuery = true)
+    Page<Object[]> findReviewsByConditions(@Param("title") String title,
+                                           @Param("month") Integer month,
+                                           @Param("year") Integer year,
+                                           @Param("name") String name,
+                                           @Param("state") Integer state,
+                                           Pageable pageable);
+
+    @Query(value = "SELECT count(r.id) " +
+            "FROM reviews r " +
+            "JOIN payment p ON r.payment_id = p.id " +
+            "JOIN tours t ON r.tour_id = t.id " +
+            "JOIN member m ON r.member_id = m.id " +
+            "WHERE (:title IS NULL OR t.title LIKE CONCAT('%', :title, '%')) " +
+            "AND (:month IS NULL OR MONTH(r.created_day) = :month) " +
+            "AND (:year IS NULL OR YEAR(r.created_day) = :year) " +
+            "AND (:name IS NULL OR m.name LIKE CONCAT('%', :name, '%')) " +
+            "AND r.state =:state", nativeQuery = true)
+    long findReviewsCount(@Param("title") String title,
+                          @Param("month") Integer month,
+                          @Param("year") Integer year,
+                          @Param("name") String name,
+                          @Param("state") Integer state);
+
+
+
+    @Query(value = "SELECT r.id, t.title, r.content, r.created_day, r.member_id, m.name, r.state " +
+            "FROM reviews r " +
+            "JOIN payment p ON r.payment_id = p.id " +
+            "JOIN tours t ON r.tour_id = t.id " +
+            "JOIN member m ON r.member_id = m.id " , nativeQuery = true)
+    Page<Object[]> findAllReviews(Pageable pageable,@Param("state") Integer state);
+
+    @Query(value = "SELECT count(r.id) " +
+            "FROM reviews r " +
+            "JOIN payment p ON r.payment_id = p.id " +
+            "JOIN tours t ON r.tour_id = t.id " +
+            "JOIN member m ON r.member_id = m.id " +
+            "AND r.state =:state", nativeQuery = true)
+    long countAllReviews(@Param("state") Integer state);
+
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Reviews r SET r.content = :content WHERE r.id = :id AND r.state = 1")
+    void updateReviewContent(@Param("id") int id, @Param("content") String content);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Reviews r SET r.state = 0 WHERE r.id = :id")
+    void updateReviewState(@Param("id") int id);
+
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Reviews r SET r.content = :content WHERE r.tours.id = :tourId AND r.id = :reviewId AND r.state = 1")
+    void updateTourReviewContent(@Param("tourId") int tourId,@Param("reviewId") int reviewId, @Param("content") String content);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Reviews r SET r.state = 0 WHERE r.tours.id = :tourId AND r.id = :reviewId")
+    void updateTourReviewState(@Param("tourId") int tourId,@Param("reviewId") int reviewId);
+
+    Page<Reviews> findByToursIdAndState(int tourId, int state, Pageable pageable);
+    Page<Reviews> findByToursId(int tourId, Pageable pageable);
+
+
+
+
+    @Query(value = "SELECT " +
+            "r.id AS review_id, " +
+            "t.title AS tour_title, " +
+            "guide.name AS guide_name, " +
+            "buyer.name AS member_name, " +
+            "r.rating AS review_rating, " +
+            "r.content AS review_content " +
+            "FROM Reviews r " +
+            "JOIN r.tours t " +
+            "JOIN Member guide ON t.guide = guide AND guide.role = 2 " +
+            "JOIN Member buyer ON r.member = buyer AND buyer.role = 0 " +
+            "WHERE buyer.id = :memberId " +
+            "AND (:title IS NULL OR t.title LIKE %:title%)")
+    Page<Object[]> findReviewsByBuyerId(@Param("memberId") int memberId,@Param("title") String title, Pageable pageable);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Reviews r SET r.content = :content,r.rating = :rating WHERE r.id = :id AND r.state = 1")
+    void updateDetailReviewContent(@Param("id") int id, @Param("content") String content,@Param("rating") int rating);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Reviews r SET r.state = 0 WHERE r.id = :id")
+    void updateDetailReviewState(@Param("id") int id);
+
 
 }
