@@ -41,9 +41,9 @@ public class AdminVideoController {
 
     @ApiOperation("교육 강좌 목록")
     @PostMapping("/education/view/list")
-    public ResponseEntity<?> getVideoList(@ApiIgnore Authentication authentication, int page,@RequestParam int state) {
+    public ResponseEntity<?> getVideoList(@ApiIgnore Authentication authentication, int page,@RequestParam int state,@RequestParam(required = false) Integer educationId) {
         int adminId = Integer.parseInt(authentication.getPrincipal().toString());
-        EducationDTO educationLogVideoDTO = adminVideoService.getEducationList(adminId, page - 1, 10,state);
+        EducationDTO educationLogVideoDTO = adminVideoService.getEducationList(adminId, page - 1, 10,state,educationId);
         return ResponseEntity.ok(educationLogVideoDTO);
     }
 

@@ -28,11 +28,12 @@ public class AdminReviewController {
                                                                  @RequestParam(required = false)Integer month,
                                                                  @RequestParam(required = false)Integer year,
                                                                  @RequestParam(required = false)String name,
-                                                                 @RequestParam(required = false)Integer state)
+                                                                 @RequestParam(required = false)Integer state,
+                                                                 @RequestParam(required = false)Integer memberId)
     {
         int adminId = Integer.parseInt(authentication.getPrincipal().toString());
         // 질문 목록 조회
-        AdminSpecificReviewsDTO adminReviewDTO = adminReviewService.getReviewList(adminId, page - 1,10,title,month,year,name,state);
+        AdminSpecificReviewsDTO adminReviewDTO = adminReviewService.getReviewList(adminId, page - 1,10,title,month,year,name,state,memberId);
         return ResponseEntity.ok(adminReviewDTO);
     }
 

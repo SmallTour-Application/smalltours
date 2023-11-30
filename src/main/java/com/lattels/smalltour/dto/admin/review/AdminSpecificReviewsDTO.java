@@ -23,7 +23,7 @@ public class AdminSpecificReviewsDTO {
         private String reviewContent;
         private LocalDateTime createdDay;
         private String status;
-        private int memberId;
+        private int paymentId;
         private String memeberName;
     }
 }
