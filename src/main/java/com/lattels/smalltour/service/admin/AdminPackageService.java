@@ -60,23 +60,25 @@ public class AdminPackageService {
         }
     }
 
+
+
     /**
      * 전체 패키지 목록 가져오기
      * 번호,패키지명,생성일시,수정일시,상태 수정 및 삭제는 따로 메서드만들어서
      * 0:미승인 1:승인 2:일시정지 3:삭제
      */
-    public AdminPackageDTO getToursList(int adminId, Integer tourId, String title, int page, int count, Integer month, Integer year, Integer state) {
+    public AdminPackageDTO getToursList(int adminId, Integer tourId, String title, int page, int count, Integer month, Integer year, Integer state, Integer price, Integer people, Integer duration) {
         checkAdmin(adminId);
         Pageable pageable = PageRequest.of(page, count);
         long resultTourInfo = 0;
 
         Page<Object[]> tourInfo;
-        if (tourId == null && month == null && year == null && state == null && title == null) {
+        if (tourId == null && month == null && year == null && state == null && title == null && price == null && people == null && duration == null) {
             tourInfo = toursRepository.findByConditionALL(month, year, tourId, state, title, pageable);
             resultTourInfo = toursRepository.countByAllConditions(month, year, tourId, state, title);
         } else {
-            tourInfo = toursRepository.findByConditions(month, year, tourId, state, title, pageable);
-            resultTourInfo = toursRepository.countByConditions(month, year, tourId, state, title);
+            tourInfo = toursRepository.findByConditions(month, year, tourId, state, title, price, people, duration ,pageable);
+            resultTourInfo = toursRepository.countByConditions(month, year, tourId, state, title, price, people, duration);
         }
 
         List<AdminPackageDTO.AdminToursList> adminTours = new ArrayList<>();
@@ -108,6 +110,12 @@ public class AdminPackageService {
                     .createdDay(((Timestamp) tours[2]).toLocalDateTime())
                     .updateDay(((Timestamp) tours[3]).toLocalDateTime())
                     .approval(approvalStatus)
+                    .guideName(String.valueOf(tours[5]))
+                    .duration(Integer.parseInt(String.valueOf(tours[6])))
+                    .price(Integer.parseInt(String.valueOf(tours[7])))
+                    .maxPeople(Integer.parseInt(String.valueOf(tours[8])))
+                    .minPeople(Integer.parseInt(String.valueOf(tours[9])))
+                    .guideId(Integer.parseInt(String.valueOf(tours[10])))
                     .build();
             adminTours.add(adminToursList);
         }
