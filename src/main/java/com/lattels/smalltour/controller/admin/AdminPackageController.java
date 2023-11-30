@@ -8,11 +8,11 @@ import com.lattels.smalltour.service.admin.AdminPackageService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
-
 
 @Slf4j
 @RestController
@@ -32,12 +32,22 @@ public class AdminPackageController {
                                                         int page,
                                                         @RequestParam(required = false)Integer month,
                                                         @RequestParam(required = false)Integer year,
-                                                        @RequestParam(required = false)Integer state)
+                                                        @RequestParam(required = false)Integer state,
+                                                        @RequestParam(required = false)Integer price,
+                                                        @RequestParam(required = false)Integer people,
+                                                        @RequestParam(required = false)Integer duration
+    )
     {
-        int adminId = Integer.parseInt(authentication.getPrincipal().toString());
-        // 질문 목록 조회
-        AdminPackageDTO adminPackageDTO = adminPackageService.getToursList(adminId, tourId,title,page - 1, 10,month,year,state);
-        return ResponseEntity.ok(adminPackageDTO);
+        try{
+            int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+            // 질문 목록 조회
+            AdminPackageDTO adminPackageDTO = adminPackageService.getToursList(adminId, tourId,title,page - 1, 10,month,year,state, price, people, duration);
+            return ResponseEntity.ok(adminPackageDTO);
+        }catch(Exception e){
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 
 

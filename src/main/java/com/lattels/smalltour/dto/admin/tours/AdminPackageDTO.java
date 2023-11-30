@@ -41,6 +41,24 @@ public class AdminPackageDTO {
 
         @ApiParam("상태")
         private String approval;
+
+        @ApiParam("가격")
+        private int price;
+
+        @ApiParam("최대인원수")
+        private int maxPeople;
+
+        @ApiParam("최소인원수")
+        private int minPeople;
+
+        @ApiParam("기간")
+        private int duration;
+
+        @ApiParam("판매자")
+        private String guideName;
+
+        @ApiParam("판매자 ID")
+        private int guideId;
     }
 
     @Data

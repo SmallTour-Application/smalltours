@@ -106,11 +106,14 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
 
 
 
-    @Query(value = "SELECT t.id,t.title,t.created_day,t.update_day,t.approvals FROM tours t " +
-            "WHERE (:month IS NULL OR MONTH(t.created_day) = :month) " +
+    @Query(value = "SELECT t.id,t.title,t.created_day,t.update_day,t.approvals, m.name, t.duration, t.price, t.max_group_size, t.min_group_size, t.guide_id FROM tours t INNER JOIN member m WHERE t.guide_id = m.id " +
+            "AND (:month IS NULL OR MONTH(t.created_day) = :month) " +
             "AND (:year IS NULL OR YEAR(t.created_day) = :year) " +
             "AND (:tourId IS NULL OR t.id = :tourId) " +
             "AND (:state IS NULL OR t.approvals = :state) " +
+            "AND (:price IS NULL OR t.price = :price) " +
+            "AND (:people IS NULL OR :people BETWEEN t.min_group_size AND t.max_group_size) " +
+            "AND (:duration IS NULL OR t.duration = :duration) " +
             "AND (:title IS NULL OR t.title LIKE CONCAT('%', :title, '%')) ", nativeQuery = true)
     Page<Object[]> findByConditions(
             @Param("month") Integer month,
@@ -118,6 +121,9 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
             @Param("tourId") Integer tourId,
             @Param("state") Integer state,
             @Param("title") String title,
+            @Param("price") Integer price,
+            @Param("people") Integer people,
+            @Param("duration") Integer duration,
             Pageable pageable);
 
     @Query(value = "SELECT COUNT(*) FROM tours t " +
@@ -125,17 +131,24 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
             "AND (:year IS NULL OR YEAR(t.created_day) =:year) " +
             "AND (:tourId IS NULL OR t.id =:tourId) " +
             "AND (:state IS NULL OR t.approvals =:state) " +
+            "AND (:price IS NULL OR t.price = :price) " +
+            "AND (:people IS NULL OR :people BETWEEN t.min_group_size AND t.max_group_size) " +
+            "AND (:duration IS NULL OR t.duration = :duration) " +
             "AND (:title IS NULL OR t.title LIKE CONCAT('%', :title, '%'))", nativeQuery = true)
     long countByConditions(
             @Param("month") Integer month,
             @Param("year") Integer year,
             @Param("tourId") Integer tourId,
             @Param("state") Integer state,
-            @Param("title") String title);
+            @Param("title") String title,
+            @Param("price") Integer price,
+            @Param("people") Integer people,
+            @Param("duration") Integer duration
+    );
 
 
 
-    @Query(value = "SELECT t.id,t.title,t.created_day,t.update_day,t.approvals FROM tours t",nativeQuery = true)
+    @Query(value = "SELECT t.id,t.title,t.created_day,t.update_day,t.approvals, m.name, t.duration, t.price, t.max_group_size, t.min_group_size, t.guide_id FROM tours t INNER JOIN member m WHERE t.guide_id = m.id",nativeQuery = true)
     Page<Object[]> findByConditionALL(
             @Param("month") Integer month,
             @Param("year") Integer year,
