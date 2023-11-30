@@ -59,7 +59,7 @@ public class AdminReviewService {
     /**
      * 관리자 인지 체크
      */
-    private void checkAdmin(final int adminId){
+    public void checkAdmin(final int adminId){
         Member admin = memberRepository.findById(adminId).orElseThrow(() -> new RuntimeException("관리자를 찾을수없습니다."));
         if(admin.getRole() != 3){
             throw new RuntimeException("관리자만 접근 가능합니다.");
@@ -67,9 +67,9 @@ public class AdminReviewService {
     }
 
     /**
-     * 리뷰 게시글 가져오기
+     * 작성자 리뷰 게시글 가져오기
      */
-    public AdminSpecificReviewsDTO getReviewList(int adminId, int page, int count, String title, Integer month, Integer year, String name, Integer state){
+    public AdminSpecificReviewsDTO getReviewList(int adminId, int page, int count, String title, Integer month, Integer year, String name, Integer state, Integer memberId){
         checkAdmin(adminId);
         Pageable pageable = PageRequest.of(page,count);
 
@@ -85,11 +85,11 @@ public class AdminReviewService {
         long reviewsCount;
         if (title == null && month == null && year == null && name == null && state == null) {
             // 모든 조건이 null일 경우, 전체 리뷰와 그 개수를 조회
-            reviewPage = reviewsRepository.findAllReviews(pageable,state);
+            reviewPage = reviewsRepository.findAllReviews(pageable,state,memberId);
             reviewsCount = reviewsRepository.countAllReviews(state);
         } else {
             // 하나 이상의 조건이 있을 경우, 조건에 맞는 리뷰와 그 개수를 조회
-            reviewPage = reviewsRepository.findReviewsByConditions(title, month, year, name,state,pageable);
+            reviewPage = reviewsRepository.findReviewsByConditions(title, month, year, name,state,pageable,memberId);
             reviewsCount = reviewsRepository.findReviewsCount(title, month, year, name,state);
         }
 
@@ -103,7 +103,7 @@ public class AdminReviewService {
                     .reviewContent((String) review[2])
                     .createdDay(((Timestamp) review[3]).toLocalDateTime())
                     .status(status)
-                    .memberId((Integer) review[4])
+                    .paymentId((Integer) review[4])
                     .memeberName((String) review[5])
                     .build();
             contentReviews.add(contentReview);
@@ -173,7 +173,7 @@ public class AdminReviewService {
                         .reviewContent(review.getContent())
                         .createdDay(review.getCreatedDay())
                         .status(review.getState() == 1 ? "작성완료" : "삭제됨")
-                        .memberId(review.getMember().getId())
+                        .paymentId(review.getMember().getId())
                         .memeberName(review.getMember().getName())
                         .build())
                 .collect(Collectors.toList());

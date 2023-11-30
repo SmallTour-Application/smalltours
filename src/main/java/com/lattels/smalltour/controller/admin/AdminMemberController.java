@@ -349,30 +349,4 @@ public class AdminMemberController {
 
     }
 
-    // 특정멤버의 이름 수정하기
-    @PostMapping("/update/name")
-    public ResponseEntity<?> memberUpdateName(@ApiIgnore Authentication authentication, @RequestParam int memberId, @RequestBody ListMemberDTO.UpdateName updateName) {
-        try {
-            int adminId = Integer.parseInt(authentication.getPrincipal().toString());
-            String updateMemberName = adminService.updateName(adminId, memberId, updateName.getName());
-            return ResponseEntity.ok().body("성공적으로 수정되었습니다." + updateMemberName);
-        } catch (Exception e) {
-            ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(responseDTO);
-        }
-    }
-
-    // 특정멤버의 이메일 수정하기
-    @PostMapping("/update/email")
-    public ResponseEntity<?> memberUpdateEmail(@ApiIgnore Authentication authentication, @RequestParam int memberId, @RequestBody ListMemberDTO.UpdateEmail updateEmail) {
-        try {
-            int adminId = Integer.parseInt(authentication.getPrincipal().toString());
-            String updateMemberEmail = adminService.updateEmail(adminId, memberId, updateEmail.getEmail());
-            return ResponseEntity.ok().body("성공적으로 수정되었습니다." + updateMemberEmail);
-        } catch (Exception e) {
-            ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
 }

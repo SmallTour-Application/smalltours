@@ -47,16 +47,16 @@ public interface EducationRepository extends JpaRepository<Education, Integer> {
     @Query(value = "SELECT (COUNT(el.guide_id) * 100.0 / (SELECT COUNT(m.id) FROM member m WHERE m.role = 2)) AS completePercent " +
             "FROM education e " +
             "JOIN education_log el ON el.education_id = e.id " +
-            "WHERE el.state = 1 AND el.education_id =:elEducationId",nativeQuery = true)
-    int findCompletedEducation(@Param("elEducationId") int elEducationId);
+            "WHERE el.state = 1 AND el.education_id =:educationId",nativeQuery = true)
+    int findCompletedEducation(@Param("educationId") int educationId);
 
-    @Query(value = "SELECT e.title,e.start_day,e.end_day,e.id,e.state FROM education e WHERE e.state =:state "
+    @Query(value = "SELECT e.title,e.start_day,e.end_day,e.id,e.state FROM education e WHERE e.state =:state AND (e.id = :educationId OR :educationId IS NULL)"
             , nativeQuery = true)
-    List<Object[]> findByGuideEducationContent(Pageable pageable,@Param("state") int state);
+    List<Object[]> findByGuideEducationContent(Pageable pageable,@Param("state") int state,@Param("educationId") Integer educationId);
 
 
-    @Query(value = "SELECT count(*) FROM education e WHERE e.state =:state ",nativeQuery = true)
-    int countState(@Param("state") int state);
+    @Query(value = "SELECT count(*) FROM education e WHERE e.state =:state AND (e.id = :educationId OR :educationId IS NULL)",nativeQuery = true)
+    int countState(@Param("state") int state,@Param("educationId") Integer educationId);
 
 
     @Query(value = "SELECT e.title,e.start_day,e.end_day,el.state,el.completed_date FROM education e JOIN education_log el ON el.education_id = e.id JOIN member m ON el.guide_id = m.id WHERE el.state =:state AND el.guide_id=:guideId"

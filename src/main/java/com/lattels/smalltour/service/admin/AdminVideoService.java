@@ -1,7 +1,6 @@
 package com.lattels.smalltour.service.admin;
 
 
-import com.google.common.base.Preconditions;
 import com.lattels.smalltour.dto.admin.education.EducationDTO;
 import com.lattels.smalltour.dto.admin.education.EducationGuideDTO;
 import com.lattels.smalltour.dto.admin.education.EducationVideoDTO;
@@ -14,6 +13,7 @@ import com.lattels.smalltour.util.FileUploadProgressListener;
 import com.lattels.smalltour.util.MultipartUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.bramp.ffmpeg.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -233,23 +233,22 @@ public class AdminVideoService {
     }
 
     //교육 영상 게시판 목록
-    public EducationDTO commonEducationLog(int adminId, int page, int countPerPage, int state){
-        int i = 1;
+    public EducationDTO commonEducationLog(int adminId, int page, int countPerPage, int state,Integer educationId){
         checkAdmin(adminId);
         //강좌갯수
-        int educationLogCount = educationRepository.countState(state);
+        int educationLogCount = educationRepository.countState(state,educationId);
 
         // 페이지
         Pageable pageable = PageRequest.of(page, countPerPage);
-        //로그 불러오기
-        List<Object[]> results = educationRepository.findByGuideEducationContent(pageable,state);
+
+        List<Object[]> results = educationRepository.findByGuideEducationContent(pageable,state,educationId);
         List<EducationDTO.EducationListDTO> educationLogVideoDTO = new ArrayList<>();
         for (Object[] result : results) {
             //교육영상 당 통계
             int completedVideoMember = educationRepository.findCompletedEducation(Integer.parseInt(String.valueOf(result[3])));
 
             EducationDTO.EducationListDTO educationLogListDTO = EducationDTO.EducationListDTO.builder()
-                    .id(i++)
+                    .id(Integer.parseInt(String.valueOf(result[3])))
                     .educationTitle(((String)result[0]))
                     .startDay(((java.sql.Date)result[1]).toLocalDate())
                     .endDay(((java.sql.Date)result[2]).toLocalDate())
@@ -266,8 +265,8 @@ public class AdminVideoService {
     }
 
     //state에 따라 교육관리 게시판 상태가 0:수강종료(불가능) 1:수강중 2:일시중지
-    public EducationDTO getEducationList(int adminId, int page, int countPerPage,int state){
-        return commonEducationLog(adminId,page,countPerPage,state);
+    public EducationDTO getEducationList(int adminId, int page, int countPerPage,int state,Integer educationId){
+        return commonEducationLog(adminId,page,countPerPage,state,educationId);
     }
 
     //강좌 수강 상태 변경(0:수강 종료 1: 수강가능 2: 일시중지)
