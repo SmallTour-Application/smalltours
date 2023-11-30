@@ -349,4 +349,29 @@ public class AdminMemberController {
 
     }
 
+    // 특정 멤버가 받은 가이드 리뷰 가져오기
+    @GetMapping("/review/guide/receiver")
+    public ResponseEntity<?> getReviewGuideByReceiver(@ApiIgnore Authentication authentication, @RequestParam int memberId, Pageable pageable, @RequestParam int state) {
+        try {
+            int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+            AdminReviewDTO.ReviewListDTO responseMemberDTO = adminMemberService.getGuideReviewByReceiver(memberId, pageable, state);
+            return ResponseEntity.ok().body(responseMemberDTO);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+    // 특정 멤버가 만든 여행들에 대한 리뷰 페이징해서 가져오기
+    @GetMapping("/review/tours/receiver")
+    public ResponseEntity<?> getReviewTours(@ApiIgnore Authentication authentication, @RequestParam int memberId, @RequestParam int state, Pageable pageable) {
+        try {
+            int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+            AdminReviewDTO.ReviewListDTO responseMemberDTO = adminMemberService.getToursReviewReceiver(memberId, pageable, state);
+            return ResponseEntity.ok().body(responseMemberDTO);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

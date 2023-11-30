@@ -31,6 +31,11 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
     //해당 회원이 작성한 리뷰 개수
     int countByMemberId(int memberId);
 
+    //countByGuideIdAndState
+    //해당 가이드에 대한 리뷰 개수
+    @Query("SELECT COUNT(r) FROM Reviews r JOIN r.tours t WHERE t.guide.id = :guideId AND r.tours.id = t.guide.id AND r.state = :state ORDER BY r.createdDay DESC")
+    int countByGuideIdAndState(@Param("guideId") int guideId, @Param("state") int state);
+
 
     @Query("SELECT r FROM Reviews r JOIN r.payment p WHERE r.tours.guide.id = :guideId AND r.payment.id = p.id AND r.payment.tours.id = r.tours.id")
     List<Reviews> findAllByGuideId(@Param("guideId") int guideId, Pageable pageable);
@@ -44,10 +49,19 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
     @Query("SELECT AVG(r.rating) FROM GuideReview r JOIN r.guide g WHERE g.id = :guideId AND g.role = 2")
     Float findAverageRatingByGuideId(@Param("guideId") Integer guideId);
 
+
+    /**
+     * 특정 멤버가 만든 여행의 리뷰를 날짜순으로 가져옵니다
+     */
+    @Query("SELECT r FROM Reviews r JOIN r.tours t WHERE t.guide.id = :guideId AND r.state = :state ORDER BY r.createdDay DESC")
+    List<Reviews> findAllByGuideIdAndStateOrderByCreatedDayDESC(@Param("guideId") int guideId, @Param("state") int state, Pageable pageable);
+
+
     /**
      * 회원이 작성한 리뷰를 페이지에 맞게 최근순으로 반환합니다.
      */
     List<Reviews> findByMemberIdOrderByCreatedDayDesc(int memberId, Pageable pageable);
+
 
     /**
      * 패키지 리뷰를 페이지에 맞게 최근순으로 반환합니다.

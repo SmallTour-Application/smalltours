@@ -29,6 +29,10 @@ public class AdminReviewDTO {
         private String guideName;
         // 패키지아이디
         private int packageId;
+        // state
+        private int state;
+        // 작성자명
+        private String reviewerName;
     }
 
     @Builder
