@@ -103,4 +103,13 @@ public class ListMemberDTO {
             return this.profileImgRequest != null;
         }
     }
+
+    //UpdateEmail
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateEmail{
+        private String email;
+    }
 }

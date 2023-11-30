@@ -51,6 +51,72 @@ public class AdminService {
     @Value("${file.path.tours.images}")
     private String filePathToursImages;
 
+    // 이름 수정 updateName
+    @Transactional
+    public String updateName(final int adminId, final int memberId, final String chgName){
+
+        checkAdmin(adminId);
+
+        if(memberId < 1){
+            log.warn("adminMemberService.updateName() : Id 값이 이상해요");
+            throw new RuntimeException("MemberService.updateName() : Id 값이 이상해요");
+        }
+        if(chgName == null || chgName.equals("")){
+            log.warn("adminMemberService.updateName() : 이름 값을 집어넣으세요");
+            throw new RuntimeException("MemberService.updateName() : 이름 값을 집어넣으세요");
+        }
+
+        try{
+            final Member member = memberRepository.findByMemberId(memberId);
+            member.setName(chgName);
+            memberRepository.save(member); // 수정
+            // 현재 저장되어 있는 값 가져오기
+            final String name = memberRepository.findNameByMemberId(memberId);
+            return name;
+
+        }catch(Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("adminMemberService.updateName() : 올바른 양식으로 입력해 주세요.");
+        }
+
+    }
+
+    // 이메일수정 updateEmail
+    @Transactional
+    public String updateEmail(final int adminId, final int memberId, final String chgEmail){
+
+        checkAdmin(adminId);
+
+        if(memberId < 1){
+            log.warn("adminMemberService.updateEmail() : Id 값이 이상해요");
+            throw new RuntimeException("MemberService.updateEmail() : Id 값이 이상해요");
+        }
+        if(chgEmail == null || chgEmail.equals("")){
+            log.warn("adminMemberService.updateEmail() : 이메일 값을 집어넣으세요");
+            throw new RuntimeException("MemberService.updateEmail() : 이메일 값을 집어넣으세요");
+        }
+        int count = memberRepository.countByEmail(chgEmail);
+        if(count > 0){
+            // 이미 같은 이메일이 있으면
+            log.warn("adminMemberService.updateEmail() : 이미 같은 이메일이 있어요");
+            throw new RuntimeException("MemberService.updateEmail() : 이미 같은 이메일이 있어요");
+        }
+
+        try{
+            final Member member = memberRepository.findByMemberId(memberId);
+            member.setEmail(chgEmail);
+            memberRepository.save(member); // 수정
+            // 현재 저장되어 있는 값 가져오기
+            String email = memberRepository.findEmailByMemberId(memberId);
+            return email;
+
+        }catch(Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("adminMemberService.updateEmail() : 올바른 양식으로 입력해 주세요.");
+        }
+
+    }
+
     public File getMemberDirectoryPath() {
         File file = new File(filePath);
         file.mkdirs();

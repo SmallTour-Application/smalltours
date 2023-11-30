@@ -17,8 +17,16 @@ import java.util.Optional;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Integer> {
 
+
+    //findEmailByMemberId
+    @Query(value = "SELECT email FROM member WHERE id = :id", nativeQuery = true)
+    String findEmailByMemberId(@Param("id") int id);
+
     // 이메일로 찾기
     Member findByEmail(String email);
+
+    // 이메일로 카운팅하기
+    int countByEmail(String email);
 
     // 해당하는 이메일이 있는지 확인
     Boolean existsByEmail (String email);
