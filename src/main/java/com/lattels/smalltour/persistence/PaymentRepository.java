@@ -184,13 +184,16 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
             "AND p.state = 1 ")
     SiteProfitDTO getSiteProfit(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
-    @Query(value = "SELECT p.id AS paymentId, t.id AS tourId, t.title, m.id AS memberId,m.name AS memberName, g.id AS guideId,g.name AS guideName, p.price, p.state, p.departure_day AS departureDay, p.people " +
+    @Query(value = "SELECT p.id AS paymentId, t.id AS tourId, t.title, m.id AS memberId,m.name AS memberName, g.id AS guideId,g.name AS guideName, p.price, p.state, p.departure_day AS departureDay, p.people, p.payment_day AS paymentDay " +
             "FROM payment p " +
             "JOIN tours t ON t.id = p.tour_id " +
             "JOIN member m ON p.member_id = m.id " +
             "JOIN member g ON t.guide_id = g.id " +
-            "WHERE t.id = :tourId AND p.state = 1", nativeQuery = true)
-    Page<AdminInterfacePaymentTourList> findPaymentTourList(@Param("tourId")int tourId, Pageable pageable);
+            "WHERE t.id = :tourId AND p.state = :state", nativeQuery = true)
+    Page<AdminInterfacePaymentTourList> findPaymentTourList(@Param("tourId")int tourId, @Param("state")int state, Pageable pageable);
+
+    //countAllByTourIdAndState
+    int countByToursIdAndState(int tourId, int state);
 
 
 }

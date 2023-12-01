@@ -251,18 +251,19 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     void updateTourPrice(@Param("id") int id, @Param("price") int price);
 
 
-    @Query(value = "SELECT t.id, t.title,t.guide_id,m.name,AVG(r.rating) AS average_rating, t.duration, t.price, t.max_group_size, t.min_group_size," +
-            "CASE WHEN EXISTS (SELECT * " +
-            "FROM guide_lock gl " +
-            "WHERE gl.guide_id = m.id " +
-            "AND :checkDate BETWEEN gl.start_day AND gl.end_day) THEN '예약불가' ELSE '예약가능' END AS status, t.thumb " +
+    @Query(value = "SELECT t.id, t.title,t.guide_id,m.name,AVG(r.rating) AS average_rating, t.duration, t.price, t.max_group_size, t.min_group_size, t.approvals,t.thumb, t.created_day " +
+//            "CASE WHEN EXISTS (SELECT * " +
+//            "FROM guide_lock gl " +
+//            "WHERE gl.guide_id = m.id " +
+//            "AND :checkDate BETWEEN gl.start_day AND gl.end_day) THEN '예약불가' ELSE '예약가능' END AS status, t.thumb " +
             "FROM tours t " +
-            "JOIN member m ON t.guide_id = m.id " +
-            "JOIN reviews r ON r.tour_id = t.id " +
+            "LEFT JOIN member m ON t.guide_id = m.id " +
+            "LEFT JOIN reviews r ON t.id = r.tour_id " +
             "WHERE t.id =:tourId " +
             "GROUP BY t.id", nativeQuery = true)
-    List<Object[]> findTourImgWithAvgRatingAndGuideLock(@Param("tourId") Integer tourId,
-                                                        @Param("checkDate") LocalDate checkDate);
+    List<Object[]> findTourImgWithAvgRatingAndGuideLock(@Param("tourId") Integer tourId
+            //, @Param("checkDate") LocalDate checkDate
+    );
 
 
 

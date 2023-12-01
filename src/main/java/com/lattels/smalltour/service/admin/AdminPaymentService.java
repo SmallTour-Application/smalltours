@@ -210,14 +210,17 @@ public class AdminPaymentService {
      * 특정 패키지에 대한 결제 목록
      * Object[] 대신 interface써서 repository에서 사용
      */
-    public List<AdminPaymentTourListDTO> getPaymentTourList(Authentication authentication, int tourId, int page) {
+    public AdminPaymentTourListDTO.AdminPaymentTourListResponseDTO getPaymentTourList(Authentication authentication, int tourId, int state, int page) {
         checkAdmin(authentication);
 
         Pageable pageable = PageRequest.of(page - 1, 10);
-        Page<AdminInterfacePaymentTourList> paymentTourLists = paymentRepository.findPaymentTourList(tourId, pageable);
-        List<AdminPaymentTourListDTO> paymentTourListDTOs = new ArrayList<>();
+        AdminPaymentTourListDTO.AdminPaymentTourListResponseDTO adminPaymentTourListResponseDTO = new AdminPaymentTourListDTO.AdminPaymentTourListResponseDTO();
+        Page<AdminInterfacePaymentTourList> paymentTourLists = paymentRepository.findPaymentTourList(tourId, state, pageable);
+        adminPaymentTourListResponseDTO.setTotalCnt(paymentRepository.countByToursIdAndState(tourId, state));
+
+        List<AdminPaymentTourListDTO.AdminPaymentTourList> paymentTourListDTOs = new ArrayList<>();
         for (AdminInterfacePaymentTourList ap : paymentTourLists) {
-            paymentTourListDTOs.add(new AdminPaymentTourListDTO(
+            paymentTourListDTOs.add(new AdminPaymentTourListDTO.AdminPaymentTourList(
                     ap.getPaymentId(),
                     ap.getTourId(),
                     ap.getTitle(),
@@ -228,10 +231,12 @@ public class AdminPaymentService {
                     ap.getPrice(),
                     ap.getState(),
                     ap.getDepartureDay(),
-                    ap.getPeople()
+                    ap.getPeople(),
+                    ap.getPaymentDay()
             ));
         }
-        return paymentTourListDTOs;
+        adminPaymentTourListResponseDTO.setPaymentList(paymentTourListDTOs);
+        return adminPaymentTourListResponseDTO;
     }
 }
 
