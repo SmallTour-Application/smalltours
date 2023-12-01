@@ -135,5 +135,19 @@ public class AdminReviewController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 가이드 리뷰 수정
+     * */
+    @ApiOperation("가이드 리뷰 수정")
+    @PostMapping("/guide/update")
+    public ResponseEntity<?> updateGuideReview(@ApiIgnore Authentication authentication,
+                                               @RequestParam(required = true) int reviewId,
+                                                @RequestParam(required = true) int score,
+                                               @RequestParam(required = true) String newContent) {
+        int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+        adminReviewService.updateGuideReview(adminId, score, reviewId,newContent);
+        return ResponseEntity.ok().build();
+    }
+
 
 }

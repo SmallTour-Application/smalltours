@@ -25,6 +25,12 @@ public interface GuideReviewRepository extends JpaRepository<GuideReview, Intege
     @Query("UPDATE GuideReview r SET r.state = 0 WHERE r.id = :id")
     void updateGuideReviewState(@Param("id") int id);
 
+    //updateGuideReviewContent
+    @Modifying
+    @Transactional
+    @Query("UPDATE GuideReview r SET r.content = :content, r.rating = :rating WHERE r.id = :id")
+    void updateGuideReviewContent(@Param("id") int id, @Param("content") String content, @Param("rating") int rating);
+
 
     // 해당 member가 작성한 가이드 리뷰 리스트를 가져옵니다. with pageable
     @Query("SELECT gr FROM GuideReview gr JOIN gr.reviewer m WHERE m.id = :memberId AND m.role = 0")

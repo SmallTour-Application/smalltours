@@ -72,6 +72,21 @@ public class AdminReviewService {
     }
 
     /**
+     * updateGuideReview(adminId, score, reviewId,newContent); 가이드 리뷰 수정
+     * */
+    public void updateGuideReview(int adminId, int score, int reviewId,String newContent) {
+        checkAdmin(adminId);
+
+        GuideReview review = guideReviewRepository.findById(reviewId).orElse(null);
+        Preconditions.checkNotNull(review, "리뷰를 찾을 수 없습니다.", reviewId);
+
+        if (review.getState() == 0) {
+            throw new RuntimeException("해당 리뷰는 삭제된 상태입니다.");
+        }
+        guideReviewRepository.updateGuideReviewContent(reviewId, newContent, score);
+    }
+
+    /**
      * 가이드 리뷰 삭제
      * */
     public void deleteGuideReview(int adminId, int reviewId) {
