@@ -16,4 +16,5 @@ public interface AdminInterfacePaymentTourList {
     Integer getState();
     LocalDate getDepartureDay();
     Integer getPeople();
+    LocalDate getPaymentDay();
 }

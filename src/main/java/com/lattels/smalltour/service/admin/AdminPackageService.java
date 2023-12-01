@@ -118,6 +118,8 @@ public class AdminPackageService {
                 .build();
     }
 
+
+
     public void updateTour(int adminId, int tourId, String title, String subtitle, String description, String meetingPoint, Integer maxGroupSize, Integer minGroupSize) {
         checkAdmin(adminId);
 
@@ -243,7 +245,7 @@ public class AdminPackageService {
     public AdminDetailImgPackageDTO getToursDetailImg(int adminId, Integer tourId) {
         checkAdmin(adminId);
         LocalDate checkDate = LocalDate.now(); // 현재 날짜 or 필요한 날짜를 변수로 설정
-        List<Object[]> tempTourDetailInfo = toursRepository.findTourImgWithAvgRatingAndGuideLock(tourId, checkDate);
+        List<Object[]> tempTourDetailInfo = toursRepository.findTourImgWithAvgRatingAndGuideLock(tourId);
         Object[] tourDetailInfo = tempTourDetailInfo.get(0);
 
         log.info(String.valueOf(tourDetailInfo[0]));
@@ -253,7 +255,7 @@ public class AdminPackageService {
                 .tourName(String.valueOf(tourDetailInfo[1]))
                 .guideId(Integer.parseInt(String.valueOf(tourDetailInfo[2])))
                 .tourSeller(String.valueOf(tourDetailInfo[3]))
-                .rating(Float.parseFloat(String.valueOf(tourDetailInfo[4])))
+                .rating((tourDetailInfo[4] != null) ? Float.parseFloat(String.valueOf(tourDetailInfo[4])) : 0)
                 .duration(Integer.parseInt(String.valueOf(tourDetailInfo[5])))
                 .price(Integer.parseInt(String.valueOf(tourDetailInfo[6])))
                 .maxPeople(Integer.parseInt(String.valueOf(tourDetailInfo[7])))
@@ -263,6 +265,7 @@ public class AdminPackageService {
 
         if (String.valueOf(tourDetailInfo[8]) != null) {
             adminToursImgDetailList.setProfile(domain + port + "/img/tours/" + String.valueOf(tourDetailInfo[10]));
+            adminToursImgDetailList.setCreatedDay(String.valueOf(tourDetailInfo[11]));
         }
 
         return adminToursImgDetailList;

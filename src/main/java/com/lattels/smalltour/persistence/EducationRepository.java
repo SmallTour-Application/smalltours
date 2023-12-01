@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.parameters.P;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,5 +66,21 @@ public interface EducationRepository extends JpaRepository<Education, Integer> {
 
     @Query(value = "SELECT count(*) FROM education_log el JOIN member m ON el.guide_id = m.id WHERE el.state =:state AND el.guide_id =:guideId",nativeQuery = true)
     int countStateEducationLog(@Param("state") int state,@Param("guideId") int memberId);
+
+
+    /**
+     * 이름, 기간으로 education 조회
+     * */
+    List<Education> findByTitleContainingAndStartDayGreaterThanEqualAndEndDayLessThanEqualOrderByEndDayDesc(String title, LocalDate startDay, LocalDate endDay, Pageable pageable);
+
+    int countByTitleContainingAndStartDayGreaterThanEqualAndEndDayLessThanEqual(String title, LocalDate startDay, LocalDate endDay);
+
+    /**
+     * 이름으로만 조회
+     * */
+    List<Education> findByTitleContainingOrderByEndDayDesc(String title, Pageable pageable);
+
+    int countByTitleContaining(String title);
+
 
 }
