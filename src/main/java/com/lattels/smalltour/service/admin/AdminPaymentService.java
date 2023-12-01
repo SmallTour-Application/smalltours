@@ -3,6 +3,7 @@ package com.lattels.smalltour.service.admin;
 
 import com.lattels.smalltour.dto.admin.member.ListMemberDTO;
 import com.lattels.smalltour.dto.admin.payment.AdminPaymentListDTO;
+import com.lattels.smalltour.dto.admin.payment.AdminPaymentUnDetailListDTO;
 import com.lattels.smalltour.dto.payment.PaymentMemberInfoDTO;
 import com.lattels.smalltour.dto.payment.PaymentMemberListDTO;
 import com.lattels.smalltour.model.Member;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -76,29 +78,29 @@ public class AdminPaymentService {
     }
 
     //공통메서드. 사이트 결제 목록가져오기(상태에 따라 다르게 가져오는건 밑에 메서드에서 구현)
-    public List<PaymentMemberListDTO> common(List<Payment> payment){
-        List<PaymentMemberListDTO> pl = new ArrayList<>();
+    public List<AdminPaymentUnDetailListDTO> common(List<Payment> payment){
+        List<AdminPaymentUnDetailListDTO> pl = new ArrayList<>();
         int counter = 1;
         // 결제한 사람이 회원인지 확인
         for (Payment payments : payment) {
-            Member member = payments.getMember();
             // 출발일 가져오기
             LocalDate departureDay = payments.getDepartureDay();
             int people = payments.getPeople();
 
-            PaymentMemberListDTO paymentMemberListDTO = PaymentMemberListDTO.builder()
+            AdminPaymentUnDetailListDTO adminPaymentUnDetailListDTO = AdminPaymentUnDetailListDTO.builder()
                     .id(counter)
-                    .tourName(payments.getTours().getTitle())
-                    //.memberId(member.getId())
-                    .email(member.getEmail())
+                    .tourId(payments.getTours().getId()) // 패키지 아이디
+                    .tourName(payments.getTours().getTitle()) //패키지(투어) 이름
+                    .email(payments.getMember().getEmail())
                     .price(payments.getTours().getPrice())
-                    .memberName(member.getName())
+                    .memberId(payments.getMember().getId()) //결제한 사람 id
+                    .memberName(payments.getMember().getName())
                     .people(people)
                     .departureDay(departureDay)
                     .state(payments.getState())
                     .build();
             // PaymentMemberInfoDTO 객체 생성하여 반환
-            pl.add(paymentMemberListDTO);
+            pl.add(adminPaymentUnDetailListDTO);
             counter++;
 
         }
@@ -108,33 +110,33 @@ public class AdminPaymentService {
     /*사이트내 회원들 결제정보 (role = 0)
      *  결제완료
      *  */
-    public List<PaymentMemberListDTO> getPaymentMemberList(Authentication authentication, int page, int countPerPage) {
+    public List<AdminPaymentUnDetailListDTO> getPaymentMemberList(Authentication authentication,Integer memberId, int page, int countPerPage) {
         checkAdmin(authentication);
         // 페이지 계산
         Pageable pageable = PageRequest.of(page, countPerPage);
-        List<Payment> payment = paymentRepository.findByPaymentMemberId(pageable);
+        List<Payment> payment = paymentRepository.findByPaymentMemberId(memberId,pageable);
         return common(payment);
     }
 
     /*사이트내 회원들 결제취소 (role = 0)
      *  결제취소
      *  */
-    public List<PaymentMemberListDTO> getPaymentCancelMemberList(Authentication authentication, int page, int countPerPage) {
+    public List<AdminPaymentUnDetailListDTO> getPaymentCancelMemberList(Authentication authentication,Integer memberId, int page, int countPerPage) {
         checkAdmin(authentication);
         // 페이지 계산
         Pageable pageable = PageRequest.of(page, countPerPage);
-        List<Payment> payment = paymentRepository.findByPaymentCancelMemberId(pageable);
+        List<Payment> payment = paymentRepository.findByPaymentCancelMemberId(memberId,pageable);
         return common(payment);
     }
 
     /*사이트내 회원들 결제환불 (role = 0)
      *  결제취소
      *  */
-    public List<PaymentMemberListDTO> getPaymentrefundMemberList(Authentication authentication, int page, int countPerPage) {
+    public List<AdminPaymentUnDetailListDTO> getPaymentrefundMemberList(Authentication authentication,Integer memberId, int page, int countPerPage) {
         checkAdmin(authentication);
         // 페이지 계산
         Pageable pageable = PageRequest.of(page, countPerPage);
-        List<Payment> payment = paymentRepository.findByPaymentRefundMemberId(pageable);
+        List<Payment> payment = paymentRepository.findByPaymentRefundMemberId(memberId,pageable);
         return common(payment);
     }
 
@@ -175,6 +177,7 @@ public class AdminPaymentService {
                     .price(payment.get(0).getPrice())
                     // 결제인원
                     .people(payment.get(0).getPeople())
+                    .departureDay(payment.get(0).getDepartureDay())
                     // 결제일
                     .paymentDay(payment.get(0).getPaymentDay())
                     //결과(state)

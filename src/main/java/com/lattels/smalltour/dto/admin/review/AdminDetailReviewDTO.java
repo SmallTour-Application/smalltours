@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class AdminDetailReviewDTO {
     private long count; // 검색결과 갯수
-    private List<detailedReview> deatilReviews;
+    private detailedReview detailReviews;
 
 
     @Data
@@ -24,7 +24,9 @@ public class AdminDetailReviewDTO {
     public static class detailedReview {
         private int id; //해당 멤버 id값
         private String tourName;
+        private int guideId;
         private String guideName;
+        private int buyId; //작성자
         private String buyName;
         private float rating;
         private String reviewContent;

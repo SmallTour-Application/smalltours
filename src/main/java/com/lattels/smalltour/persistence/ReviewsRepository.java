@@ -110,23 +110,25 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
     String getRating(@Param("tours") Tours tours);
 
 
-    @Query(value = "SELECT r.id, t.title, r.content, r.created_day, p.id, m.name, r.state " +
+    @Query(value = "SELECT r.id AS reviewId, t.title, r.content, r.created_day, p.id AS paymentId, m.name, r.state, r.member_id AS reviewerId, g.id AS guideId " +
             "FROM reviews r " +
-            "JOIN payment p ON r.payment_id = p.id " +
-            "JOIN tours t ON r.tour_id = t.id " +
-            "JOIN member m ON r.member_id = m.id " +
+            "INNER JOIN payment p ON r.payment_id = p.id " +
+            "INNER JOIN tours t ON r.tour_id = t.id " +
+            "INNER JOIN member m ON r.member_id = m.id " +
+            "INNER JOIN member g ON t.guide_id = g.id " +
             "WHERE (:title IS NULL OR t.title LIKE CONCAT('%', :title, '%')) " +
             "AND (:month IS NULL OR MONTH(r.created_day) = :month) " +
             "AND (:year IS NULL OR YEAR(r.created_day) = :year) " +
             "AND (:name IS NULL OR m.name LIKE CONCAT('%', :name, '%')) " +
-            "AND r.state =:state AND r.member_id =:memberId", nativeQuery = true)
+            "AND (:state IS NULL OR r.state = :state) " +
+            "AND (:memberId IS NULL OR r.member_id = :memberId)", nativeQuery = true)
     Page<Object[]> findReviewsByConditions(@Param("title") String title,
                                            @Param("month") Integer month,
                                            @Param("year") Integer year,
                                            @Param("name") String name,
                                            @Param("state") Integer state,
-                                           Pageable pageable,
-                                           @Param("memberId") Integer memberId);
+                                           @Param("memberId") Integer memberId,
+                                           Pageable pageable);
 
     @Query(value = "SELECT count(r.id) " +
             "FROM reviews r " +
@@ -137,7 +139,7 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
             "AND (:month IS NULL OR MONTH(r.created_day) = :month) " +
             "AND (:year IS NULL OR YEAR(r.created_day) = :year) " +
             "AND (:name IS NULL OR m.name LIKE CONCAT('%', :name, '%')) " +
-            "AND r.state =:state", nativeQuery = true)
+            "AND (:state IS NULL OR r.state =:state) ", nativeQuery = true)
     long findReviewsCount(@Param("title") String title,
                           @Param("month") Integer month,
                           @Param("year") Integer year,
@@ -146,21 +148,21 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
 
 
 
-    @Query(value = "SELECT r.id, t.title, r.content, r.created_day, p.id, m.name, r.state " +
+    @Query(value = "SELECT r.id AS reviewId, t.title, r.content, r.created_day, p.id AS paymentId, m.name, r.state, r.member_id AS memberId, g.id AS guideId " +
             "FROM reviews r " +
             "JOIN payment p ON r.payment_id = p.id " +
             "JOIN tours t ON r.tour_id = t.id " +
             "JOIN member m ON r.member_id = m.id " +
-            "WHERE r.member_id =:memberId AND r.state =:state" , nativeQuery = true)
-    Page<Object[]> findAllReviews(Pageable pageable,@Param("state") Integer state,@Param("memberId") Integer memberId);
+            "JOIN member g ON t.guide_id = g.id " , nativeQuery = true)
+    Page<Object[]> findAllReviews(Pageable pageable);
+
 
     @Query(value = "SELECT count(r.id) " +
             "FROM reviews r " +
             "JOIN payment p ON r.payment_id = p.id " +
             "JOIN tours t ON r.tour_id = t.id " +
-            "JOIN member m ON r.member_id = m.id " +
-            "AND r.state =:state", nativeQuery = true)
-    long countAllReviews(@Param("state") Integer state);
+            "JOIN member m ON r.member_id = m.id " , nativeQuery = true)
+    long countAllReviews();
 
 
     @Modifying
@@ -184,26 +186,40 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
     @Query("UPDATE Reviews r SET r.state = 0 WHERE r.tours.id = :tourId AND r.id = :reviewId")
     void updateTourReviewState(@Param("tourId") int tourId,@Param("reviewId") int reviewId);
 
-    Page<Reviews> findByToursIdAndState(int tourId, int state, Pageable pageable);
-    Page<Reviews> findByToursId(int tourId, Pageable pageable);
+    @Query(value = "SELECT r.id AS reviewId, t.title, r.content, r.created_day, r.state, p.id AS paymentId, m.name, m.id AS memberId, g.id AS guideId " +
+            "FROM reviews r " +
+            "JOIN tours t ON r.tour_id = t.id " +
+            "JOIN member m ON r.member_id = m.id " +
+            "JOIN member g ON t.guide_id = g.id " +
+            "JOIN payment p ON r.payment_id = p.id " +
+            "WHERE (:tourId IS NULL OR t.id = :tourId) " +
+            "AND (:state IS NULL OR r.state = :state)", nativeQuery = true)
+    Page<Object[]> findByToursIdAndState(@Param("tourId") Integer tourId, @Param("state") Integer state, Pageable pageable);
+
+    @Query(value = "SELECT r.id AS reviewId, t.title, r.content, r.created_day, r.state, p.id AS paymentId, m.name, m.id AS memberId, g.id AS guideId " +
+            "FROM reviews r " +
+            "JOIN tours t ON r.tour_id = t.id " +
+            "JOIN member m ON r.member_id = m.id " +
+            "JOIN member g ON t.guide_id = g.id " +
+            "JOIN payment p ON r.payment_id = p.id", nativeQuery = true)
+    Page<Object[]> findByToursId(Pageable pageable);
 
 
 
 
     @Query(value = "SELECT " +
-            "r.id AS review_id, " +
-            "t.title AS tour_title, " +
-            "guide.name AS guide_name, " +
-            "buyer.name AS member_name, " +
-            "r.rating AS review_rating, " +
-            "r.content AS review_content " +
+            "r.id AS reviewId, " +
+            "t.title , " +
+            "guide.id AS guideId, guide.name , " +
+            "buyer.id AS buyerId, buyer.name , " +
+            "r.rating , " +
+            "r.content  " +
             "FROM Reviews r " +
             "JOIN r.tours t " +
             "JOIN Member guide ON t.guide = guide AND guide.role = 2 " +
             "JOIN Member buyer ON r.member = buyer AND buyer.role = 0 " +
-            "WHERE buyer.id = :memberId " +
-            "AND (:title IS NULL OR t.title LIKE %:title%)")
-    Page<Object[]> findReviewsByBuyerId(@Param("memberId") int memberId,@Param("title") String title, Pageable pageable);
+            "WHERE buyer.id = :memberId AND r.id = :reviewId")
+    List<Object[]> findReviewsByBuyerId(@Param("memberId") int memberId,@Param("reviewId") int reviewId);
 
     @Modifying
     @Transactional

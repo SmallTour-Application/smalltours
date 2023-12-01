@@ -86,6 +86,7 @@ public class AdminReviewService {
         guideReviewRepository.updateGuideReviewContent(reviewId, newContent, score);
     }
 
+
     /**
      * 가이드 리뷰 삭제
      * */
@@ -119,12 +120,12 @@ public class AdminReviewService {
         long reviewsCount;
         if (title == null && month == null && year == null && name == null && state == null) {
             // 모든 조건이 null일 경우, 전체 리뷰와 그 개수를 조회
-            reviewPage = reviewsRepository.findAllReviews(pageable,state,memberId);
-            reviewsCount = reviewsRepository.countAllReviews(state);
+            reviewPage = reviewsRepository.findAllReviews(pageable);
+            reviewsCount = reviewPage.getTotalElements();
         } else {
             // 하나 이상의 조건이 있을 경우, 조건에 맞는 리뷰와 그 개수를 조회
-            reviewPage = reviewsRepository.findReviewsByConditions(title, month, year, name,state,pageable,memberId);
-            reviewsCount = reviewsRepository.findReviewsCount(title, month, year, name,state);
+            reviewPage = reviewsRepository.findReviewsByConditions(title, month, year, name,state,memberId,pageable);
+            reviewsCount = reviewPage.getTotalElements();
         }
 
         List<AdminSpecificReviewsDTO.ContentReview> contentReviews = new ArrayList<>();
@@ -139,6 +140,8 @@ public class AdminReviewService {
                     .status(status)
                     .paymentId((Integer) review[4])
                     .memeberName((String) review[5])
+                    .memberId((Integer) review[7]) //리뷰 작성자
+                    .guideId((Integer) review[8]) // 리뷰를 받은 당사자 아이디(가이드)
                     .build();
             contentReviews.add(contentReview);
         }
@@ -187,28 +190,30 @@ public class AdminReviewService {
     /**
      * 특정 투어에 대한 리뷰 목록 가져오기
      */
-    public AdminSpecificReviewsDTO getTourReviews(int adminId, int tourId, int page, int count, Integer state) {
+    public AdminSpecificReviewsDTO getTourReviews(int adminId, Integer tourId, int page, int count, Integer state) {
         checkAdmin(adminId);
         Pageable pageable = PageRequest.of(page, count);
-        Page<Reviews> reviewsPage;
+        Page<Object[]> reviewsPage;
 
-        if (state != null) {
+        if (state != null || tourId != null) {
             reviewsPage = reviewsRepository.findByToursIdAndState(tourId, state, pageable);
         } else {
-            reviewsPage = reviewsRepository.findByToursId(tourId, pageable);
+            reviewsPage = reviewsRepository.findByToursId(pageable);
         }
 
         long reviewsCount = reviewsPage.getTotalElements();
 
         List<AdminSpecificReviewsDTO.ContentReview> contentReviews = reviewsPage.getContent().stream()
                 .map(review -> AdminSpecificReviewsDTO.ContentReview.builder()
-                        .id(review.getId())
-                        .tourName(review.getTours().getTitle()) // 예시: 투어 제목
-                        .reviewContent(review.getContent())
-                        .createdDay(review.getCreatedDay())
-                        .status(review.getState() == 1 ? "작성완료" : "삭제됨")
-                        .paymentId(review.getMember().getId())
-                        .memeberName(review.getMember().getName())
+                        .id((Integer) review[0]) // r.id
+                        .tourName((String) review[1]) // t.title
+                        .reviewContent((String) review[2]) // r.content
+                        .createdDay(((Timestamp) review[3]).toLocalDateTime()) // r.created_day
+                        .status((Integer) review[4] == 1 ? "작성완료" : "삭제됨") // r.state
+                        .paymentId((Integer) review[5]) // p.id
+                        .memeberName((String) review[6]) // m.name
+                        .memberId((Integer) review[7]) // m.id AS memberId
+                        .guideId((Integer) review[8]) // g.id AS guideId
                         .build())
                 .collect(Collectors.toList());
 
@@ -246,34 +251,40 @@ public class AdminReviewService {
 
 
     /**
-        리뷰 목록 -> 클릭 -> 해당 멤버가 작성한 리뷰,
-        상품의 title로 검색할수있게함
+     리뷰 목록 -> 클릭 -> 해당 멤버가 작성한 리뷰,
+     상품의 title로 검색할수있게함
      */
 
-    public AdminDetailReviewDTO getReviewsByBuyer(int adminId, int memberId,String title, int page, int size) {
+    public AdminDetailReviewDTO getReviewsByBuyer(int adminId, int memberId,int reviewId) {
         checkAdmin(adminId);
-        Pageable pageable = PageRequest.of(page, size);
 
-        Page<Object[]> reviewPage = reviewsRepository.findReviewsByBuyerId(memberId, title,pageable);
+        List<Object[]> reviewList = reviewsRepository.findReviewsByBuyerId(memberId,reviewId);
 
-        List<AdminDetailReviewDTO.detailedReview> detailedReviews = reviewPage.getContent().stream()
-                .map(objects -> {
-                    return AdminDetailReviewDTO.detailedReview.builder()
-                            .id((Integer) objects[0])
-                            .tourName((String) objects[1])
-                            .guideName((String) objects[2])
-                            .buyName((String) objects[3])
-                            .rating((Integer) objects[4])
-                            .reviewContent((String) objects[5])
-                            .build();
+        // 첫 번째 리뷰 가져오기
+        Object[] review = reviewList.isEmpty() ? null : reviewList.get(0);
 
-                }).collect(Collectors.toList());
+        // 첫 번째 리뷰가 있을 경우에만 DTO 생성
+        AdminDetailReviewDTO.detailedReview detailedReview = null;
+        if (review != null) {
+            detailedReview = AdminDetailReviewDTO.detailedReview.builder()
+                    .id((Integer) review[0])
+                    .tourName((String) review[1])
+                    .guideId((Integer) review[2])
+                    .guideName((String) review[3])
+                    .buyId((Integer) review[4])
+                    .buyName((String) review[5])
+                    .rating((Integer) review[6])
+                    .reviewContent((String) review[7])
+                    .build();
+        }
 
         return AdminDetailReviewDTO.builder()
-                .count(reviewPage.getTotalElements())
-                .deatilReviews(detailedReviews)
+                .count(review != null ? 1L : 0L) // 리뷰가 있으면 1, 없으면 0
+                .detailReviews(detailedReview)
                 .build();
     }
+
+
 
 
     /**
