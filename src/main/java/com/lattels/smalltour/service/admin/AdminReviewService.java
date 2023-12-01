@@ -130,18 +130,19 @@ public class AdminReviewService {
 
         List<AdminSpecificReviewsDTO.ContentReview> contentReviews = new ArrayList<>();
         for (Object[] review : reviewPage) {
-            String status = (Integer) review[6] == 1 ? "작성완료" : "삭제됨";
+            String status = (Integer) review[7] == 1 ? "작성완료" : "삭제됨";
 
             AdminSpecificReviewsDTO.ContentReview contentReview = AdminSpecificReviewsDTO.ContentReview.builder()
                     .id((Integer) review[0])
-                    .tourName((String) review[1])
-                    .reviewContent((String) review[2])
-                    .createdDay(((Timestamp) review[3]).toLocalDateTime())
+                    .tourId((Integer) review[1])
+                    .tourName((String) review[2])
+                    .reviewContent((String) review[3])
+                    .createdDay(((Timestamp) review[4]).toLocalDateTime())
                     .status(status)
-                    .paymentId((Integer) review[4])
-                    .memeberName((String) review[5])
-                    .memberId((Integer) review[7]) //리뷰 작성자
-                    .guideId((Integer) review[8]) // 리뷰를 받은 당사자 아이디(가이드)
+                    .paymentId((Integer) review[5])
+                    .memeberName((String) review[6])
+                    .memberId((Integer) review[8]) //리뷰 작성자
+                    .guideId((Integer) review[9]) // 리뷰를 받은 당사자 아이디(가이드)
                     .build();
             contentReviews.add(contentReview);
         }
@@ -206,14 +207,15 @@ public class AdminReviewService {
         List<AdminSpecificReviewsDTO.ContentReview> contentReviews = reviewsPage.getContent().stream()
                 .map(review -> AdminSpecificReviewsDTO.ContentReview.builder()
                         .id((Integer) review[0]) // r.id
-                        .tourName((String) review[1]) // t.title
-                        .reviewContent((String) review[2]) // r.content
-                        .createdDay(((Timestamp) review[3]).toLocalDateTime()) // r.created_day
-                        .status((Integer) review[4] == 1 ? "작성완료" : "삭제됨") // r.state
-                        .paymentId((Integer) review[5]) // p.id
-                        .memeberName((String) review[6]) // m.name
-                        .memberId((Integer) review[7]) // m.id AS memberId
-                        .guideId((Integer) review[8]) // g.id AS guideId
+                        .tourId((Integer) review[1])
+                        .tourName((String) review[2]) // t.title
+                        .reviewContent((String) review[3]) // r.content
+                        .createdDay(((Timestamp) review[4]).toLocalDateTime()) // r.created_day
+                        .status((Integer) review[5] == 1 ? "작성완료" : "삭제됨") // r.state
+                        .paymentId((Integer) review[6]) // p.id
+                        .memeberName((String) review[7]) // m.name
+                        .memberId((Integer) review[8]) // m.id AS memberId
+                        .guideId((Integer) review[9]) // g.id AS guideId
                         .build())
                 .collect(Collectors.toList());
 
@@ -268,13 +270,14 @@ public class AdminReviewService {
         if (review != null) {
             detailedReview = AdminDetailReviewDTO.detailedReview.builder()
                     .id((Integer) review[0])
-                    .tourName((String) review[1])
-                    .guideId((Integer) review[2])
-                    .guideName((String) review[3])
-                    .buyId((Integer) review[4])
-                    .buyName((String) review[5])
-                    .rating((Integer) review[6])
-                    .reviewContent((String) review[7])
+                    .tourId((Integer) review[1])
+                    .tourName((String) review[2])
+                    .guideId((Integer) review[3])
+                    .guideName((String) review[4])
+                    .buyId((Integer) review[5])
+                    .buyName((String) review[6])
+                    .rating((Integer) review[7])
+                    .reviewContent((String) review[8])
                     .build();
         }
 

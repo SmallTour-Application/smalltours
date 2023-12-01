@@ -19,6 +19,7 @@ public class AdminSpecificReviewsDTO {
     @AllArgsConstructor
     public static class ContentReview {
         private int id; //해당 멤버 id값
+        private int tourId;
         private String tourName;
         private String reviewContent;
         private LocalDateTime createdDay;

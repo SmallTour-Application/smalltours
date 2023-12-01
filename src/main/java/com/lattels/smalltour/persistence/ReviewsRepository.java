@@ -110,7 +110,7 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
     String getRating(@Param("tours") Tours tours);
 
 
-    @Query(value = "SELECT r.id AS reviewId, t.title, r.content, r.created_day, p.id AS paymentId, m.name, r.state, r.member_id AS reviewerId, g.id AS guideId " +
+    @Query(value = "SELECT r.id AS reviewId,t.id, t.title, r.content, r.created_day, p.id AS paymentId, m.name, r.state, r.member_id AS reviewerId, g.id AS guideId " +
             "FROM reviews r " +
             "INNER JOIN payment p ON r.payment_id = p.id " +
             "INNER JOIN tours t ON r.tour_id = t.id " +
@@ -148,7 +148,7 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
 
 
 
-    @Query(value = "SELECT r.id AS reviewId, t.title, r.content, r.created_day, p.id AS paymentId, m.name, r.state, r.member_id AS memberId, g.id AS guideId " +
+    @Query(value = "SELECT r.id AS reviewId,t.id, t.title, r.content, r.created_day, p.id AS paymentId, m.name, r.state, r.member_id AS memberId, g.id AS guideId " +
             "FROM reviews r " +
             "JOIN payment p ON r.payment_id = p.id " +
             "JOIN tours t ON r.tour_id = t.id " +
@@ -186,7 +186,7 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
     @Query("UPDATE Reviews r SET r.state = 0 WHERE r.tours.id = :tourId AND r.id = :reviewId")
     void updateTourReviewState(@Param("tourId") int tourId,@Param("reviewId") int reviewId);
 
-    @Query(value = "SELECT r.id AS reviewId, t.title, r.content, r.created_day, r.state, p.id AS paymentId, m.name, m.id AS memberId, g.id AS guideId " +
+    @Query(value = "SELECT r.id AS reviewId,t.id, t.title, r.content, r.created_day, r.state, p.id AS paymentId, m.name, m.id AS memberId, g.id AS guideId " +
             "FROM reviews r " +
             "JOIN tours t ON r.tour_id = t.id " +
             "JOIN member m ON r.member_id = m.id " +
@@ -196,7 +196,7 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
             "AND (:state IS NULL OR r.state = :state)", nativeQuery = true)
     Page<Object[]> findByToursIdAndState(@Param("tourId") Integer tourId, @Param("state") Integer state, Pageable pageable);
 
-    @Query(value = "SELECT r.id AS reviewId, t.title, r.content, r.created_day, r.state, p.id AS paymentId, m.name, m.id AS memberId, g.id AS guideId " +
+    @Query(value = "SELECT r.id AS reviewId,t.id, t.title, r.content, r.created_day, r.state, p.id AS paymentId, m.name, m.id AS memberId, g.id AS guideId " +
             "FROM reviews r " +
             "JOIN tours t ON r.tour_id = t.id " +
             "JOIN member m ON r.member_id = m.id " +
@@ -209,7 +209,7 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
 
     @Query(value = "SELECT " +
             "r.id AS reviewId, " +
-            "t.title , " +
+            "t.id,t.title , " +
             "guide.id AS guideId, guide.name , " +
             "buyer.id AS buyerId, buyer.name , " +
             "r.rating , " +
