@@ -26,6 +26,7 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     List<Tours> findByMemberId(@Param("memberId") int memberId, Pageable pageable);
 
 
+
     List<Tours> findAll();
 
     /**
@@ -106,14 +107,11 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
 
 
 
-    @Query(value = "SELECT t.id,t.title,t.created_day,t.update_day,t.approvals, m.name, t.duration, t.price, t.max_group_size, t.min_group_size, t.guide_id FROM tours t INNER JOIN member m WHERE t.guide_id = m.id " +
-            "AND (:month IS NULL OR MONTH(t.created_day) = :month) " +
+    @Query(value = "SELECT t.id,t.title,t.created_day,t.update_day,t.approvals FROM tours t " +
+            "WHERE (:month IS NULL OR MONTH(t.created_day) = :month) " +
             "AND (:year IS NULL OR YEAR(t.created_day) = :year) " +
             "AND (:tourId IS NULL OR t.id = :tourId) " +
             "AND (:state IS NULL OR t.approvals = :state) " +
-            "AND (:price IS NULL OR t.price = :price) " +
-            "AND (:people IS NULL OR :people BETWEEN t.min_group_size AND t.max_group_size) " +
-            "AND (:duration IS NULL OR t.duration = :duration) " +
             "AND (:title IS NULL OR t.title LIKE CONCAT('%', :title, '%')) ", nativeQuery = true)
     Page<Object[]> findByConditions(
             @Param("month") Integer month,
@@ -121,9 +119,6 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
             @Param("tourId") Integer tourId,
             @Param("state") Integer state,
             @Param("title") String title,
-            @Param("price") Integer price,
-            @Param("people") Integer people,
-            @Param("duration") Integer duration,
             Pageable pageable);
 
     @Query(value = "SELECT COUNT(*) FROM tours t " +
@@ -131,24 +126,17 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
             "AND (:year IS NULL OR YEAR(t.created_day) =:year) " +
             "AND (:tourId IS NULL OR t.id =:tourId) " +
             "AND (:state IS NULL OR t.approvals =:state) " +
-            "AND (:price IS NULL OR t.price = :price) " +
-            "AND (:people IS NULL OR :people BETWEEN t.min_group_size AND t.max_group_size) " +
-            "AND (:duration IS NULL OR t.duration = :duration) " +
             "AND (:title IS NULL OR t.title LIKE CONCAT('%', :title, '%'))", nativeQuery = true)
     long countByConditions(
             @Param("month") Integer month,
             @Param("year") Integer year,
             @Param("tourId") Integer tourId,
             @Param("state") Integer state,
-            @Param("title") String title,
-            @Param("price") Integer price,
-            @Param("people") Integer people,
-            @Param("duration") Integer duration
-    );
+            @Param("title") String title);
 
 
 
-    @Query(value = "SELECT t.id,t.title,t.created_day,t.update_day,t.approvals, m.name, t.duration, t.price, t.max_group_size, t.min_group_size, t.guide_id FROM tours t INNER JOIN member m WHERE t.guide_id = m.id",nativeQuery = true)
+    @Query(value = "SELECT t.id,t.title,t.created_day,t.update_day,t.approvals FROM tours t",nativeQuery = true)
     Page<Object[]> findByConditionALL(
             @Param("month") Integer month,
             @Param("year") Integer year,
@@ -214,7 +202,7 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     void deleteTourById(@Param("id") int id);
 
 
-    @Query(value = "SELECT t.id, t.title,t.guide_id, AVG(r.rating) AS average_rating, t.duration, t.price, t.max_group_size," +
+    @Query(value = "SELECT t.id, t.title,t.guide_id,m.name, AVG(r.rating) AS average_rating, t.duration, t.price, t.max_group_size," +
             "CASE WHEN EXISTS (SELECT * " +
             "FROM guide_lock gl " +
             "WHERE gl.guide_id = m.id " +
@@ -224,18 +212,32 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
             "JOIN reviews r ON r.tour_id = t.id " +
             "WHERE :tourId IS NULL OR t.id =:tourId " +
             "GROUP BY t.id", nativeQuery = true)
-    Page<Object[]> findTourWithAvgRatingAndGuideLock(@Param("tourId") Integer tourId,
-                                                     @Param("checkDate") LocalDate checkDate,
-                                                     Pageable pageable);
+    List<Object[]> findTourWithAvgRatingAndGuideLock(@Param("tourId") Integer tourId,
+                                                     @Param("checkDate") LocalDate checkDate);
+
+    @Query(value = "SELECT t.id, t.title,t.guide_id,m.name, AVG(r.rating) AS average_rating, t.duration, t.price, t.max_group_size," +
+            "CASE WHEN EXISTS (SELECT * " +
+            "FROM guide_lock gl " +
+            "WHERE gl.guide_id = m.id " +
+            "AND :checkDate BETWEEN gl.start_day AND gl.end_day) THEN '예약불가' ELSE '예약가능' END AS status " +
+            "FROM tours t " +
+            "JOIN member m ON t.guide_id = m.id " +
+            "JOIN reviews r ON r.tour_id = t.id " +
+            "WHERE :tourId IS NULL OR t.id =:tourId " +
+            "GROUP BY t.id", nativeQuery = true)
+    Page<Object[]> findPageTourWithAvgRatingAndGuideLock(@Param("tourId") Integer tourId,
+                                                         @Param("checkDate") LocalDate checkDate,
+                                                         Pageable pageable);
 
     @Modifying
     @Transactional
-    @Query("UPDATE Tours t SET t.title = :title, t.duration = :duration, t.price = :price , t.maxGroupSize = :maxGroupSize WHERE t.id = :id")
+    @Query("UPDATE Tours t SET t.title =:title, t.duration =:duration, t.price =:price , t.maxGroupSize =:maxGroupSize , t.minGroupSize =:minGroupSize WHERE t.id = :id")
     void updateTourDetails(@Param("id") int id,
                            @Param("title") String title,
                            @Param("duration") int duration,
                            @Param("price") int price,
-                           @Param("maxGroupSize") int maxGroupSize);
+                           @Param("maxGroupSize") int maxGroupSize,
+                           @Param("minGroupSize") int minGroupSize);
 
 
     @Modifying
@@ -249,7 +251,7 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     void updateTourPrice(@Param("id") int id, @Param("price") int price);
 
 
-    @Query(value = "SELECT t.id, t.title,t.guide_id, AVG(r.rating) AS average_rating, t.duration, t.price, t.max_group_size," +
+    @Query(value = "SELECT t.id, t.title,t.guide_id,m.name,AVG(r.rating) AS average_rating, t.duration, t.price, t.max_group_size," +
             "CASE WHEN EXISTS (SELECT * " +
             "FROM guide_lock gl " +
             "WHERE gl.guide_id = m.id " +
@@ -259,9 +261,12 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
             "JOIN reviews r ON r.tour_id = t.id " +
             "WHERE t.id =:tourId " +
             "GROUP BY t.id", nativeQuery = true)
-    Page<Object[]> findTourImgWithAvgRatingAndGuideLock(@Param("tourId") Integer tourId,
-                                                     @Param("checkDate") LocalDate checkDate,
-                                                     Pageable pageable);
+    List<Object[]> findTourImgWithAvgRatingAndGuideLock(@Param("tourId") Integer tourId,
+                                                        @Param("checkDate") LocalDate checkDate);
+
+
 
 
 }
+
+
