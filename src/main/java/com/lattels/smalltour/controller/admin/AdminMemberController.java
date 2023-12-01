@@ -311,10 +311,10 @@ public class AdminMemberController {
 
     // 특정 멤버의 리뷰 리스트 가져오기
     @GetMapping("/review/member")
-    public ResponseEntity<?> getReviewMember(@ApiIgnore Authentication authentication, @RequestParam int memberId, Pageable pageable) {
+    public ResponseEntity<?> getReviewMember(@ApiIgnore Authentication authentication, @RequestParam int memberId, @RequestParam int state,Pageable pageable) {
         try {
             int adminId = Integer.parseInt(authentication.getPrincipal().toString());
-            AdminReviewDTO.ReviewListDTO responseMemberDTO = adminMemberService.getReviewsByMemberId(memberId, pageable);
+            AdminReviewDTO.ReviewListDTO responseMemberDTO = adminMemberService.getReviewsByMemberId(memberId,state ,pageable);
             return ResponseEntity.ok().body(responseMemberDTO);
         } catch (Exception e) {
             ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
@@ -324,10 +324,10 @@ public class AdminMemberController {
 
     // 특정 멤버의 가이드 리뷰 리스트 가져오기
     @GetMapping("/review/guide")
-    public ResponseEntity<?> getReviewGuide(@ApiIgnore Authentication authentication, @RequestParam int memberId, Pageable pageable) {
+    public ResponseEntity<?> getReviewGuide(@ApiIgnore Authentication authentication, @RequestParam int memberId, @RequestParam int state, Pageable pageable) {
         try {
             int adminId = Integer.parseInt(authentication.getPrincipal().toString());
-            AdminReviewDTO.ReviewListDTO responseMemberDTO = adminMemberService.getGuideReview(memberId, pageable);
+            AdminReviewDTO.ReviewListDTO responseMemberDTO = adminMemberService.getGuideReview(memberId, state, pageable);
             return ResponseEntity.ok().body(responseMemberDTO);
         } catch (Exception e) {
             ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();

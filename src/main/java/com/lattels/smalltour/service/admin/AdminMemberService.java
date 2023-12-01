@@ -104,12 +104,13 @@ public class AdminMemberService {
 
 
     // 특정 회원의 리뷰 목록 가져오기 + pageable
-    public AdminReviewDTO.ReviewListDTO getReviewsByMemberId(int memberId, Pageable pageable) {
+    public AdminReviewDTO.ReviewListDTO getReviewsByMemberId(int memberId,int state, Pageable pageable) {
         try{
-            List<Reviews> reviews = reviewRepository.findByMemberIdOrderByCreatedDayDesc(memberId, pageable);
+            List<Reviews> reviews = reviewRepository.findByMemberIdAndStateOrderByCreatedDayDesc(memberId, state, pageable);
+            // state와 memberId로 검색한 결과를 reviews에 할당
             List<AdminReviewDTO.ReviewDTO> reviewDTOs = new ArrayList<>();
             // 전체 검색결과
-            int totalCnt = reviewRepository.countByMemberId(memberId);
+            int totalCnt = reviewRepository.countByMemberIdAndStateOrderByCreatedDayDesc(memberId, state);
             // DTO로 변환
             AdminReviewDTO.ReviewListDTO reviewListDTO = AdminReviewDTO.ReviewListDTO.builder().totalCnt(totalCnt).build();
 
@@ -139,12 +140,12 @@ public class AdminMemberService {
     }
 
     // 특정 멤버가 작성한 가이드 리뷰 가져오기
-    public AdminReviewDTO.ReviewListDTO getGuideReview(int memberId, Pageable pageable) {
+    public AdminReviewDTO.ReviewListDTO getGuideReview(int memberId, int state,  Pageable pageable) {
         try{
-            List<GuideReview> guideReviews = guideReviewRepository.findByReviewerIdOrderByCreatedDayDesc(memberId, pageable);
+            List<GuideReview> guideReviews = guideReviewRepository.findByReviewerIdAndStateOrderByCreatedDayDesc(memberId,state, pageable);
             List<AdminReviewDTO.ReviewDTO> reviewDTOs = new ArrayList<>();
             // 전체 검색결과
-            int totalCnt = guideReviewRepository.countByReviewerId(memberId);
+            int totalCnt = guideReviewRepository.countByReviewerIdAndStateOrderByCreatedDayDesc(memberId, state);
             // DTO로 변환
             AdminReviewDTO.ReviewListDTO reviewListDTO = AdminReviewDTO.ReviewListDTO.builder().totalCnt(totalCnt).build();
 
