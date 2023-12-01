@@ -18,41 +18,35 @@ import java.util.List;
 @AllArgsConstructor
 public class AdminDetailImgPackageDTO {
 
-    private List<AdminToursImgDetailList> adminToursImg;
+    //번호,패키지명,생성일시,수정일시,상태
+    @ApiParam("패키지 ID")
+    private int tourId;
 
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class AdminToursImgDetailList {
-        //번호,패키지명,생성일시,수정일시,상태
-        @ApiParam("패키지 ID")
-        private int tourId;
+    @ApiParam("패키지명")
+    private String tourName;
 
-        @ApiParam("패키지명")
-        private String tourName;
+    @ApiParam("판매자 아이디")
+    private int guideId;
 
-        @ApiParam("판매자")
-        private String tourSeller;
+    @ApiParam("판매자")
+    private String tourSeller;
 
-        @ApiParam("평점")
-        private float rating;
+    @ApiParam("평점")
+    private float rating;
 
-        @ApiParam("기간")
-        private int duration;
+    @ApiParam("기간")
+    private int duration;
 
-        @ApiParam("가격")
-        private int price;
+    @ApiParam("가격")
+    private int price;
 
-        @ApiParam("인원수")
-        private int people;
+    @ApiParam("인원수")
+    private int people;
 
-        @ApiParam("예약 여부")
-        private String status;
+    @ApiParam("예약 여부")
+    private String status;
 
-        @ApiParam("이미지 경로")
-        private String profile; // 프로필 이미지가 들어있는 경로
-
-    }
+    @ApiParam("이미지 경로")
+    private String profile; // 프로필 이미지가 들어있는 경로
 
 }

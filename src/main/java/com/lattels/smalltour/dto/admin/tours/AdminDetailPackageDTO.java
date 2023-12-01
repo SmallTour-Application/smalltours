@@ -32,6 +32,9 @@ public class AdminDetailPackageDTO {
         @ApiParam("패키지명")
         private String tourName;
 
+        @ApiParam("판매자아이디")
+        private int guideId;
+
         @ApiParam("판매자")
         private String tourSeller;
 

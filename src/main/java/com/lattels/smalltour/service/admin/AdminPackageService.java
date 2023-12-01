@@ -60,25 +60,23 @@ public class AdminPackageService {
         }
     }
 
-
-
     /**
      * 전체 패키지 목록 가져오기
      * 번호,패키지명,생성일시,수정일시,상태 수정 및 삭제는 따로 메서드만들어서
      * 0:미승인 1:승인 2:일시정지 3:삭제
      */
-    public AdminPackageDTO getToursList(int adminId, Integer tourId, String title, int page, int count, Integer month, Integer year, Integer state, Integer price, Integer people, Integer duration) {
+    public AdminPackageDTO getToursList(int adminId, Integer tourId, String title, int page, int count, Integer month, Integer year, Integer state) {
         checkAdmin(adminId);
         Pageable pageable = PageRequest.of(page, count);
         long resultTourInfo = 0;
 
         Page<Object[]> tourInfo;
-        if (tourId == null && month == null && year == null && state == null && title == null && price == null && people == null && duration == null) {
+        if (tourId == null && month == null && year == null && state == null && title == null) {
             tourInfo = toursRepository.findByConditionALL(month, year, tourId, state, title, pageable);
             resultTourInfo = toursRepository.countByAllConditions(month, year, tourId, state, title);
         } else {
-            tourInfo = toursRepository.findByConditions(month, year, tourId, state, title, price, people, duration ,pageable);
-            resultTourInfo = toursRepository.countByConditions(month, year, tourId, state, title, price, people, duration);
+            tourInfo = toursRepository.findByConditions(month, year, tourId, state, title, pageable);
+            resultTourInfo = toursRepository.countByConditions(month, year, tourId, state, title);
         }
 
         List<AdminPackageDTO.AdminToursList> adminTours = new ArrayList<>();
@@ -110,12 +108,6 @@ public class AdminPackageService {
                     .createdDay(((Timestamp) tours[2]).toLocalDateTime())
                     .updateDay(((Timestamp) tours[3]).toLocalDateTime())
                     .approval(approvalStatus)
-                    .guideName(String.valueOf(tours[5]))
-                    .duration(Integer.parseInt(String.valueOf(tours[6])))
-                    .price(Integer.parseInt(String.valueOf(tours[7])))
-                    .maxPeople(Integer.parseInt(String.valueOf(tours[8])))
-                    .minPeople(Integer.parseInt(String.valueOf(tours[9])))
-                    .guideId(Integer.parseInt(String.valueOf(tours[10])))
                     .build();
             adminTours.add(adminToursList);
         }
@@ -128,6 +120,10 @@ public class AdminPackageService {
 
     public void updateTour(int adminId, int tourId, String title, String subtitle, String description, String meetingPoint, Integer maxGroupSize, Integer minGroupSize) {
         checkAdmin(adminId);
+
+        if (maxGroupSize != null && minGroupSize != null && minGroupSize > maxGroupSize) {
+            throw new IllegalArgumentException("최대인원을 넘어설수없습니다. 최소인원 업데이트할 경우");
+        }
 
         if (title != null) {
             toursRepository.updateTourTitle(tourId, title);
@@ -169,7 +165,7 @@ public class AdminPackageService {
         checkAdmin(adminId);
         Pageable pageable = PageRequest.of(page, count);
         LocalDate checkDate = LocalDate.now(); // 현재 날짜 or 필요한 날짜를 변수로 설정
-        Page<Object[]> tourDetailInfo = toursRepository.findTourWithAvgRatingAndGuideLock(tourId, checkDate, pageable);
+        Page<Object[]> tourDetailInfo = toursRepository.findPageTourWithAvgRatingAndGuideLock(tourId, checkDate, pageable);
 
         long resultDetailTourInfo = tourDetailInfo.getTotalElements();
         List<AdminDetailPackageDTO.AdminToursDetailList> adminDetailTours = new ArrayList<>();
@@ -178,12 +174,13 @@ public class AdminPackageService {
             AdminDetailPackageDTO.AdminToursDetailList adminDetailToursList = AdminDetailPackageDTO.AdminToursDetailList.builder()
                     .tourId(Integer.parseInt(String.valueOf(tours[0])))
                     .tourName(String.valueOf(tours[1]))
-                    .tourSeller(String.valueOf(tours[2]))
-                    .rating(Float.parseFloat(String.valueOf(tours[3])))
-                    .duration(Integer.parseInt(String.valueOf(tours[4])))
-                    .price(Integer.parseInt(String.valueOf(tours[5])))
-                    .people(Integer.parseInt(String.valueOf(tours[6])))
-                    .status(String.valueOf(tours[7]))
+                    .guideId(Integer.parseInt(String.valueOf(tours[2])))
+                    .tourSeller(String.valueOf(tours[3]))
+                    .rating(Float.parseFloat(String.valueOf(tours[4])))
+                    .duration(Integer.parseInt(String.valueOf(tours[5])))
+                    .price(Integer.parseInt(String.valueOf(tours[6])))
+                    .people(Integer.parseInt(String.valueOf(tours[7])))
+                    .status(String.valueOf(tours[8]))
                     .build();
             adminDetailTours.add(adminDetailToursList);
         }
@@ -196,76 +193,77 @@ public class AdminPackageService {
 
 
     /**
-     *패키지 관리(패키지관리) 수정
+     * 패키지 관리(패키지관리) 수정
      */
-    public void updateDetailTour(int adminId, int tourId, String title, Integer duration, Integer price,Integer maxPeople,int page, int count) {
+    public void updateDetailTour(int adminId, int tourId, String title, Integer duration, Integer price, Integer maxPeople, Integer minPeople) {
         checkAdmin(adminId); // 관리자 권한 확인
         LocalDate checkDate = LocalDate.now();
-        Pageable pageable = PageRequest.of(page, count);
-        Page<Object[]> tourDetailInfo = toursRepository.findTourWithAvgRatingAndGuideLock(tourId, checkDate, pageable);
 
-        if (tourDetailInfo.hasContent()) {
-            Object[] tourDetails = tourDetailInfo.getContent().get(0);
-            String reservationStatus = (String) tourDetails[7];
+        List<Object[]> tourDetailInfo = toursRepository.findTourWithAvgRatingAndGuideLock(tourId, checkDate);
 
-            if ("예약불가".equals(reservationStatus)) {
-                throw new IllegalStateException("이 투어는 현재 예약 불가라 수정 할 수 없습니다.");
-            }
-            if (title != null) {
-                toursRepository.updateTourTitle(tourId, title);
-            }
-            if (duration != null) {
-                toursRepository.updateTourDuration(tourId, duration);
-            }
-            if (price != null) {
-                toursRepository.updateTourPrice(tourId, price);
-            }
-            if (maxPeople != null) {
-                toursRepository.updateTourMaxGroupSize(tourId, maxPeople);
-            }
-            if (title != null && duration != null && price != null && maxPeople != null) {
-                // 업데이트 메서드 호출
-                toursRepository.updateTourDetails(tourId, title, duration, price, maxPeople);
-            }
-        } else {
-            throw new IllegalStateException("해당 ID를 가진 투어가 존재하지 않습니다.");
+        if (tourDetailInfo.isEmpty()) {
+            throw new IllegalStateException("투어 정보를 찾을 수 없습니다.");
         }
+
+        if (maxPeople != null && minPeople != null && minPeople > maxPeople) {
+            throw new IllegalArgumentException("최대인원을 넘어설수없습니다. 최소인원 업데이트할 경우");
+        }
+
+
+        Object[] tourDetails = tourDetailInfo.get(0);
+        String reservationStatus = (String) tourDetails[8];
+
+        if ("예약불가".equals(reservationStatus)) {
+            throw new IllegalStateException("이 투어는 현재 예약 불가라 수정 할 수 없습니다.");
+        }
+
+        if (title != null) {
+            toursRepository.updateTourTitle(tourId, title);
+        }
+        if (duration != null) {
+            toursRepository.updateTourDuration(tourId, duration);
+        }
+        if (price != null) {
+            toursRepository.updateTourPrice(tourId, price);
+        }
+        if (maxPeople != null) {
+            toursRepository.updateTourMaxGroupSize(tourId, maxPeople);
+        }
+        if (minPeople != null) {
+            toursRepository.updateTourMinGroupSize(tourId, minPeople);
+        }
+
     }
 
     /**
      * 패키지 관리(패키지관리)
      * 상세보기 (이미지 포함)
      */
-    public AdminDetailImgPackageDTO getToursDetailImg(int adminId, Integer tourId, int page, int count) {
+    public AdminDetailImgPackageDTO getToursDetailImg(int adminId, Integer tourId) {
         checkAdmin(adminId);
-        Pageable pageable = PageRequest.of(page, count);
         LocalDate checkDate = LocalDate.now(); // 현재 날짜 or 필요한 날짜를 변수로 설정
-        Page<Object[]> tourDetailInfo = toursRepository.findTourImgWithAvgRatingAndGuideLock(tourId, checkDate, pageable);
+        List<Object[]> tempTourDetailInfo = toursRepository.findTourImgWithAvgRatingAndGuideLock(tourId, checkDate);
+        Object[] tourDetailInfo = tempTourDetailInfo.get(0);
 
-        List<AdminDetailImgPackageDTO.AdminToursImgDetailList> adminDetailImgTours = new ArrayList<>();
+        log.info(String.valueOf(tourDetailInfo[0]));
 
-        for (Object[] tours : tourDetailInfo) {
-            AdminDetailImgPackageDTO.AdminToursImgDetailList adminDetailToursList = AdminDetailImgPackageDTO.AdminToursImgDetailList.builder()
-                    .tourId(Integer.parseInt(String.valueOf(tours[0])))
-                    .tourName(String.valueOf(tours[1]))
-                    .tourSeller(String.valueOf(tours[2]))
-                    .rating(Float.parseFloat(String.valueOf(tours[3])))
-                    .duration(Integer.parseInt(String.valueOf(tours[4])))
-                    .price(Integer.parseInt(String.valueOf(tours[5])))
-                    .people(Integer.parseInt(String.valueOf(tours[6])))
-                    .status(String.valueOf(tours[7]))
-                    .build();
+        AdminDetailImgPackageDTO adminToursImgDetailList = AdminDetailImgPackageDTO.builder()
+                .tourId(Integer.parseInt(String.valueOf(tourDetailInfo[0])))
+                .tourName(String.valueOf(tourDetailInfo[1]))
+                .guideId(Integer.parseInt(String.valueOf(tourDetailInfo[2])))
+                .tourSeller(String.valueOf(tourDetailInfo[3]))
+                .rating(Float.parseFloat(String.valueOf(tourDetailInfo[4])))
+                .duration(Integer.parseInt(String.valueOf(tourDetailInfo[5])))
+                .price(Integer.parseInt(String.valueOf(tourDetailInfo[6])))
+                .people(Integer.parseInt(String.valueOf(tourDetailInfo[7])))
+                .status(String.valueOf(tourDetailInfo[8]))
+                .build();
 
-            if(String.valueOf(tours[8]) != null){
-                adminDetailToursList.setProfile(domain + port + "/img/tours/" + String.valueOf(tours[8]));
-            }
-
-            adminDetailImgTours.add(adminDetailToursList);
+        if (String.valueOf(tourDetailInfo[8]) != null) {
+            adminToursImgDetailList.setProfile(domain + port + "/img/tours/" + String.valueOf(tourDetailInfo[9]));
         }
 
-        return AdminDetailImgPackageDTO.builder()
-                .adminToursImg(adminDetailImgTours)
-                .build();
+        return adminToursImgDetailList;
     }
-
 }
+
