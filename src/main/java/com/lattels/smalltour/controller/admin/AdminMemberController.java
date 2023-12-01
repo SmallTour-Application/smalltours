@@ -11,6 +11,7 @@ import com.lattels.smalltour.dto.admin.Traffic.AdminFavoriteGuideCountUpdateDTO;
 import com.lattels.smalltour.dto.admin.member.AdminAddMemberDTO;
 import com.lattels.smalltour.dto.admin.member.ListMemberDTO;
 import com.lattels.smalltour.dto.admin.payment.AdminPaymentListDTO;
+import com.lattels.smalltour.dto.admin.payment.AdminPaymentTourListDTO;
 import com.lattels.smalltour.dto.admin.payment.AdminPaymentUnDetailListDTO;
 import com.lattels.smalltour.dto.admin.review.AdminReviewDTO;
 import com.lattels.smalltour.dto.admin.search.AdminSearchDTO;
@@ -375,5 +376,18 @@ public class AdminMemberController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+
+    @GetMapping("/payment/tours/list")
+    public ResponseEntity<?> getPaymentToursList(@ApiIgnore Authentication authentication, @RequestParam int tourId,int page) {
+        try {
+
+            List<AdminPaymentTourListDTO> adminPaymentTourListDTO = adminPaymentService.getPaymentTourList(authentication,tourId, page);
+            return ResponseEntity.ok().body(adminPaymentTourListDTO);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 
 }

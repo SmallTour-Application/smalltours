@@ -1,10 +1,12 @@
 package com.lattels.smalltour.persistence;
 
+import com.lattels.smalltour.dto.admin.payment.AdminInterfacePaymentTourList;
 import com.lattels.smalltour.dto.stats.SiteProfitDTO;
 import com.lattels.smalltour.dto.stats.TotalVolumePercentageDTO;
 import com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO;
 import com.lattels.smalltour.model.Payment;
 import com.lattels.smalltour.model.Tours;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -181,5 +183,14 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
             "WHERE p.paymentDay >= :startDate AND p.paymentDay <= :endDate " +
             "AND p.state = 1 ")
     SiteProfitDTO getSiteProfit(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    @Query(value = "SELECT p.id AS paymentId, t.id AS tourId, t.title, m.id AS memberId,m.name AS memberName, g.id AS guideId,g.name AS guideName, p.price, p.state, p.departure_day AS departureDay, p.people " +
+            "FROM payment p " +
+            "JOIN tours t ON t.id = p.tour_id " +
+            "JOIN member m ON p.member_id = m.id " +
+            "JOIN member g ON t.guide_id = g.id " +
+            "WHERE t.id = :tourId AND p.state = 1", nativeQuery = true)
+    Page<AdminInterfacePaymentTourList> findPaymentTourList(@Param("tourId")int tourId, Pageable pageable);
+
 
 }
