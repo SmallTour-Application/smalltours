@@ -2,7 +2,9 @@ package com.lattels.smalltour.service.admin;
 
 
 import com.lattels.smalltour.dto.admin.member.ListMemberDTO;
+import com.lattels.smalltour.dto.admin.payment.AdminInterfacePaymentTourList;
 import com.lattels.smalltour.dto.admin.payment.AdminPaymentListDTO;
+import com.lattels.smalltour.dto.admin.payment.AdminPaymentTourListDTO;
 import com.lattels.smalltour.dto.admin.payment.AdminPaymentUnDetailListDTO;
 import com.lattels.smalltour.dto.payment.PaymentMemberInfoDTO;
 import com.lattels.smalltour.dto.payment.PaymentMemberListDTO;
@@ -13,6 +15,7 @@ import com.lattels.smalltour.persistence.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
@@ -201,6 +204,34 @@ public class AdminPaymentService {
         //리턴
         return memberPaymentListDTO;
     }
- 
 
+
+    /**
+     * 특정 패키지에 대한 결제 목록
+     * Object[] 대신 interface써서 repository에서 사용
+     */
+    public List<AdminPaymentTourListDTO> getPaymentTourList(Authentication authentication, int tourId, int page) {
+        checkAdmin(authentication);
+
+        Pageable pageable = PageRequest.of(page - 1, 10);
+        Page<AdminInterfacePaymentTourList> paymentTourLists = paymentRepository.findPaymentTourList(tourId, pageable);
+        List<AdminPaymentTourListDTO> paymentTourListDTOs = new ArrayList<>();
+        for (AdminInterfacePaymentTourList ap : paymentTourLists) {
+            paymentTourListDTOs.add(new AdminPaymentTourListDTO(
+                    ap.getPaymentId(),
+                    ap.getTourId(),
+                    ap.getTitle(),
+                    ap.getMemberId(),
+                    ap.getMemberName(),
+                    ap.getGuideId(),
+                    ap.getGuideName(),
+                    ap.getPrice(),
+                    ap.getState(),
+                    ap.getDepartureDay(),
+                    ap.getPeople()
+            ));
+        }
+        return paymentTourListDTOs;
+    }
 }
+

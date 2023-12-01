@@ -179,8 +179,9 @@ public class AdminPackageService {
                     .rating(Float.parseFloat(String.valueOf(tours[4])))
                     .duration(Integer.parseInt(String.valueOf(tours[5])))
                     .price(Integer.parseInt(String.valueOf(tours[6])))
-                    .people(Integer.parseInt(String.valueOf(tours[7])))
-                    .status(String.valueOf(tours[8]))
+                    .maxPeople(Integer.parseInt(String.valueOf(tours[7])))
+                    .minPeople(Integer.parseInt(String.valueOf(tours[8])))
+                    .status(String.valueOf(tours[9]))
                     .build();
             adminDetailTours.add(adminDetailToursList);
         }
@@ -255,12 +256,13 @@ public class AdminPackageService {
                 .rating(Float.parseFloat(String.valueOf(tourDetailInfo[4])))
                 .duration(Integer.parseInt(String.valueOf(tourDetailInfo[5])))
                 .price(Integer.parseInt(String.valueOf(tourDetailInfo[6])))
-                .people(Integer.parseInt(String.valueOf(tourDetailInfo[7])))
-                .status(String.valueOf(tourDetailInfo[8]))
+                .maxPeople(Integer.parseInt(String.valueOf(tourDetailInfo[7])))
+                .minPeople(Integer.parseInt(String.valueOf(tourDetailInfo[8])))
+                .status(String.valueOf(tourDetailInfo[9]))
                 .build();
 
         if (String.valueOf(tourDetailInfo[8]) != null) {
-            adminToursImgDetailList.setProfile(domain + port + "/img/tours/" + String.valueOf(tourDetailInfo[9]));
+            adminToursImgDetailList.setProfile(domain + port + "/img/tours/" + String.valueOf(tourDetailInfo[10]));
         }
 
         return adminToursImgDetailList;

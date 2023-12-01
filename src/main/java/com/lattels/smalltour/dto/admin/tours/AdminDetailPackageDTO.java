@@ -47,8 +47,11 @@ public class AdminDetailPackageDTO {
         @ApiParam("가격")
         private int price;
 
-        @ApiParam("인원수")
-        private int people;
+        @ApiParam("최대 인원수")
+        private int maxPeople;
+
+        @ApiParam("최소 인원수")
+        private int minPeople;
 
         @ApiParam("예약 여부")
         private String status;

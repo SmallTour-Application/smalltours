@@ -215,7 +215,7 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     List<Object[]> findTourWithAvgRatingAndGuideLock(@Param("tourId") Integer tourId,
                                                      @Param("checkDate") LocalDate checkDate);
 
-    @Query(value = "SELECT t.id, t.title,t.guide_id,m.name, AVG(r.rating) AS average_rating, t.duration, t.price, t.max_group_size," +
+    @Query(value = "SELECT t.id, t.title,t.guide_id,m.name, AVG(r.rating) AS average_rating, t.duration, t.price, t.max_group_size, t.min_group_size," +
             "CASE WHEN EXISTS (SELECT * " +
             "FROM guide_lock gl " +
             "WHERE gl.guide_id = m.id " +
@@ -251,7 +251,7 @@ public interface ToursRepository extends JpaRepository<Tours, Integer> {
     void updateTourPrice(@Param("id") int id, @Param("price") int price);
 
 
-    @Query(value = "SELECT t.id, t.title,t.guide_id,m.name,AVG(r.rating) AS average_rating, t.duration, t.price, t.max_group_size," +
+    @Query(value = "SELECT t.id, t.title,t.guide_id,m.name,AVG(r.rating) AS average_rating, t.duration, t.price, t.max_group_size, t.min_group_size," +
             "CASE WHEN EXISTS (SELECT * " +
             "FROM guide_lock gl " +
             "WHERE gl.guide_id = m.id " +
