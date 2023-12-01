@@ -7,8 +7,10 @@ import com.lattels.smalltour.model.Tours;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,6 +18,13 @@ import java.util.List;
 
 
 public interface GuideReviewRepository extends JpaRepository<GuideReview, Integer> {
+
+    //updateGuideReviewState
+    @Modifying
+    @Transactional
+    @Query("UPDATE GuideReview r SET r.state = 0 WHERE r.id = :id")
+    void updateGuideReviewState(@Param("id") int id);
+
 
     // 해당 member가 작성한 가이드 리뷰 리스트를 가져옵니다. with pageable
     @Query("SELECT gr FROM GuideReview gr JOIN gr.reviewer m WHERE m.id = :memberId AND m.role = 0")
@@ -25,8 +34,14 @@ public interface GuideReviewRepository extends JpaRepository<GuideReview, Intege
     @Query("SELECT count(gr) FROM GuideReview gr JOIN gr.reviewer m WHERE m.id = :memberId AND m.role = 0")
     int countByReviewerId(@Param("memberId") int memberId);
 
-    /* findByGuideIdOrderByCreatedDayDesc **/
+    int countByReviewerIdAndStateOrderByCreatedDayDesc(int reviewerId, int state);
+
+    //findByGuideIdAndStateOrderByCreatedDayDesc
     List<GuideReview> findByGuideIdAndStateOrderByCreatedDayDesc(int guideId, int state, Pageable pageable);
+
+
+    /* findByGuideIdOrderByCreatedDayDesc **/
+    List<GuideReview> findByReviewerIdAndStateOrderByCreatedDayDesc(int reviewerId, int state, Pageable pageable);
 
     /*countByGuideId**/
     int countByGuideIdAndState(int guideId, int state);

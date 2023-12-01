@@ -29,7 +29,9 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
 
     //countByMemberId jpa로
     //해당 회원이 작성한 리뷰 개수
-    int countByMemberId(int memberId);
+    int countByMemberIdAndStateOrderByCreatedDayDesc(int memberId, int state);
+
+    List<Reviews> findByMemberIdAndStateOrderByCreatedDayDesc(int memberId, int state, Pageable pageable);
 
     //countByGuideIdAndState
     //해당 가이드에 대한 리뷰 개수

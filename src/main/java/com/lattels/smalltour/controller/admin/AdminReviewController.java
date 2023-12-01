@@ -125,5 +125,15 @@ public class AdminReviewController {
         return ResponseEntity.ok().build();
     }
 
+    @ApiOperation("가이드 리뷰 삭제")
+    @PostMapping("/guide/delete")
+    public ResponseEntity<?> deleteGuideReview(@ApiIgnore Authentication authentication,
+                                               @RequestParam(required = false) int reviewId) {
+        int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+        adminReviewService.deleteGuideReview(adminId, reviewId);
+
+        return ResponseEntity.ok().build();
+    }
+
 
 }

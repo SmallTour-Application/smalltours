@@ -4,8 +4,10 @@ package com.lattels.smalltour.service.admin;
 import com.google.common.base.Preconditions;
 import com.lattels.smalltour.dto.admin.review.AdminDetailReviewDTO;
 import com.lattels.smalltour.dto.admin.review.AdminSpecificReviewsDTO;
+import com.lattels.smalltour.model.GuideReview;
 import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.model.Reviews;
+import com.lattels.smalltour.persistence.GuideReviewRepository;
 import com.lattels.smalltour.persistence.MemberRepository;
 import com.lattels.smalltour.persistence.QuestionRepository;
 import com.lattels.smalltour.persistence.ReviewsRepository;
@@ -31,6 +33,8 @@ public class AdminReviewService {
     private final MemberRepository memberRepository;
     private final QuestionRepository questionRepository;
     private final ReviewsRepository reviewsRepository;
+    //guideReviewRepository
+    private final GuideReviewRepository guideReviewRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -56,6 +60,7 @@ public class AdminReviewService {
      * 질문의 답변은 정환씨가 했던 QuestionAnswerService를 사용하면 됨
      */
 
+
     /**
      * 관리자 인지 체크
      */
@@ -64,6 +69,20 @@ public class AdminReviewService {
         if(admin.getRole() != 3){
             throw new RuntimeException("관리자만 접근 가능합니다.");
         }
+    }
+
+    /**
+     * 가이드 리뷰 삭제
+     * */
+    public void deleteGuideReview(int adminId, int reviewId) {
+        checkAdmin(adminId);
+
+        GuideReview review = guideReviewRepository.findById(reviewId).orElse(null);
+        Preconditions.checkNotNull(review,"리뷰를 찾을 수 없습니다.",reviewId);
+
+        // 기존 이미지 삭제
+        // 질문 삭제
+        guideReviewRepository.updateGuideReviewState(reviewId);
     }
 
     /**
