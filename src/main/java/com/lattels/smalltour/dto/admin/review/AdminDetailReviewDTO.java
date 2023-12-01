@@ -23,6 +23,7 @@ public class AdminDetailReviewDTO {
     @AllArgsConstructor
     public static class detailedReview {
         private int id; //해당 멤버 id값
+        private int tourId;
         private String tourName;
         private int guideId;
         private String guideName;
