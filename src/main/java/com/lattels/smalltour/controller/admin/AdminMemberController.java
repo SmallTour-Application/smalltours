@@ -11,6 +11,7 @@ import com.lattels.smalltour.dto.admin.Traffic.AdminFavoriteGuideCountUpdateDTO;
 import com.lattels.smalltour.dto.admin.member.AdminAddMemberDTO;
 import com.lattels.smalltour.dto.admin.member.ListMemberDTO;
 import com.lattels.smalltour.dto.admin.payment.AdminPaymentListDTO;
+import com.lattels.smalltour.dto.admin.payment.AdminPaymentUnDetailListDTO;
 import com.lattels.smalltour.dto.admin.review.AdminReviewDTO;
 import com.lattels.smalltour.dto.admin.search.AdminSearchDTO;
 import com.lattels.smalltour.dto.admin.tours.AdminToursDTO;
@@ -194,33 +195,33 @@ public class AdminMemberController {
 
 
 
-    @ApiOperation("회원 결제 목록")
+    @ApiOperation("회원 결제 목록,memberId 입력 안할 시 전체 목록 반환")
     @PostMapping("/paymentList")
-    public ResponseEntity<?> getPaymentList(@ApiIgnore Authentication authentication,int page) {
-        List<PaymentMemberListDTO> paymentListDTO = adminPaymentService.getPaymentMemberList(authentication, page - 1, NUMBER_OF_PAYMENT_PER_PAGE);
+    public ResponseEntity<?> getPaymentList(@ApiIgnore Authentication authentication,@RequestParam(required = false) Integer memberId,int page) {
+        List<AdminPaymentUnDetailListDTO> paymentListDTO = adminPaymentService.getPaymentMemberList(authentication, memberId,page - 1, NUMBER_OF_PAYMENT_PER_PAGE);
 
         return ResponseEntity.ok(paymentListDTO);
     }
 
-    @ApiOperation("회원 결제 취소 목록")
+    @ApiOperation("회원 결제 취소 목록,memberId 입력 안할 시 전체 목록 반환")
     @PostMapping("/payment/cancel")
-    public ResponseEntity<?> getCancelPayment(@ApiIgnore Authentication authentication,int page) {
-        List<PaymentMemberListDTO> paymentListDTO = adminPaymentService.getPaymentCancelMemberList(authentication, page - 1, NUMBER_OF_PAYMENT_PER_PAGE);
+    public ResponseEntity<?> getCancelPayment(@ApiIgnore Authentication authentication,@RequestParam(required = false) Integer memberId, int page) {
+        List<AdminPaymentUnDetailListDTO> paymentListDTO = adminPaymentService.getPaymentCancelMemberList(authentication,memberId, page - 1, NUMBER_OF_PAYMENT_PER_PAGE);
 
         return ResponseEntity.ok(paymentListDTO);
     }
 
-    @ApiOperation("회원 결제 환불 목록")
+    @ApiOperation("회원 결제 환불 목록,memberId 입력 안할 시 전체 목록 반환")
     @PostMapping("/payment/refund")
-    public ResponseEntity<?> getRefundPayment(@ApiIgnore Authentication authentication,int page) {
-        List<PaymentMemberListDTO> paymentListDTO = adminPaymentService.getPaymentrefundMemberList(authentication, page - 1, NUMBER_OF_PAYMENT_PER_PAGE);
+    public ResponseEntity<?> getRefundPayment(@ApiIgnore Authentication authentication,@RequestParam(required = false) Integer memberId,int page) {
+        List<AdminPaymentUnDetailListDTO> paymentListDTO = adminPaymentService.getPaymentrefundMemberList(authentication,memberId, page - 1, NUMBER_OF_PAYMENT_PER_PAGE);
 
         return ResponseEntity.ok(paymentListDTO);
     }
 
     @ApiOperation("회원 삭제")
     @PostMapping("/delete/member")
-    public ResponseEntity<?> getDeleteMember(@ApiIgnore Authentication authentication,@RequestParam int memberId) {
+    public ResponseEntity<?> getDeleteMember(@ApiIgnore Authentication authentication,@RequestParam Integer memberId) {
         int adminId = Integer.parseInt(authentication.getPrincipal().toString());
         adminService.deleteMember(adminId, memberId);
         return ResponseEntity.ok("삭제완료");
@@ -297,6 +298,7 @@ public class AdminMemberController {
     }
 
     // 특정 멤버의 결제정보 가져오기
+    @ApiOperation(value = "PaymentList경로 위에있음.<- 해당 경로의 메서드는 memberId null허용하게함")
     @GetMapping("/payment/member")
     public ResponseEntity<?> getPaymentMember(@ApiIgnore Authentication authentication, @RequestParam int memberId, Pageable pageable, @RequestParam int state) {
         try {

@@ -25,5 +25,8 @@ public class AdminSpecificReviewsDTO {
         private String status;
         private int paymentId;
         private String memeberName;
+        private int memberId;
+        private int guideId;
+
     }
 }

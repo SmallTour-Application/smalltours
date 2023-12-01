@@ -94,13 +94,13 @@ public class AdminReviewController {
     @ApiOperation("리뷰 상세 목록 조회")
     @GetMapping("/detail/list")
     public ResponseEntity<AdminDetailReviewDTO> getDetailReviewList(@ApiIgnore Authentication authentication,
-                                                                    @RequestParam(value = "memberId", required = false)Integer memberId,
-                                                                    @RequestParam(value = "title", required = false)String title,
-                                                                    int page)
+                                                                    @RequestParam(value = "memberId", required = false)int memberId,
+                                                                    @RequestParam(value = "reviewId", required = false)int reviewId
+                                                                   )
     {
         int adminId = Integer.parseInt(authentication.getPrincipal().toString());
         // 질문 목록 조회
-        AdminDetailReviewDTO adminDetailReviewDTO = adminReviewService.getReviewsByBuyer(adminId,memberId,title,page - 1,10);
+        AdminDetailReviewDTO adminDetailReviewDTO = adminReviewService.getReviewsByBuyer(adminId,memberId,reviewId);
         return ResponseEntity.ok(adminDetailReviewDTO);
     }
 
@@ -136,17 +136,17 @@ public class AdminReviewController {
     }
 
     /**
-     * 가이드 리뷰 수정
-     * */
-    @ApiOperation("가이드 리뷰 수정")
-    @PostMapping("/guide/update")
+    * 가이드 리뷰 수정
+    * */
+   @ApiOperation("가이드 리뷰 수정")
+   @PostMapping("/guide/update")
     public ResponseEntity<?> updateGuideReview(@ApiIgnore Authentication authentication,
-                                               @RequestParam(required = true) int reviewId,
-                                                @RequestParam(required = true) int score,
-                                               @RequestParam(required = true) String newContent) {
+                                              @RequestParam(required = true) int reviewId,
+                                            @RequestParam(required = true) int score,
+                                              @RequestParam(required = true) String newContent) {
         int adminId = Integer.parseInt(authentication.getPrincipal().toString());
         adminReviewService.updateGuideReview(adminId, score, reviewId,newContent);
-        return ResponseEntity.ok().build();
+       return ResponseEntity.ok().build();
     }
 
 

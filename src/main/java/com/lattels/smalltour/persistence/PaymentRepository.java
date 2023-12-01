@@ -130,20 +130,20 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     //memberId로 payment찾기 + 결제성공
     @Query(value = "SELECT * FROM payment p " +
             "JOIN member m ON p.member_id = m.id " +
-            "WHERE m.role = 0 AND p.state = 1 AND m.id = :memberId ",nativeQuery = true)
-    List<Payment> findByPaymentMemberId(Pageable pageable);
+            "WHERE m.role = 0 AND p.state = 1 AND (:memberId IS NULL OR m.id = :memberId)", nativeQuery = true)
+    List<Payment> findByPaymentMemberId(@Param("memberId") Integer memberId,Pageable pageable);
 
     //memberId로 payment찾기 + 결제취소
     @Query(value = "SELECT * FROM payment p " +
             "JOIN member m ON p.member_id = m.id " +
-            "WHERE m.role = 0 AND p.state = 2 ",nativeQuery = true)
-    List<Payment> findByPaymentCancelMemberId(Pageable pageable);
+            "WHERE m.role = 0 AND p.state = 2 AND (:memberId IS NULL OR m.id = :memberId)",nativeQuery = true)
+    List<Payment> findByPaymentCancelMemberId(@Param("memberId") Integer memberId,Pageable pageable);
 
     //memberId로 payment찾기 + 결제환불
     @Query(value = "SELECT * FROM payment p " +
             "JOIN member m ON p.member_id = m.id " +
-            "WHERE m.role = 0 AND p.state = 3 ",nativeQuery = true)
-    List<Payment> findByPaymentRefundMemberId(Pageable pageable);
+            "WHERE m.role = 0 AND p.state = 3 AND (:memberId IS NULL OR m.id = :memberId)",nativeQuery = true)
+    List<Payment> findByPaymentRefundMemberId(@Param("memberId") Integer memberId,Pageable pageable);
 
     /*
      * 1년간의 월별 예약 수 가져오기
