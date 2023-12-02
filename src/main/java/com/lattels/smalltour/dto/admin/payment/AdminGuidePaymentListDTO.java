@@ -32,7 +32,7 @@ public class AdminGuidePaymentListDTO {
         private String guideName;
         private int price;
         //결제일
-        private LocalDateTime paymentDay;
+        private LocalDate paymentDay;
         //가이드 startDay~ endDAy
         private LocalDate startDay;
         private LocalDate endDay;
