@@ -10,6 +10,7 @@ import com.lattels.smalltour.dto.ToursDTO;
 import com.lattels.smalltour.dto.admin.Traffic.AdminFavoriteGuideCountUpdateDTO;
 import com.lattels.smalltour.dto.admin.member.AdminAddMemberDTO;
 import com.lattels.smalltour.dto.admin.member.ListMemberDTO;
+import com.lattels.smalltour.dto.admin.payment.AdminPaymentDetailDTO;
 import com.lattels.smalltour.dto.admin.payment.AdminPaymentListDTO;
 import com.lattels.smalltour.dto.admin.payment.AdminPaymentTourListDTO;
 import com.lattels.smalltour.dto.admin.payment.AdminPaymentUnDetailListDTO;
@@ -390,5 +391,17 @@ public class AdminMemberController {
         }
     }
 
+
+    @ApiOperation(value = "특정 결제 번호 입력하면 상세 정보 보여줌")
+    @PostMapping("/payment/detail")
+    public ResponseEntity<?> getPaymentDetail(@ApiIgnore Authentication authentication, @RequestParam int paymentId) {
+        try {
+
+            AdminPaymentDetailDTO paymentDetailDTO = adminPaymentService.getPaymentDetail(authentication,paymentId);
+            return ResponseEntity.ok().body(paymentDetailDTO);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
 }
