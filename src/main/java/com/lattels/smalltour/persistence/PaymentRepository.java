@@ -1,5 +1,6 @@
 package com.lattels.smalltour.persistence;
 
+import com.lattels.smalltour.dto.admin.payment.AdminInterfacePaymentDetail;
 import com.lattels.smalltour.dto.admin.payment.AdminInterfacePaymentTourList;
 import com.lattels.smalltour.dto.stats.SiteProfitDTO;
 import com.lattels.smalltour.dto.stats.TotalVolumePercentageDTO;
@@ -15,6 +16,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 
 public interface PaymentRepository extends JpaRepository<Payment, Integer> {
@@ -257,4 +259,15 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     int findGuidePaymentWithoutDateCount(@Param("memberName") String memberName,
                                     @Param("tourName") String tourName);
 
+
+    @Query(value = "SELECT p.id AS paymentId, m.id AS memberId, m.name AS memberName, m.email, m.tel, " +
+            "g.id AS guideId, g.name AS guideName, p.payment_day AS paymentDay, gl.start_day AS startDay, gl.end_day AS endDay, " +
+            "p.people, p.state, t.id AS tourId, t.title, t.price, p.departure_day AS departureDay " +
+            "FROM payment p " +
+            "JOIN tours t ON p.tour_id = t.id " +
+            "JOIN member m ON p.member_id = m.id " +
+            "JOIN member g ON t.guide_id = g.id " +
+            "JOIN guide_lock gl ON gl.guide_id = g.id " +
+            "WHERE p.id = :paymentId", nativeQuery = true)
+    Optional<AdminInterfacePaymentDetail> findByPaymentDetail(@Param("paymentId") int paymentId);
 }

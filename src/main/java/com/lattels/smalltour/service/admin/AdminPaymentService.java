@@ -30,6 +30,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -282,6 +283,46 @@ public class AdminPaymentService {
                 .build();
     }
 
+    /**
+     * 결제목록중 클릭시 해당 결제의 상세 정보들 모음
+     *
+     */
+    public AdminPaymentDetailDTO getPaymentDetail(Authentication authentication, int paymentId) {
+        checkAdmin(authentication);
 
+        Optional<AdminInterfacePaymentDetail> paymentDetails = paymentRepository.findByPaymentDetail(paymentId);
+
+        if(!paymentDetails.isPresent()){
+            throw new RuntimeException("해당 결제에 대한 정보가 없습니다.");
+        }
+
+        AdminInterfacePaymentDetail detail = paymentDetails.get();
+        int state = detail.getState();
+        String status = state == 1 ? "결제성공" : "결제실패";
+        AdminPaymentDetailDTO.PaymentDetailDTO paymentDetailDTO = AdminPaymentDetailDTO.PaymentDetailDTO.builder()
+                .id(detail.getPaymentId())
+                .memberId(detail.getMemberId())
+                .memberName(detail.getMemberName())
+                .email(detail.getEmail())
+                .tel(detail.getTel())
+                .guideId(detail.getGuideId())
+                .guideName(detail.getGuideName())
+                .paymentDay(detail.getPaymentDay())
+                .startDay(detail.getStartDay())
+                .endDay(detail.getEndDay())
+                .people(detail.getPeople())
+                .state(status)
+                .tourId(detail.getTourId())
+                .tourName(detail.getTitle())
+                .price(detail.getPrice())
+                .departureDay(detail.getDepartureDay())
+                .build();
+
+        return AdminPaymentDetailDTO.builder()
+                .paymentDetailDTO(paymentDetailDTO)
+                .build();
+
+
+    }
 }
 
