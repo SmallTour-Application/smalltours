@@ -195,5 +195,21 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     //countAllByTourIdAndState
     int countByToursIdAndState(int tourId, int state);
 
+    @Query(value = "SELECT m.id AS memberId, m.name AS memberName, m.tel AS memberTel, p.people, p.departure_day, m.email AS memberEmail, g.id AS guideId, g.name AS guideName, t.price, p.payment_day, gl.start_day, gl.end_day, p.state, t.title, t.id AS tourId " +
+            "FROM payment p " +
+            "JOIN tours t ON p.tour_id = t.id " +
+            "JOIN member m ON p.member_id = m.id " +
+            "JOIN member g ON g.id = t.guide_id " +
+            "JOIN guide_lock gl ON gl.guide_id = g.id " +
+            "WHERE (:memberName IS NULL OR m.name LIKE %:memberName%) " +
+            "AND (:tourName IS NULL OR t.title LIKE %:tourName%) " +
+            "AND (:startDay IS NULL OR gl.start_day = :startDay) " +
+            "AND (:endDay IS NULL OR gl.end_day = :endDay)",
+            nativeQuery = true)
+    Page<Object[]> findGuidePayment(@Param("memberName") String memberName,
+                                    @Param("tourName") String tourName,
+                                    @Param("startDay") LocalDate startDay,
+                                    @Param("endDay") LocalDate endDay,
+                                    Pageable pageable);
 
 }

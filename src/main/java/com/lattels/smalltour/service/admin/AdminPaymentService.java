@@ -2,10 +2,7 @@ package com.lattels.smalltour.service.admin;
 
 
 import com.lattels.smalltour.dto.admin.member.ListMemberDTO;
-import com.lattels.smalltour.dto.admin.payment.AdminInterfacePaymentTourList;
-import com.lattels.smalltour.dto.admin.payment.AdminPaymentListDTO;
-import com.lattels.smalltour.dto.admin.payment.AdminPaymentTourListDTO;
-import com.lattels.smalltour.dto.admin.payment.AdminPaymentUnDetailListDTO;
+import com.lattels.smalltour.dto.admin.payment.*;
 import com.lattels.smalltour.dto.payment.PaymentMemberInfoDTO;
 import com.lattels.smalltour.dto.payment.PaymentMemberListDTO;
 import com.lattels.smalltour.model.Member;
@@ -27,6 +24,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -238,5 +236,40 @@ public class AdminPaymentService {
         adminPaymentTourListResponseDTO.setPaymentList(paymentTourListDTOs);
         return adminPaymentTourListResponseDTO;
     }
+
+     public AdminGuidePaymentListDTO  (Authentication authentication,String name,String title,LocalDate startDay, LocalDate endDay, int page){
+        checkAdmin(authentication);
+        Pageable pageable = PageRequest.of(page - 1, 10);
+        Page<Object[]> guidePayment = paymentRepository.findGuidePayment(name,title,startDay,endDay,pageable);
+        List<AdminGuidePaymentListDTO.GuideDurationDTO> guideDurationDTOS = new ArrayList<>();
+        for(Object[] result : guidePayment){
+            int state = (Integer) result[12];
+            String status = state == 1 ? "예약" : "미예약";
+            AdminGuidePaymentListDTO.GuideDurationDTO gd = AdminGuidePaymentListDTO.GuideDurationDTO.builder()
+                    .memberId((Integer)result[0])
+                    .memberName((String) result[1])
+                    .tel((String) result[2])
+                    .people((Integer) result[3])
+                    .departureDay(result[4] != null ? ((java.sql.Date) result[4]).toLocalDate() : null) // java.sql.Date -> LocalDate
+                    .email((String) result[5])
+                    .guideId((Integer) result[6])
+                    .guideName((String) result[7])
+                    .price((Integer) result[8])
+                    .paymentDay(result[9] != null ? ((Timestamp) result[9]).toLocalDateTime() : null) // java.sql.Timestamp -> LocalDateTime
+                    .startDay(result[10] != null ? ((java.sql.Date) result[10]).toLocalDate() : null) // java.sql.Date -> LocalDate
+                    .endDay(result[11] != null ? ((java.sql.Date) result[11]).toLocalDate() : null) // java.sql.Date -> LocalDate
+                    .state(status)
+                    .toursTitle((String) result[13])
+                    .toursId((Integer) result[14])
+                    .build();
+            guideDurationDTOS.add(gd);
+        }
+        return AdminGuidePaymentListDTO.builder()
+                .totalCnt((int) guidePayment.getTotalElements())
+                .guideDurationDTOS(guideDurationDTOS)
+                .build();
+    }
+
+
 }
 
