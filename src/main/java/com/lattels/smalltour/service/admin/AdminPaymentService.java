@@ -240,7 +240,19 @@ public class AdminPaymentService {
      public AdminGuidePaymentListDTO getToursList(Authentication authentication,String name,String title,LocalDate startDay, LocalDate endDay, int page){
         checkAdmin(authentication);
         Pageable pageable = PageRequest.of(page - 1, 10);
-        Page<Object[]> guidePayment = paymentRepository.findGuidePayment(name,title,startDay,endDay,pageable);
+        String tempName = name == null ? "" : name;
+        String tempTitle = title == null ? "" : title;
+        int cnt = 0;
+         Page<Object[]> guidePayment = null;
+        // startDay와 endDay가 null이 아니면
+        if(startDay != null && endDay != null){
+            guidePayment = paymentRepository.findGuidePayment(tempName,tempTitle,startDay,endDay,pageable);
+            cnt = paymentRepository.findGuidePaymentCount(tempName,tempTitle,startDay,endDay);
+        }else{
+            // 날짜 빼고 검색
+            guidePayment = paymentRepository.findGuidePaymentWithoutDate(tempName,tempTitle,pageable);
+            cnt = paymentRepository.findGuidePaymentWithoutDateCount(tempName,tempTitle);
+        }
         List<AdminGuidePaymentListDTO.GuideDurationDTO> guideDurationDTOS = new ArrayList<>();
         for(Object[] result : guidePayment){
             int state = (Integer) result[12];
@@ -254,10 +266,10 @@ public class AdminPaymentService {
                     .email((String) result[5])
                     .guideId((Integer) result[6])
                     .guideName((String) result[7])
-                    .price((Integer) result[8])
-                    .paymentDay(result[9] != null ? ((Timestamp) result[9]).toLocalDateTime() : null) // java.sql.Timestamp -> LocalDateTime
-                    .startDay(result[10] != null ? ((java.sql.Date) result[10]).toLocalDate() : null) // java.sql.Date -> LocalDate
-                    .endDay(result[11] != null ? ((java.sql.Date) result[11]).toLocalDate() : null) // java.sql.Date -> LocalDate
+                    .price(Integer.parseInt(String.valueOf(result[8])))
+                    .paymentDay(result[9] != null ? LocalDate.parse(String.valueOf(result[9])) : null)
+                    .startDay(result[10] != null ? LocalDate.parse(String.valueOf(result[10])) : null) // java.sql.Date -> LocalDate
+                    .endDay(result[11] != null ? LocalDate.parse(String.valueOf(result[11])) : null) // java.sql.Date -> LocalDate
                     .state(status)
                     .toursTitle((String) result[13])
                     .toursId((Integer) result[14])
@@ -265,7 +277,7 @@ public class AdminPaymentService {
             guideDurationDTOS.add(gd);
         }
         return AdminGuidePaymentListDTO.builder()
-                .totalCnt((int) guidePayment.getTotalElements())
+                .totalCnt(cnt)
                 .guideDurationDTOS(guideDurationDTOS)
                 .build();
     }
