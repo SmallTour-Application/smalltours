@@ -237,7 +237,7 @@ public class AdminPaymentService {
         return adminPaymentTourListResponseDTO;
     }
 
-     public AdminGuidePaymentListDTO  (Authentication authentication,String name,String title,LocalDate startDay, LocalDate endDay, int page){
+     public AdminGuidePaymentListDTO getToursList(Authentication authentication,String name,String title,LocalDate startDay, LocalDate endDay, int page){
         checkAdmin(authentication);
         Pageable pageable = PageRequest.of(page - 1, 10);
         Page<Object[]> guidePayment = paymentRepository.findGuidePayment(name,title,startDay,endDay,pageable);
