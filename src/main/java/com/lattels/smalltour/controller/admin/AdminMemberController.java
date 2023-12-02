@@ -378,11 +378,12 @@ public class AdminMemberController {
     }
 
 
+
     @GetMapping("/payment/tours/list")
-    public ResponseEntity<?> getPaymentToursList(@ApiIgnore Authentication authentication, @RequestParam int tourId,int page, int state) {
+    public ResponseEntity<?> getPaymentToursList(@ApiIgnore Authentication authentication, @RequestParam int tourId,int page,int state) {
         try {
 
-            AdminPaymentTourListDTO.AdminPaymentTourListResponseDTO adminPaymentTourListDTO = adminPaymentService.getPaymentTourList(authentication,tourId, state,page);
+            AdminPaymentTourListDTO.AdminPaymentTourListResponseDTO adminPaymentTourListDTO = adminPaymentService.getPaymentTourList(authentication,tourId,state,page);
             return ResponseEntity.ok().body(adminPaymentTourListDTO);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
