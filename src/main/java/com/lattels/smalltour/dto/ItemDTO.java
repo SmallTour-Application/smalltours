@@ -12,7 +12,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -28,6 +30,64 @@ public class ItemDTO {
         @Positive(message = "양수만 가능합니다.")
         @ApiModelProperty(value = "아이템 아이디", example = "1")
         private int id;
+
+    }
+
+    @Data
+    @NoArgsConstructor
+    @ApiModel(value = "Item 등록 요청 DTO")
+    public static class AddRequestDTO {
+
+        @NotBlank(message = "필수 입력값입니다.")
+        @ApiModelProperty(value = "상품 이름", example = "상품 이름")
+        private String title;
+
+        @PositiveOrZero(message = "양수 또는 0만 가능합니다.")
+        @ApiModelProperty(value = "상품 가격", example = "100000")
+        private int price;
+
+        @Positive(message = "양수만 가능합니다.")
+        @ApiModelProperty(value = "기간(달)", example = "1")
+        private int period;
+
+        @PositiveOrZero(message = "양수 또는 0만 가능합니다.")
+        @ApiModelProperty(value = "상품 타입", example = "0 : 상위노출 / 1 : 배너")
+        private int type;
+
+        @PositiveOrZero(message = "양수 또는 0만 가능합니다.")
+        @ApiModelProperty(value = "상품 상태", example = "0 : 공개 / 1 : 비공개")
+        private int state;
+
+    }
+
+    @Data
+    @NoArgsConstructor
+    @ApiModel(value = "Item 수정 요청 DTO")
+    public static class UpdateRequestDTO {
+
+        @Positive(message = "양수만 가능합니다.")
+        @ApiModelProperty(value = "아이템 아이디", example = "1")
+        private int id;
+
+        @NotBlank(message = "필수 입력값입니다.")
+        @ApiModelProperty(value = "상품 이름", example = "상품 이름")
+        private String title;
+
+        @PositiveOrZero(message = "양수 또는 0만 가능합니다.")
+        @ApiModelProperty(value = "상품 가격", example = "100000")
+        private int price;
+
+        @Positive(message = "양수만 가능합니다.")
+        @ApiModelProperty(value = "기간(달)", example = "1")
+        private int period;
+
+        @PositiveOrZero(message = "양수 또는 0만 가능합니다.")
+        @ApiModelProperty(value = "상품 타입", example = "0 : 상위노출 / 1 : 배너")
+        private int type;
+
+        @PositiveOrZero(message = "양수 또는 0만 가능합니다.")
+        @ApiModelProperty(value = "상품 상태", example = "0 : 공개 / 1 : 비공개")
+        private int state;
 
     }
 
@@ -172,6 +232,19 @@ public class ItemDTO {
 
         // 상위노출 상품
         public static final int UPPER_PAYMENT = 0;
+        // 배너 상품
+        public static final int BANNER = 1;
+
+    }
+
+    public static class ItemState {
+
+        // 등록됨
+        public static final int PUBLIC = 0;
+        // 비공개
+        public static final int NONDISCLOSURE = 1;
+        // 삭제
+        public static final int DELETE = 2;
 
     }
 }

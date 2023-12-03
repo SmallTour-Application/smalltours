@@ -158,6 +158,37 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 
     @Query(value = "SELECT count(*) FROM member m WHERE m.role = 2", nativeQuery = true)
     Integer findByCountId();
+
+    /**
+     * @param role 권한
+     * @return 유저 목록
+     */
+    Page<Member> findByRole(int role, Pageable pageable);
+
+    /**
+     * 검색어가 포함되는 이름을 가진 유저 목록
+     * @param word 검색어
+     * @param role 권한
+     * @return 유저 목록
+     */
+    Page<Member> findByNameContainsAndRole(String word, int role, Pageable pageable);
+
+    /**
+     * 검색어가 포함되는 닉네임을 가진 유저 목록
+     * @param word 검색어
+     * @param role 권한
+     * @return 유저 목록
+     */
+    Page<Member> findByNicknameContainsAndRole(String word, int role, Pageable pageable);
+
+    /**
+     * 검색어가 포함되는 이메일을 가진 유저 목록
+     * @param word 검색어
+     * @param role 권한
+     * @return 유저 목록
+     */
+    Page<Member> findByEmailContainsAndRole(String word, int role, Pageable pageable);
+
 }
 
 

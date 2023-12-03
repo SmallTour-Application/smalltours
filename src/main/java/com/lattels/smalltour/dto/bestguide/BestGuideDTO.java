@@ -1,4 +1,4 @@
-package com.lattels.smalltour.dto;
+package com.lattels.smalltour.dto.bestguide;
 
 import com.lattels.smalltour.model.Member;
 import io.swagger.annotations.ApiModel;
@@ -16,8 +16,42 @@ import java.time.LocalDateTime;
 @Builder
 public class BestGuideDTO {
 
-    @Getter
-    @Setter
+    @Data
+    @NoArgsConstructor
+    @ApiModel(value = "가이드 ID DTO")
+    public static class IdRequestDTO {
+
+        @Positive(message = "양수만 가능합니다.")
+        @ApiModelProperty(value = "BestGuide ID", example = "1")
+        private int id;
+
+    }
+
+    @Data
+    @NoArgsConstructor
+    @ApiModel(value = "가이드 검색 DTO")
+    public static class SearchRequestDTO {
+
+        @ApiModelProperty(value = "search type", example = "0 : 없음 / 1 : 이름 / 2 : 닉네임 / 3 : 이메일")
+        private int type;
+
+        @ApiModelProperty(value = "검색어", example = "aaa")
+        private String word;
+
+        /**
+         * 검색 타입
+         */
+        public static class SearchType {
+
+            public static final int NONE = 0;
+            public static final int BY_NAME = 1;
+            public static final int BY_NICKNAME = 2;
+            public static final int BY_EMAIL = 3;
+
+        }
+    }
+
+    @Data
     @NoArgsConstructor
     @ApiModel(value = "가이드 정보 응답 DTO")
     public static class GuideInfoResponseDTO {

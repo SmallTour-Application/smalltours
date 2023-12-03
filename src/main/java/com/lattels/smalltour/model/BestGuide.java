@@ -18,8 +18,13 @@ import java.time.LocalDate;
 public class BestGuide {
 
     @Id
-    @Column(name = "guide_id")
-    private int guideId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
+
+    @ManyToOne
+    @JoinColumn(name = "guide_id")
+    private Member guide;
 
     @Column(name = "set_day")
     private LocalDate setDay; //선정일시
