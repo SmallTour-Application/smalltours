@@ -22,7 +22,7 @@ public class AdminPaymentDetailDTO {
         private String tel;
         private int guideId; //가이드 아이디
         private String guideName;
-        private LocalDateTime paymentDay;
+        private LocalDate paymentDay;
         private LocalDate startDay;
         private LocalDate endDay;
         private int people;

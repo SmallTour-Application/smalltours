@@ -42,6 +42,8 @@ public class AdminGuidePaymentListDTO {
         private String toursTitle;
         //상품아이디
         private int toursId;
+        //payment 아이디
+        private int paymentId;
     }
 
 

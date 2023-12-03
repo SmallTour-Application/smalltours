@@ -274,6 +274,7 @@ public class AdminPaymentService {
                     .state(status)
                     .toursTitle((String) result[13])
                     .toursId((Integer) result[14])
+                    .paymentId((Integer) result[15])
                     .build();
             guideDurationDTOS.add(gd);
         }
@@ -308,8 +309,8 @@ public class AdminPaymentService {
                 .guideId(detail.getGuideId())
                 .guideName(detail.getGuideName())
                 .paymentDay(detail.getPaymentDay())
-                .startDay(detail.getStartDay())
-                .endDay(detail.getEndDay())
+                //.startDay(detail.getStartDay())
+                //.endDay(detail.getEndDay())
                 .people(detail.getPeople())
                 .state(status)
                 .tourId(detail.getTourId())

@@ -13,7 +13,7 @@ public interface AdminInterfacePaymentDetail {
     String getTel();
     Integer getGuideId();
     String getGuideName();
-    LocalDateTime getPaymentDay();
+    LocalDate getPaymentDay();
     LocalDate getStartDay();
     LocalDate getEndDay();
     Integer getPeople();

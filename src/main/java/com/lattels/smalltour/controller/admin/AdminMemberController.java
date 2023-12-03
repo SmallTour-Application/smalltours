@@ -400,6 +400,7 @@ public class AdminMemberController {
             AdminPaymentDetailDTO paymentDetailDTO = adminPaymentService.getPaymentDetail(authentication,paymentId);
             return ResponseEntity.ok().body(paymentDetailDTO);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
