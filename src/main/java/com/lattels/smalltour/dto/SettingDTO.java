@@ -16,12 +16,12 @@ public class SettingDTO {
     @ApiModelProperty(value = "아이디", example = "1")
     private int id;
 
-    @ApiModelProperty(value = "패키지 수수료", example = "1")
-    private String packageCommission;
+    @ApiModelProperty(value = "패키지 수수료", example = "0.0")
+    private double packageCommission;
 
     public SettingDTO(Setting setting) {
         this.id = setting.getId();
-        this.packageCommission = String.valueOf(setting.getPackageCommission());
+        this.packageCommission = setting.getPackageCommission();
     }
 
 }

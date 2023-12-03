@@ -26,32 +26,15 @@ public class SettingController {
     private final SettingService settingService;
 
     /*
-     * 설정 추가
+     * 설정하기
      */
-    @PostMapping(value = "/add")
+    @PostMapping(value = "/set-up")
     @ApiOperation(value = "설정 추가")
-    public ResponseEntity<Object> addSetting(@ApiIgnore Authentication authentication, @RequestBody SettingDTO settingDTO) {
+    public ResponseEntity<Object> setUp(@ApiIgnore Authentication authentication, @RequestBody SettingDTO settingDTO) {
 
         try {
-            settingService.addSetting(authentication, settingDTO);
+            settingService.setUp(authentication, settingDTO);
             return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ResponseMessageException(ErrorCode.INVALID_PARAMETER);
-        }
-
-    }
-
-    /*
-     * 설정 수정
-     */
-    @PostMapping(value = "/update")
-    @ApiOperation(value = "설정 업데이트")
-    public ResponseEntity<SettingDTO> updateSetting(@ApiIgnore Authentication authentication, @RequestBody SettingDTO settingDTO) {
-
-        try {
-            SettingDTO responseDTO = settingService.updateSetting(authentication, settingDTO);
-            return ResponseEntity.ok().body(responseDTO);
         } catch (Exception e) {
             e.printStackTrace();
             throw new ResponseMessageException(ErrorCode.INVALID_PARAMETER);

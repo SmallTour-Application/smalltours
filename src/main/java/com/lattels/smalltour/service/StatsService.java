@@ -1,10 +1,11 @@
 package com.lattels.smalltour.service;
 
 import com.google.common.base.Preconditions;
+import com.google.common.math.Stats;
 import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.stats.SiteProfitDTO;
-import com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO;
 import com.lattels.smalltour.dto.stats.StatsDTO;
+import com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO;
 import com.lattels.smalltour.dto.stats.TotalVolumePercentageDTO;
 import com.lattels.smalltour.exception.ErrorCode;
 import com.lattels.smalltour.exception.ResponseMessageException;
@@ -24,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -41,6 +41,10 @@ public class StatsService {
     private final ReviewsRepository reviewsRepository;
 
     private final SettingRepository settingRepository;
+
+    private final BannerRepository bannerRepository;
+
+    private final UpperPaymentRepository upperPaymentRepository;
 
     @Value("${server.domain}")
     private String domain;
@@ -295,15 +299,57 @@ public class StatsService {
 
         LocalDateTime startDate = requestDTO.getStartDate().atStartOfDay();
         LocalDateTime endDate = requestDTO.getEndDate().atStartOfDay();
-        SiteProfitDTO siteProfitDTO = paymentRepository.getSiteProfit(startDate, endDate);
+        String packageProfitStr = paymentRepository.sumPriceByDate(startDate, endDate);
+        String bannerProfitStr = bannerRepository.sumPriceByDate(startDate, endDate);
+        String upperPaymentProfitStr = upperPaymentRepository.sumPriceByDate(startDate, endDate);
 
+        if (packageProfitStr == null) packageProfitStr = "0";
+        if (bannerProfitStr == null) bannerProfitStr = "0";
+        if (upperPaymentProfitStr == null) upperPaymentProfitStr = "0";
+
+        int bannerProfit = Integer.parseInt(bannerProfitStr);
+        int upperPaymentProfit = Integer.parseInt(upperPaymentProfitStr);
+
+        double packageCommission = 0;
         List<Setting> settings = settingRepository.findAll();
-        Setting setting = settings.get(0);
+        if (settings != null) packageCommission = settings.get(0).getPackageCommission();
 
-        siteProfitDTO.setToursProfit((int) ((siteProfitDTO.getToursProfit()/setting.getPackageCommission()) * 100));
-        int totalProfit = siteProfitDTO.getToursProfit() + siteProfitDTO.getUpperPaymentProfit();
-        siteProfitDTO.setTotalProfit(totalProfit);
+        double tempPackageProfit = (Integer.parseInt(packageProfitStr) * packageCommission) / 100;
+        int packageProfit = (int) tempPackageProfit;
+        SiteProfitDTO siteProfitDTO = new SiteProfitDTO(packageProfit, upperPaymentProfit, bannerProfit);
         return siteProfitDTO;
 
     }
+
+    public StatsDTO.SearchGuideSalesResponseDTO searchGuideSales(Authentication authentication, StatsDTO.SearchGuideSalesRequestDTO requestDTO) {
+
+        int memberId = Integer.parseInt(authentication.getPrincipal().toString());
+        Member member = memberRepository.findByMemberId(memberId);
+        // 등록된 회원인지 검사
+        if (member == null) {
+            throw new ResponseMessageException(ErrorCode.USER_UNREGISTERED);
+        }
+        // 관리자 회원인지 검사
+        if (member.getRole() != MemberDTO.MemberRole.ADMIN) {
+            throw new ResponseMessageException(ErrorCode.ADMIN_INVALID_PERMISSION);
+        }
+
+        List<Object[]> objects = paymentRepository.searchSalesByConditions(requestDTO.getStartDate(), requestDTO.getEndDate(), requestDTO.getSales(), requestDTO.getState(), requestDTO.getToursTitle());
+        List<StatsDTO.DatePerSalesDTO> datePerSalesDTOS = new ArrayList<>();
+        StatsDTO.SearchGuideSalesResponseDTO responseDTOS = new StatsDTO.SearchGuideSalesResponseDTO();
+        int salesVolume = 0;
+        int sales = 0;
+        for (Object[] object : objects) {
+            StatsDTO.DatePerSalesDTO datePerSalesDTO = new StatsDTO.DatePerSalesDTO(object);
+            salesVolume += datePerSalesDTO.getSalesVolume();
+            sales += datePerSalesDTO.getSales();
+            datePerSalesDTOS.add(datePerSalesDTO);
+        }
+        responseDTOS.setTotalSalesVolume(salesVolume);
+        responseDTOS.setTotalSales(sales);
+        responseDTOS.setDatePerSalesDTOS(datePerSalesDTOS);
+        return responseDTOS;
+
+    }
+
 }

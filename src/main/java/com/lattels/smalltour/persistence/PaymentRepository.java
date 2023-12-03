@@ -2,7 +2,6 @@ package com.lattels.smalltour.persistence;
 
 import com.lattels.smalltour.dto.admin.payment.AdminInterfacePaymentDetail;
 import com.lattels.smalltour.dto.admin.payment.AdminInterfacePaymentTourList;
-import com.lattels.smalltour.dto.stats.SiteProfitDTO;
 import com.lattels.smalltour.dto.stats.TotalVolumePercentageDTO;
 import com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO;
 import com.lattels.smalltour.model.Payment;
@@ -12,14 +11,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-
-public interface PaymentRepository extends JpaRepository<Payment, Integer> {
+@Repository
+public interface PaymentRepository extends JpaRepository<Payment, Integer>, PaymentRepositoryCustom {
 
     //countAllByToursId
     int countAllByToursId(int toursId);
@@ -180,11 +180,11 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     /*
     * 기간 동안의 사이트 수익
     */
-    @Query(value = "SELECT new com.lattels.smalltour.dto.stats.SiteProfitDTO((SELECT sum(up.item.price) FROM UpperPayment up WHERE up.payDay >= :startDate AND up.payDay <= :endDate), SUM(p.price)) " +
+    @Query(value = "SELECT SUM(p.price) " +
             "FROM Payment p " +
             "WHERE p.paymentDay >= :startDate AND p.paymentDay <= :endDate " +
             "AND p.state = 1 ")
-    SiteProfitDTO getSiteProfit(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+    String sumPriceByDate(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     @Query(value = "SELECT p.id AS paymentId, t.id AS tourId, t.title, m.id AS memberId,m.name AS memberName, g.id AS guideId,g.name AS guideName, p.price, p.state, p.departure_day AS departureDay, p.people, p.payment_day AS paymentDay " +
             "FROM payment p " +
@@ -269,4 +269,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
             "INNER JOIN member g ON t.guide_id = g.id " +
             "WHERE p.id = :paymentId", nativeQuery = true)
     Optional<AdminInterfacePaymentDetail> findByPaymentDetail(@Param("paymentId") int paymentId);
+
+//    List<Object[]> searchSalesByConditions(LocalDate startDay, LocalDate endDay, Long sales, Integer state, String toursTitle);
 }
