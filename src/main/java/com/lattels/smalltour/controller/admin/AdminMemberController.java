@@ -243,7 +243,7 @@ public class AdminMemberController {
     }
 
 
-    @PostMapping("/add/member")
+    @PostMapping("/add/register")
     public ResponseEntity<?> registerMember(@ApiIgnore Authentication authentication, AdminAddMemberDTO.AddMember addMemberDTO) {
 
         try {

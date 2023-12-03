@@ -51,12 +51,12 @@ public interface EducationRepository extends JpaRepository<Education, Integer> {
             "WHERE el.state = 1 AND el.education_id =:educationId",nativeQuery = true)
     int findCompletedEducation(@Param("educationId") int educationId);
 
-    @Query(value = "SELECT e.title,e.start_day,e.end_day,e.id,e.state FROM education e WHERE e.state =:state AND (e.id = :educationId OR :educationId IS NULL)"
+    @Query(value = "SELECT e.title,e.start_day,e.end_day,e.id,e.state FROM education e WHERE (e.state =:state OR :state IS NULL) AND (e.id = :educationId OR :educationId IS NULL)"
             , nativeQuery = true)
     List<Object[]> findByGuideEducationContent(Pageable pageable,@Param("state") int state,@Param("educationId") Integer educationId);
 
 
-    @Query(value = "SELECT count(*) FROM education e WHERE e.state =:state AND (e.id = :educationId OR :educationId IS NULL)",nativeQuery = true)
+    @Query(value = "SELECT count(*) FROM education e WHERE (e.state =:state OR :state IS NULL) AND (e.id = :educationId OR :educationId IS NULL)",nativeQuery = true)
     int countState(@Param("state") int state,@Param("educationId") Integer educationId);
 
 
@@ -82,5 +82,10 @@ public interface EducationRepository extends JpaRepository<Education, Integer> {
 
     int countByTitleContaining(String title);
 
+
+    @Query(value = "SELECT e.id AS educationId, e.video_path, e.start_day, e.end_day, e.play_time, e.title, e.upload_day, e.state AS educationState, el.education_id AS educationLogId, " +
+            "el.guide_id AS educationLogGuideId, m.name AS guideName, el.last_view, el.state AS educationLogState, el.completed_date " +
+    "FROM education e JOIN education_log el ON e.id = el.education_id JOIN member m ON el.guide_id = m.id WHERE e.id =:educationId ", nativeQuery = true)
+    List<Object[]> findEducationDetail(@Param("educationId") int educationId);
 
 }

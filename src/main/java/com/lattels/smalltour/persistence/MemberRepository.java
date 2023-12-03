@@ -189,6 +189,10 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
      */
     Page<Member> findByEmailContainsAndRole(String word, int role, Pageable pageable);
 
+
+
+    @Query(value = "SELECT * FROM member m JOIN best_guide bg ON m.id = bg.guide_id WHERE m.role = 2 AND m.id =:memberId", nativeQuery = true)
+    Member findByMemberDetailInfoId(@Param("memberId") Integer memberId);
 }
 
 

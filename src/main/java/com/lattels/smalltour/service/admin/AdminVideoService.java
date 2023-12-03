@@ -2,6 +2,7 @@ package com.lattels.smalltour.service.admin;
 
 
 import com.lattels.smalltour.dto.admin.education.EducationDTO;
+import com.lattels.smalltour.dto.admin.education.EducationDetailDTO;
 import com.lattels.smalltour.dto.admin.education.EducationGuideDTO;
 import com.lattels.smalltour.dto.admin.education.EducationVideoDTO;
 import com.lattels.smalltour.model.Education;
@@ -27,6 +28,7 @@ import net.bramp.ffmpeg.probe.FFmpegFormat;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -283,5 +285,43 @@ public class AdminVideoService {
         checkAdmin(adminId);
         Education education = educationRepository.findById(educationId);
         educationRepository.delete(education);
+    }
+
+
+    public EducationDetailDTO getEducationDetail(int adminId, int educationId){
+        checkAdmin(adminId);
+        List<Object[]> educations = educationRepository.findEducationDetail(educationId);
+
+        if (educations.isEmpty()) {
+            throw new RuntimeException("해당 강좌를 수강한 가이드들 기록이 없습니다.");
+        }
+
+        List<EducationDetailDTO.EducationDTO> educationDTOS = new ArrayList<>();
+
+        for(Object[] educationDetail : educations){
+
+            EducationDetailDTO.EducationDTO educationDTO = EducationDetailDTO.EducationDTO.builder()
+                    .id((Integer) educationDetail[0])
+                    .videoPath((String) educationDetail[1])
+                    .startDay(educationDetail[2] != null ? ((java.sql.Date) educationDetail[2]).toLocalDate() : null)
+                    .endDay(educationDetail[3] != null ? ((java.sql.Date) educationDetail[3]).toLocalDate() : null)
+                    .playTime(educationDetail[4] != null ? ((java.sql.Time) educationDetail[4]).toLocalTime() : null) // LocalDateTime으로 변환
+                    .title((String) educationDetail[5])
+                    .uploadDay(educationDetail[6] != null ? ((java.sql.Date) educationDetail[6]).toLocalDate() : null)
+                    .educationState(((Integer) educationDetail[7]))
+                    .educationLogId((Integer) educationDetail[8])
+                    .guideId((Integer) educationDetail[9])
+                    .guideName((String) educationDetail[10])
+                    .lastView(educationDetail[11] != null ? ((java.sql.Time) educationDetail[11]).toLocalTime() : null) // LocalDateTime으로 변환
+                    .educationLogState(educationDetail[12] != null ? ((Number) educationDetail[12]).intValue() : null)
+                    .completedDate(educationDetail[13] != null ? ((java.sql.Date) educationDetail[13]).toLocalDate() : null)
+                    .build();
+
+            educationDTOS.add(educationDTO);
+        }
+
+        return EducationDetailDTO.builder()
+                .educationDTO(educationDTOS)
+                .build();
     }
 }
