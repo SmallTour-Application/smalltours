@@ -8,6 +8,7 @@ import org.springframework.util.ObjectUtils;
 
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -122,6 +123,65 @@ public class StatsDTO {
         private int totalSalesVolume;
 
         List<TotalVolumePercentageDTO> totalVolumePercentageDTOList;
+
+    }
+
+    @Data
+    @NoArgsConstructor
+    @ApiModel(value = "가이드 통계 검색 요청 DTO")
+    public static class  SearchGuideSalesRequestDTO{
+
+        @ApiModelProperty(value = "시작일", example = "2023-04-13")
+        private LocalDate startDate;
+
+        @ApiModelProperty(value = "종료일", example = "2023-04-13")
+        private LocalDate endDate;
+
+        @ApiModelProperty(value = "판매량 (몇 개 이상)", example = "1")
+        private int sales;
+
+        @ApiModelProperty(value = "상태", example = "0 : 미결제 / 1 : 결제")
+        private int state;
+
+        @ApiModelProperty(value = "패키지 이름", example = "패키지명")
+        private String toursTitle;
+
+    }
+
+    @Data
+    @NoArgsConstructor
+    @ApiModel(value = "가이드 통계 응답 DTO")
+    public static class SearchGuideSalesResponseDTO {
+
+        @ApiModelProperty(value = "총 판매량", example = "1")
+        private int totalSalesVolume;
+
+        @ApiModelProperty(value = "총 매출액", example = "1")
+        private int totalSales;
+
+        List<DatePerSalesDTO> datePerSalesDTOS;
+
+    }
+
+    @Data
+    @NoArgsConstructor
+    @ApiModel(value = "가이드 날짜별 매출")
+    public static class DatePerSalesDTO {
+
+        @ApiModelProperty(value = "날짜", example = "")
+        private Date date;
+
+        @ApiModelProperty(value = "판매량", example = "1")
+        private int salesVolume;
+
+        @ApiModelProperty(value = "매출액", example = "1")
+        private int sales;
+
+        public DatePerSalesDTO(Object[] objects) {
+            this.date = (Date) objects[0];
+            this.salesVolume = Integer.parseInt(String.valueOf(objects[1]));
+            this.sales = Integer.parseInt(String.valueOf(objects[2]));
+        }
 
     }
 

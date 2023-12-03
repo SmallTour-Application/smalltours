@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 
@@ -19,8 +20,10 @@ public interface UpperPaymentRepository extends JpaRepository<UpperPayment, Inte
     */
     Page<UpperPayment> findAllByGuideOrderByPayDay(Member member, Pageable pageable);
 
-
-
+    @Query(value = "SELECT SUM(up.item.price) " +
+            "FROM UpperPayment up " +
+            "WHERE up.payDay >= :startDate AND up.payDay <= :endDate ")
+    String sumPriceByDate(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     @Query(value = "SELECT u FROM UpperPayment u " +
             "JOIN u.guide g JOIN u.tours t JOIN u.item i " +

@@ -5,6 +5,7 @@ import com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO;
 import com.lattels.smalltour.dto.stats.StatsDTO;
 import com.lattels.smalltour.exception.ErrorCode;
 import com.lattels.smalltour.exception.ResponseMessageException;
+import com.lattels.smalltour.model.Payment;
 import com.lattels.smalltour.service.StatsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -98,10 +99,10 @@ public class StatsController {
     */
     @PostMapping(value = "/total-volume-percentage")
     @ApiOperation(value = "기간 동안의 판매 비율 가져오기")
-    public ResponseEntity<StatsDTO.TotalVolumePercentageResponseDTO> getTotalVolumePercentageList(@ApiIgnore Authentication authentication, @RequestBody StatsDTO.DateRequestDTO requestDTO) {
+    public ResponseEntity<StatsDTO.TotalVolumePercentageResponseDTO> getTotalVolumePercentageList(@ApiIgnore Authentication authentication, @RequestBody StatsDTO.DateRequestDTO dateRequestDTO) {
 
         try {
-            StatsDTO.TotalVolumePercentageResponseDTO responseDTO = statsService.getTotalVolumePercentageList(authentication, requestDTO);
+            StatsDTO.TotalVolumePercentageResponseDTO responseDTO = statsService.getTotalVolumePercentageList(authentication, dateRequestDTO);
             return ResponseEntity.ok().body(responseDTO);
         } catch (Exception e) {
             e.printStackTrace();
@@ -115,10 +116,27 @@ public class StatsController {
     */
     @PostMapping(value = "/site-profit")
     @ApiOperation(value = "기간 동안의 사이트 수익 가져오기")
-    public ResponseEntity<SiteProfitDTO> getSiteProfit(@ApiIgnore Authentication authentication, @RequestBody StatsDTO.DateRequestDTO requestDTO) {
+    public ResponseEntity<SiteProfitDTO> getSiteProfit(@ApiIgnore Authentication authentication, @RequestBody StatsDTO.DateRequestDTO dateRequestDTO) {
 
         try {
-            SiteProfitDTO responseDTO = statsService.getSiteProfit(authentication, requestDTO);
+            SiteProfitDTO responseDTO = statsService.getSiteProfit(authentication, dateRequestDTO);
+            return ResponseEntity.ok().body(responseDTO);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseMessageException(ErrorCode.INVALID_PARAMETER);
+        }
+
+    }
+
+    /*
+    * 가이드 통계 검색
+    */
+    @PostMapping(value = "/search/guide-sales")
+    @ApiOperation(value = "가이드 통계 검색")
+    public ResponseEntity<StatsDTO.SearchGuideSalesResponseDTO> searchGuideSales(@ApiIgnore Authentication authentication, @RequestBody StatsDTO.SearchGuideSalesRequestDTO requestDTO) {
+
+        try {
+            StatsDTO.SearchGuideSalesResponseDTO responseDTO = statsService.searchGuideSales(authentication, requestDTO);
             return ResponseEntity.ok().body(responseDTO);
         } catch (Exception e) {
             e.printStackTrace();
