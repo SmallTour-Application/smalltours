@@ -2,6 +2,7 @@ package com.lattels.smalltour.controller.admin;
 
 
 import com.lattels.smalltour.dto.admin.education.EducationDTO;
+import com.lattels.smalltour.dto.admin.education.EducationDetailDTO;
 import com.lattels.smalltour.dto.admin.education.EducationGuideDTO;
 import com.lattels.smalltour.dto.admin.education.EducationVideoDTO;
 import com.lattels.smalltour.service.admin.AdminVideoService;
@@ -39,7 +40,7 @@ public class AdminVideoController {
         }
     }
 
-    @ApiOperation("교육 강좌 목록")
+    @ApiOperation("교육 강좌 목록, page, state 입력 필수 educationId는 안하면 전체가, 하면 해당 id에 속한것만")
     @PostMapping("/education/view/list")
     public ResponseEntity<?> getVideoList(@ApiIgnore Authentication authentication, int page,@RequestParam int state,@RequestParam(required = false) Integer educationId) {
         int adminId = Integer.parseInt(authentication.getPrincipal().toString());
@@ -81,5 +82,15 @@ public class AdminVideoController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @ApiOperation("교육 상세 강좌 목록")
+    @PostMapping("/education/detail")
+    public ResponseEntity<?> getEducationDetail(@ApiIgnore Authentication authentication, @RequestParam() Integer educationId) {
+        int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+        EducationDetailDTO educationDetailDTO = adminVideoService.getEducationDetail(adminId, educationId);
+        return ResponseEntity.ok(educationDetailDTO);
+    }
+    
+    
 
 }

@@ -49,6 +49,7 @@ public class ListMemberDTO {
 
     private String profileImg;
 
+    private String bestGuide;
     public ListMemberDTO(final Member member) {
 
         this.id = member.getId();

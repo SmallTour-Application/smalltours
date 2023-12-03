@@ -164,8 +164,18 @@ public class AdminService {
            checkAdmin(adminId);
 
             Member member = memberRepository.findByMemberInfoId(memberId);
+            Member bestGuide = memberRepository.findByMemberDetailInfoId(memberId);
             if (member == null) {
                 throw new RuntimeException("해당 멤버를 찾을 수 없습니다.");
+            }
+
+            String guideStatus = "";
+            if(member.getRole() == 2){
+                guideStatus = (bestGuide != null) ? "우수가이드" : "일반가이드";
+            }else if(member.getRole() == 0){
+                guideStatus = "일반 회원";
+            }else{
+                guideStatus = "미등록 가이드";
             }
 
             ListMemberDTO listMemberDTO = ListMemberDTO.builder()
@@ -178,7 +188,9 @@ public class AdminService {
                     .birthDay(member.getBirthDay())
                     .joinDay(member.getJoinDay())
                     .gender(member.getGender())
+                    .state(member.getState())
                     .role(member.getRole())
+                    .bestGuide(guideStatus)
                     .build();
 
             if(member.getProfile() != null){
@@ -205,7 +217,23 @@ public class AdminService {
             List<Member> member = memberRepository.findByMembersId();
             List<ListMemberDTO> listMember = new ArrayList<>();
 
+
             for (Member members : member){
+
+                Member bestGuide = memberRepository.findByMemberDetailInfoId(members.getId());
+                if (members == null) {
+                    throw new RuntimeException("해당 멤버를 찾을 수 없습니다.");
+                }
+
+                String guideStatus = "";
+                if(members.getRole() == 2){
+                    guideStatus = (bestGuide != null) ? "우수가이드" : "일반가이드";
+                }else if(members.getRole() == 0){
+                    guideStatus = "일반 회원";
+                }else{
+                    guideStatus = "미등록 가이드";
+                }
+
                 ListMemberDTO listMemberDTO = ListMemberDTO.builder()
                         .id(members.getId())
                         .email(members.getEmail())
@@ -217,6 +245,7 @@ public class AdminService {
                         .joinDay(members.getJoinDay())
                         .gender(members.getGender())
                         .role(members.getRole())
+                        .bestGuide(guideStatus)
                         .build();
 
                 if(members.getProfile() != null){
