@@ -50,6 +50,8 @@ public class ListMemberDTO {
     private String profileImg;
 
     private String bestGuide;
+
+    private String kakaoConnect;
     public ListMemberDTO(final Member member) {
 
         this.id = member.getId();
