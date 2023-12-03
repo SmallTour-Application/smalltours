@@ -6,14 +6,8 @@ import com.lattels.smalltour.dto.MemberDTO;
 import com.lattels.smalltour.dto.favoriteGuideDTO;
 import com.lattels.smalltour.exception.ErrorCode;
 import com.lattels.smalltour.exception.ResponseMessageException;
-import com.lattels.smalltour.model.FavoriteGuide;
-import com.lattels.smalltour.model.FavoriteTour;
-import com.lattels.smalltour.model.Member;
-import com.lattels.smalltour.model.Tours;
-import com.lattels.smalltour.persistence.FavoriteGuideRepository;
-import com.lattels.smalltour.persistence.FavoriteTourRepository;
-import com.lattels.smalltour.persistence.MemberRepository;
-import com.lattels.smalltour.persistence.ToursRepository;
+import com.lattels.smalltour.model.*;
+import com.lattels.smalltour.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +26,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -43,6 +38,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final FavoriteTourRepository favoriteTourRepository;
     private final ToursRepository toursRepository;
+    private final KakaoInfoRepository kakaoInfoRepository;
 
     @Value("${file.path}")
     private String filePath;
@@ -68,6 +64,20 @@ public class MemberService {
         try{
             //Optional<Member> member = memberRepository.findById(memberDTO.getId());
             Member member = memberRepository.findByMemberId(memberDTO.getId());
+            Member bestGuide = memberRepository.findByMemberDetailInfoId(member.getId());
+
+            String guideStatus = "";
+            if(member.getRole() == 2){
+                guideStatus = (bestGuide != null) ? "우수가이드" : "일반가이드";
+            }else if(member.getRole() == 0){
+                guideStatus = "일반 회원";
+            }else{
+                guideStatus = "미등록 가이드";
+            }
+
+            Optional<KakaoInfo> kakaoInfo = kakaoInfoRepository.findByMemberId(member.getId());
+            String kakaoConnectStatus = kakaoInfo.isPresent() ? "카카오 계정이랑 연동" : "연동안됨";
+
 
             MemberDTO responseMemberDTO = MemberDTO.builder()
                     .email(member.getEmail())
@@ -79,6 +89,8 @@ public class MemberService {
                     .joinDay(LocalDateTime.now())
                     .gender(member.getGender())
                     .role(member.getRole())
+                    .bestGuide(guideStatus)
+                    .kakaoConnect(kakaoConnectStatus)
                     .build();
 
             //이미지가 있으면

@@ -7,6 +7,7 @@ import com.lattels.smalltour.dto.admin.member.AdminAddMemberDTO;
 import com.lattels.smalltour.dto.admin.member.ListMemberDTO;
 import com.lattels.smalltour.dto.admin.search.AdminSearchDTO;
 import com.lattels.smalltour.dto.search.SearchGuideDTO;
+import com.lattels.smalltour.model.KakaoInfo;
 import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.persistence.*;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ public class AdminService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final FavoriteGuideRepository favoriteGuideRepository;
+    private final KakaoInfoRepository kakaoInfoRepository;
 
     @Value("${file.path}")
     private String filePath;
@@ -165,6 +167,9 @@ public class AdminService {
 
             Member member = memberRepository.findByMemberInfoId(memberId);
             Member bestGuide = memberRepository.findByMemberDetailInfoId(memberId);
+            Optional<KakaoInfo> kakaoInfo = kakaoInfoRepository.findByMemberId(member.getId());
+            String kakaoConnectStatus = kakaoInfo.isPresent() ? "카카오 계정이랑 연동" : "연동안됨";
+
             if (member == null) {
                 throw new RuntimeException("해당 멤버를 찾을 수 없습니다.");
             }
@@ -191,6 +196,7 @@ public class AdminService {
                     .state(member.getState())
                     .role(member.getRole())
                     .bestGuide(guideStatus)
+                    .kakaoConnect(kakaoConnectStatus)
                     .build();
 
             if(member.getProfile() != null){
@@ -217,10 +223,14 @@ public class AdminService {
             List<Member> member = memberRepository.findByMembersId();
             List<ListMemberDTO> listMember = new ArrayList<>();
 
-
             for (Member members : member){
 
                 Member bestGuide = memberRepository.findByMemberDetailInfoId(members.getId());
+                Optional<KakaoInfo> kakaoInfo = kakaoInfoRepository.findByMemberId(members.getId());
+                String kakaoConnectStatus = kakaoInfo.isPresent() ? "카카오 계정이랑 연동" : "연동안됨";
+
+
+
                 if (members == null) {
                     throw new RuntimeException("해당 멤버를 찾을 수 없습니다.");
                 }
@@ -246,6 +256,7 @@ public class AdminService {
                         .gender(members.getGender())
                         .role(members.getRole())
                         .bestGuide(guideStatus)
+                        .kakaoConnect(kakaoConnectStatus)
                         .build();
 
                 if(members.getProfile() != null){

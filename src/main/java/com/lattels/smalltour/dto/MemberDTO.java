@@ -175,6 +175,10 @@ public class MemberDTO {
 
     private String profileImg;
 
+    private String bestGuide;
+
+    private String kakaoConnect;
+
 
     public MemberDTO(final Member member) {
 
