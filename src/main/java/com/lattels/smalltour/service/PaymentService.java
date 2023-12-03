@@ -239,8 +239,8 @@ public class PaymentService {
         Member searcher = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다. (회원 ID: " + memberId + ")"));
 
-        // 검색을 하는 사람이 가이드인지 확인
-        if (searcher.getRole() != 2) {
+        // 검색을 하는 사람이 가이드나 admin인지 확인
+        if (searcher.getRole() == 0) {
             throw new IllegalArgumentException("가이드만이 이 정보를 검색할 수 있습니다. (회원 ID: " + memberId + ")");
         }
 

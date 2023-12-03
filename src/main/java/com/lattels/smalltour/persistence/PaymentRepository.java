@@ -197,7 +197,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     //countAllByTourIdAndState
     int countByToursIdAndState(int tourId, int state);
 
-    @Query(value = "SELECT m.id AS memberId, m.name AS memberName, m.tel AS memberTel, p.people, p.departure_day, m.email AS memberEmail, g.id AS guideId, g.name AS guideName, p.price AS price, p.payment_day, gl.start_day, gl.end_day, p.state, t.title, t.id AS tourId " +
+    @Query(value = "SELECT m.id AS memberId, m.name AS memberName, m.tel AS memberTel, p.people, p.departure_day, m.email AS memberEmail, g.id AS guideId, g.name AS guideName, p.price AS price, p.payment_day, gl.start_day, gl.end_day, p.state, t.title, t.id AS tourId, p.id AS paymentId " +
             "FROM payment p " +
             "JOIN tours t ON p.tour_id = t.id " +
             "JOIN member m ON p.member_id = m.id " +
@@ -233,7 +233,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
 
 
     // findGuidePayment에서 날짜 빼고 검색
-    @Query(value = "SELECT m.id AS memberId, m.name AS memberName, m.tel AS memberTel, p.people, p.departure_day, m.email AS memberEmail, g.id AS guideId, g.name AS guideName, p.price AS price, p.payment_day, gl.start_day, gl.end_day, p.state, t.title, t.id AS tourId " +
+    @Query(value = "SELECT m.id AS memberId, m.name AS memberName, m.tel AS memberTel, p.people, p.departure_day, m.email AS memberEmail, g.id AS guideId, g.name AS guideName, p.price AS price, p.payment_day, gl.start_day, gl.end_day, p.state, t.title, t.id AS tourId, p.id AS paymentId " +
             "FROM payment p " +
             "JOIN tours t ON p.tour_id = t.id " +
             "JOIN member m ON p.member_id = m.id " +
@@ -261,13 +261,12 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
 
 
     @Query(value = "SELECT p.id AS paymentId, m.id AS memberId, m.name AS memberName, m.email, m.tel, " +
-            "g.id AS guideId, g.name AS guideName, p.payment_day AS paymentDay, gl.start_day AS startDay, gl.end_day AS endDay, " +
+            "g.id AS guideId, g.name AS guideName, p.payment_day AS paymentDay, " +
             "p.people, p.state, t.id AS tourId, t.title, t.price, p.departure_day AS departureDay " +
             "FROM payment p " +
-            "JOIN tours t ON p.tour_id = t.id " +
-            "JOIN member m ON p.member_id = m.id " +
-            "JOIN member g ON t.guide_id = g.id " +
-            "JOIN guide_lock gl ON gl.guide_id = g.id " +
+            "INNER JOIN tours t ON p.tour_id = t.id " +
+            "INNER JOIN member m ON p.member_id = m.id " +
+            "INNER JOIN member g ON t.guide_id = g.id " +
             "WHERE p.id = :paymentId", nativeQuery = true)
     Optional<AdminInterfacePaymentDetail> findByPaymentDetail(@Param("paymentId") int paymentId);
 }
