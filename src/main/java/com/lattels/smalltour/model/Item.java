@@ -36,4 +36,7 @@ public class Item {
     @Column(name = "type")
     private int type;
 
+    @Column(name = "state")
+    private int state;
+
 }

@@ -24,7 +24,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/stats")
-@Api(tags = "Stats Controller", description = "가이드 통계 컨트롤러")
+@Api(tags = "Stats Controller", description = "통계 컨트롤러")
 public class StatsController {
 
     private final StatsService statsService;
@@ -63,7 +63,7 @@ public class StatsController {
     * 월별 예약 수 가져오기
     */
     @PostMapping(value = "/payment-per-month")
-    @ApiOperation(value = "월별 가입 수")
+    @ApiOperation(value = "월별 예약 수")
     public ResponseEntity<List<TotalCntPerMonthDTO>> getPaymentPerMonth(@ApiIgnore Authentication authentication) {
 
         try {
