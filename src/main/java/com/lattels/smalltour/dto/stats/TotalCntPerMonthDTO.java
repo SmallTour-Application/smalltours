@@ -15,6 +15,11 @@ public class TotalCntPerMonthDTO {
     @ApiModelProperty(value = "가입자 수", example = "2")
     private long totalCnt;
 
+    public TotalCntPerMonthDTO(int year, int month, long memberCnt) {
+        this.month = year + "-" + month;
+//        this.month = month;
+        this.totalCnt = memberCnt;
+    }
     public TotalCntPerMonthDTO(LocalDateTime month, long memberCnt) {
         this.month = month.getYear() + "-" + month.getMonthValue();
         this.totalCnt = memberCnt;

@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +71,13 @@ public class EducationService {
             EducationLog educationLog = educationLogRepository.findByEducationIdAndGuideId(education.getId(), memberId);
             // 비어있다면 3(시청 전)
             if (educationLog == null) {
-                listResponseDTO.setState(EducationLogDTO.EducationLogState.DO_NOT);
+                // 현재 날짜가 시작 날짜보다 이전이라면
+                if (LocalDate.now().isBefore(education.getStartDay())) {
+                    listResponseDTO.setState(EducationLogDTO.EducationLogState.IMPOSSIBLE);
+                }
+                else {
+                    listResponseDTO.setState(EducationLogDTO.EducationLogState.POSSIBLE);
+                }
             }
             else {
                 listResponseDTO.setState(educationLog.getState());

@@ -273,7 +273,11 @@ public interface ToursRepository extends JpaRepository<Tours, Integer>, JpaSpeci
             //, @Param("checkDate") LocalDate checkDate
     );
 
-
+    @Query(value = "SELECT COUNT(t) " +
+            "FROM Tours t " +
+            "WHERE t.createdDay BETWEEN :startDay AND :endDay " +
+            "AND t.approvals = :approvals")
+    long searchTotalCntByDate(@Param("startDay") LocalDateTime startDay, @Param("endDay") LocalDateTime endDay, @Param("approvals") int approvals);
 
 
 }

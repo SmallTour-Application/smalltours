@@ -16,6 +16,7 @@ public enum ErrorCode {
     TRAVELER_INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "여행자 권한이 없습니다."),
     GUIDE_INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "가이드 권한이 없습니다."),
     ADMIN_INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "관리자 권한이 없습니다."),
+    INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
 
     // 404 NOT_FOUND 잘못된 리소스 접근
     LECTURE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 강의 ID 입니다."),

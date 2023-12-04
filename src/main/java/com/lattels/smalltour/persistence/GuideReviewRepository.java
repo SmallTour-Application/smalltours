@@ -141,6 +141,15 @@ public interface GuideReviewRepository extends JpaRepository<GuideReview, Intege
                            @Param("startDate") LocalDateTime startDate,
                            @Param("endDate") LocalDateTime endDate);
 
+    @Query(value = "SELECT COUNT(gr) " +
+            "FROM GuideReview gr " +
+            "WHERE gr.createdDay BETWEEN :startDay AND :endDay")
+    long searchTotalCntByDate(@Param("startDay") LocalDateTime startDay, @Param("endDay") LocalDateTime endDay);
+
+    @Query(value = "SELECT AVG(gr.rating) " +
+            "FROM GuideReview gr " +
+            "WHERE gr.createdDay BETWEEN :startDay AND :endDay")
+    String searchTotalRatingByDate(@Param("startDay") LocalDateTime startDay, @Param("endDay") LocalDateTime endDay);
 
 
 }
