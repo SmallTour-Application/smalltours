@@ -59,6 +59,13 @@ public class AdminVideoService {
     @Value("${file.path.education}")
     private String educationFilePath;
 
+    // 서버 주소와 포트 번호 properties에서 불러오기
+    @Value("${server.domain}")
+    private String domain;
+    // 포트번호
+    @Value("${server.port}")
+    private String port;
+
     public File getEducationDirectoryPath() {
         File file = new File(educationFilePath);
         file.mkdirs();
@@ -353,6 +360,8 @@ public class AdminVideoService {
      * */
     public EducationDetailDTO.EducationDTO getEducationDetailwithEducationId(int adminId, int educationId) {
         try {
+
+
             checkAdmin(adminId);
             Education education = educationRepository.findById(educationId);
             if (education == null) {
@@ -361,7 +370,7 @@ public class AdminVideoService {
             // EducationDetailDTO로 변환
             EducationDetailDTO.EducationDTO educationDTO = EducationDetailDTO.EducationDTO.builder()
                     .id(education.getId())
-                    .videoPath(education.getVideoPath())
+                    .videoPath( domain + port  + "/img/education/" +  education.getVideoPath())
                     .startDay(education.getStartDay())
                     .endDay(education.getEndDay())
                     .playTime(education.getPlayTime())

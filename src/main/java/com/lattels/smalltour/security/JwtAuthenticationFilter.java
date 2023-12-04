@@ -84,8 +84,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         throws ServletException, IOException {
         try {
             // 요청에서 토큰 가져오기
-            String token = parseBearerToken(request);
-            //request.getHeader("Authorization"); // Http 요청의 헤더를 파싱해 토큰을 리턴하는 함수
+            String token = //parseBearerToken(request);
+            request.getHeader("Authorization"); // Http 요청의 헤더를 파싱해 토큰을 리턴하는 함수
             // 토큰 검사하기. JWT이므로 인가 서버에 요청하지 않고도 검증 가능
             if (token != null && !token.equalsIgnoreCase("null")){
                 // userId 가져오기. 위조된 경우 예외 처리된다.
@@ -109,6 +109,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.setContext(securityContext);
 
                 }
+            }else{
+                log.info("토큰이슈");
             }
         } catch(Exception ex){
             logger.error("Could not set user authentication in security context", ex);

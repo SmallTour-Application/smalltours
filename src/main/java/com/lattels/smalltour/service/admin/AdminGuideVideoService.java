@@ -106,7 +106,7 @@ public class AdminGuideVideoService {
                     .startDay(((java.sql.Date)result[1]).toLocalDate())
                     .endDay(((java.sql.Date)result[2]).toLocalDate())
                     .state(state)
-                    .completeDate(((java.sql.Date)result[4]).toLocalDate())
+                    .completeDate((result[4] == null) ? null : ((java.sql.Date)result[4]).toLocalDate())
                     .build();
             educationGuideListDTO.add(educationGuideLogListDTO);
         }

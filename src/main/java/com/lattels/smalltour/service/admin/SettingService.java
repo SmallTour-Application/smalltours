@@ -79,6 +79,15 @@ public class SettingService {
         }
         List<Setting> settings = settingRepository.findAll();
 
+        // setting에 값이 없다면 새로 만들기
+        if (settings.size() == 0) {
+            Setting setting = Setting.builder()
+                    .packageCommission(0)
+                    .build();
+            settingRepository.save(setting);
+            settings = settingRepository.findAll();
+        }
+
         SettingDTO settingDTO = new SettingDTO(settings.get(0));
 
         return settingDTO;

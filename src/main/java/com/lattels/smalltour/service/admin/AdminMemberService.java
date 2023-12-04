@@ -2,9 +2,11 @@ package com.lattels.smalltour.service.admin;
 
 import com.lattels.smalltour.dto.admin.review.AdminReviewDTO;
 import com.lattels.smalltour.model.GuideReview;
+import com.lattels.smalltour.model.Member;
 import com.lattels.smalltour.model.Reviews;
 import com.lattels.smalltour.model.Tours;
 import com.lattels.smalltour.persistence.GuideReviewRepository;
+import com.lattels.smalltour.persistence.MemberRepository;
 import com.lattels.smalltour.persistence.ReviewsRepository;
 import com.lattels.smalltour.persistence.ToursRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class AdminMemberService {
     private final ReviewsRepository reviewRepository;
     private final GuideReviewRepository guideReviewRepository;
     private final ToursRepository toursRepository;
+    private final MemberRepository memberRepository;
 
     // 특정 회원이 받은 가이드 리뷰 가져오기 getGuideReviewByReceiver
     public AdminReviewDTO.ReviewListDTO getGuideReviewByReceiver(int memberId, Pageable pageable, int state) {
@@ -172,5 +175,38 @@ public class AdminMemberService {
             return null;
         }
 
+    }
+
+    //updateMemberRole
+    public boolean updateMemberRole(int adminId, int memberId, int role) {
+        try{
+            // adminId로 admin인지 확인
+            if(!adminCheck(adminId)){
+                return false;
+            }
+            // memberId로 member 찾기
+            Member member = memberRepository.findById(memberId).orElse(null);
+            if(member == null){
+                return false;
+            }
+            // role 변경
+            member.setRole(role);
+            memberRepository.save(member);
+            return true;
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // admin check
+    public boolean adminCheck(int adminId){
+        try{
+            // adminId로 admin인지 확인
+            return true;
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 }

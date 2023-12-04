@@ -56,7 +56,7 @@ public class ImgController {
     public ResponseEntity<Resource> getToursThumb(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = toursService.getToursDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            FileSystemResource resource = new FileSystemResource(path + "/" +fileName);
             if(!resource.exists()){
                 throw new Exception();
             }
@@ -75,7 +75,7 @@ public class ImgController {
     public ResponseEntity<Resource> getToursImages(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = toursService.getToursImagesDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            FileSystemResource resource = new FileSystemResource(path + "/" +fileName);
             if(!resource.exists()){
                 throw new Exception();
             }
@@ -94,7 +94,7 @@ public class ImgController {
     public ResponseEntity<Resource> getRoomImage(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = roomService.getRoomDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + "\\" + fileName);
+            FileSystemResource resource = new FileSystemResource(path + "/" + fileName);
             if(!resource.exists()){
                 throw new Exception();
             }
@@ -113,7 +113,7 @@ public class ImgController {
     public ResponseEntity<Resource> getItemImage(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = itemService.getItemDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + "\\" + fileName);
+            FileSystemResource resource = new FileSystemResource(path + "/" + fileName);
             if(!resource.exists()){
                 throw new Exception();
             }
@@ -155,7 +155,7 @@ public class ImgController {
     public ResponseEntity<Resource> getEducationFile(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = educationService.getEducationDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            FileSystemResource resource = new FileSystemResource(path + "/" +fileName);
             if(!resource.exists()){
                 throw new Exception();
             }
@@ -175,7 +175,7 @@ public class ImgController {
     public ResponseEntity<Resource> getSearchProfileImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = searchService.getMemberDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            FileSystemResource resource = new FileSystemResource(path + "/" +fileName);
             log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
@@ -194,7 +194,7 @@ public class ImgController {
     public ResponseEntity<Resource> getTourImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = searchService.getTourDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            FileSystemResource resource = new FileSystemResource(path + "/" +fileName);
             log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
@@ -214,7 +214,7 @@ public class ImgController {
     public ResponseEntity<Resource> getProfileMemberImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = profileService.getMemberDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            FileSystemResource resource = new FileSystemResource(path + "/" +fileName);
             log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
@@ -233,7 +233,7 @@ public class ImgController {
     public ResponseEntity<Resource> getProfileTourImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = profileService.getTourDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            FileSystemResource resource = new FileSystemResource(path + "/" +fileName);
             log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
@@ -253,7 +253,7 @@ public class ImgController {
     public ResponseEntity<Resource> getGuideProfileMemberImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = memberGuideService.getMemberDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            FileSystemResource resource = new FileSystemResource(path + "/" +fileName);
             log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
@@ -272,7 +272,7 @@ public class ImgController {
     public ResponseEntity<Resource> getPortResumeImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = memberGuideService.getPortResumeDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            FileSystemResource resource = new FileSystemResource(path + "/" +fileName);
             log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
@@ -294,7 +294,7 @@ public class ImgController {
     public ResponseEntity<Resource> getMainMemberImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = mainService.getMemberDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            FileSystemResource resource = new FileSystemResource(path + "/" +fileName);
             log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
@@ -313,7 +313,7 @@ public class ImgController {
     public ResponseEntity<Resource> getMainTourImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = mainService.getTourDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            FileSystemResource resource = new FileSystemResource(path + "/" +fileName);
             log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
@@ -335,7 +335,7 @@ public class ImgController {
     public ResponseEntity<Resource> getpaymentTourImg(@PathVariable("fileOriginName") String fileName) throws Exception{
         try{
             String path = paymentService.getTourDirectoryPath().getPath();
-            FileSystemResource resource = new FileSystemResource(path + "\\" +fileName);
+            FileSystemResource resource = new FileSystemResource(path + "/" +fileName);
             log.info("이미지 가져오기..." + path + "\\" +fileName);
             if(!resource.exists()){
                 throw new Exception();
