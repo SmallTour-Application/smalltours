@@ -31,14 +31,18 @@ public class AdminPaymentController {
                                                                                  @RequestParam(required = false)String name,
                                                                                  @RequestParam(required = false) String tourName,
                                                                                  // 시작일
-                                                                                 @RequestParam(required = false) LocalDate startDate,
+                                                                                 @RequestParam(required = false) String startDate,
                                                                                  // 종료일
-                                                                                 @RequestParam(required = false)LocalDate endDate,
+                                                                                 @RequestParam(required = false)String endDate,
                                                                                 int page)
     {
         try{
+            // String으로 들어온 날짜를 LocalDate로 변환
+            LocalDate startDay = startDate != null ? LocalDate.parse(startDate) : null;
+            LocalDate endDay = endDate != null ? LocalDate.parse(endDate) : null;
+            log.info("startDay : " + startDay + ", endDay : " + endDay);
             // 질문 목록 조회
-            AdminGuidePaymentListDTO adminPackageDTO = adminPaymentService.getToursList(authentication,name,tourName,startDate,endDate,page);
+            AdminGuidePaymentListDTO adminPackageDTO = adminPaymentService.getToursList(authentication,name,tourName,startDay,endDay,page);
             return ResponseEntity.ok(adminPackageDTO);
         }catch(Exception e){
             e.printStackTrace();

@@ -31,11 +31,12 @@ public class AdminEducationController {
     @GetMapping("/list")
     public ResponseEntity<EducationDTO> getEducationList(@ApiIgnore Authentication authentication,
                                                          @RequestParam(required = false) String title,
-                                                         @RequestParam(required = false) LocalDate startDate,
-                                                         @RequestParam(required = false) LocalDate endDate,
+                                                         @RequestParam(required = false) String startDateStr,
+                                                         @RequestParam(required = false) String endDateStr,
                                                          Pageable pageable) {
         int adminId = Integer.parseInt(authentication.getPrincipal().toString());
-        EducationDTO adminEducationDTO = adminEducationService.getEducationList(adminId, title, startDate, endDate, pageable);
-        return ResponseEntity.ok(adminEducationDTO);
+        LocalDate startDate = startDateStr != null ? LocalDate.parse(startDateStr) : null;
+        LocalDate endDate = endDateStr != null ? LocalDate.parse(endDateStr) : null;
+        EducationDTO adminEducationDTO = adminEducationService.getEducationList(adminId, title, startDate, endDate, pageable);        return ResponseEntity.ok(adminEducationDTO);
     }
 }
