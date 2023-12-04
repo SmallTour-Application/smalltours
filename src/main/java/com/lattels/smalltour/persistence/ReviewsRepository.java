@@ -231,5 +231,15 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Integer> {
     @Query("UPDATE Reviews r SET r.state = 0 WHERE r.id = :id")
     void updateDetailReviewState(@Param("id") int id);
 
+    @Query(value = "SELECT COUNT(r) " +
+            "FROM Reviews r " +
+            "WHERE r.createdDay BETWEEN :startDay AND :endDay")
+    long searchTotalCntByDate(@Param("startDay") LocalDateTime startDay, @Param("endDay") LocalDateTime endDay);
+
+    @Query(value = "SELECT AVG(r.rating) " +
+            "FROM Reviews r " +
+            "WHERE r.createdDay BETWEEN :startDay AND :endDay")
+    String searchTotalRatingByDate(@Param("startDay") LocalDateTime startDay, @Param("endDay") LocalDateTime endDay);
+
 
 }

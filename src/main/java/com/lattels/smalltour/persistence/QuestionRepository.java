@@ -35,7 +35,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
             "AND (:month IS NULL OR MONTH(q.created_day) =:month) " +
             "AND (:year IS NULL OR YEAR(q.created_day) =:year) " +
             "ORDER BY q.created_day DESC", nativeQuery = true)
-    Page<Question> findMemberQuestionAnswer(Pageable pageable, @Param("title") String title,Integer month, Integer year);
+    Page<Question> findMemberQuestionAnswer(Pageable pageable, @Param("title") String title, @Param("month")Integer month, @Param("year")Integer year);
 
 
     @Query(value = "SELECT q.* FROM question q JOIN member m on q.member_id = m.id " +
@@ -44,6 +44,6 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
             "AND (:month IS NULL OR MONTH(q.created_day) =:month) " +
             "AND (:year IS NULL OR YEAR(q.created_day) =:year) " +
             "order by q.created_day desc",nativeQuery = true)
-    Page<Question> findMemberQuestion(Pageable pageable,@Param("title") String title,Integer month, Integer year);
+    Page<Question> findMemberQuestion(Pageable pageable,@Param("title") String title,@Param("month")Integer month, @Param("year")Integer year);
 
 }
