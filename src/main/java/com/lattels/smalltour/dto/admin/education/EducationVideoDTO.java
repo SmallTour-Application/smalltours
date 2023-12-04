@@ -68,7 +68,7 @@ public class EducationVideoDTO {
         @ApiModelProperty(value = "동영상 ID", example = "1")
         private int id;
 
-        @NotBlank(message = "필수 입력 값입니다.")
+
         @ApiModelProperty(value = "동영상 이름", example = "동영상 이름입니다")
         private String title;
 

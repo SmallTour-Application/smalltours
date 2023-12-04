@@ -142,34 +142,29 @@ public class AdminVideoService {
 
         Education education= Education.builder()
                 .id(oldEducationVideo.getId())
-                .startDay(updateRequestDTO.getStartDay())
-                .endDay(updateRequestDTO.getEndDay())
-                .title(updateRequestDTO.getTitle())
+                .startDay(updateRequestDTO.getStartDay() != null ? updateRequestDTO.getStartDay() : oldEducationVideo.getStartDay())
+                .endDay(updateRequestDTO.getEndDay() != null ? updateRequestDTO.getEndDay() : oldEducationVideo.getEndDay())
+                .title(updateRequestDTO.getTitle() != null ? updateRequestDTO.getTitle() : oldEducationVideo.getTitle())
                 .uploadDay(LocalDate.now())
                 .state(1) // 일단 수강가능으로 1:수강가능 0:불가능
                 .build();
-        educationRepository.save(education);
+
 
         // 비디오 파일인지 구분
         boolean isEducationVideoFile;
 
         // 동영상이 있을 경우
         if (videoFile != null && !videoFile.isEmpty()) {
-
-            // 비디오 파일이라고 체크
             isEducationVideoFile = true;
-
-            // 동영상 한개만 저장
+            // 새로운 비디오 파일이 있을 경우
             MultipartFile multipartFile = videoFile.get(0);
+            File newFile = noUpdateFile(education.getVideoPath(), education.getId(), getEducationDirectoryPath(), multipartFile, isEducationVideoFile);
 
-            // 동영상 저장
-            File newFile = saveFile(education.getVideoPath(), education.getId(), getEducationDirectoryPath(), multipartFile, isEducationVideoFile);
-
-            // 교육 비디오 파일명 DB에 저장
-            education.setVideoPath(newFile.getName());
-
-            // 동영상 재생시간 받아와서 저장
-            education.setPlayTime(getVideoPlayTime(newFile));
+            // 새로운 파일이 성공적으로 저장된 경우에만 정보 업데이트
+            if (newFile != null) {
+                education.setVideoPath(newFile.getName());
+                education.setPlayTime(getVideoPlayTime(newFile));
+            }
 
         }
         else {
@@ -181,7 +176,35 @@ public class AdminVideoService {
         educationRepository.save(education);
 
     }
+    private File noUpdateFile(String fileName, int videoId, File directoryPath, MultipartFile multipartFile, boolean isEducationVideoFile) {
+        try {
+            File newFile;
 
+            // 새로운 파일이 제공된 경우에만 기존 파일 삭제 및 새로운 파일 저장
+            if (!multipartFile.isEmpty()) {
+                // 기존 파일이 있다면 삭제
+                if (fileName != null) {
+                    deleteVideoFile(fileName, directoryPath);
+                }
+
+                if (isEducationVideoFile) {
+                    // 동영상 저장 (파일명 : "동영상 ID.확장자")
+                    newFile = MultipartUtils.saveVideo(multipartFile, directoryPath, String.valueOf(videoId));
+                } else {
+                    // 이미지 저장 (파일명 : "동영상 ID.확장자")
+                    newFile = MultipartUtils.saveImage(multipartFile, directoryPath, String.valueOf(videoId));
+                }
+
+                return newFile;
+            } else {
+                // 새로운 파일이 제공되지 않았으면 null 반환
+                return directoryPath;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     // 파일 저장
     private File saveFile(String fileName, int videoId, File directoryPath, MultipartFile multipartFile, boolean isEducationVideoFile) {
