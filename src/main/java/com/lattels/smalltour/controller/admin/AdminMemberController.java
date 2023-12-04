@@ -247,6 +247,7 @@ public class AdminMemberController {
     public ResponseEntity<?> registerMember(@ApiIgnore Authentication authentication, AdminAddMemberDTO.AddMember addMemberDTO) {
 
         try {
+            log.info("addMemberDTO : " + addMemberDTO.toString());
             int adminId = Integer.parseInt(authentication.getPrincipal().toString());
             AdminAddMemberDTO registeredMember = adminService.adminAddMember(adminId,addMemberDTO);
             AdminAddMemberDTO responseMemberDTO = AdminAddMemberDTO.builder()
@@ -255,6 +256,7 @@ public class AdminMemberController {
                     .build();
             return ResponseEntity.ok().body(responseMemberDTO);
         } catch (Exception e) {
+            e.printStackTrace();
             ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
             return ResponseEntity.badRequest().body(responseDTO);
         }
@@ -405,4 +407,16 @@ public class AdminMemberController {
         }
     }
 
+    // member의 role 변경하는 controller
+    @ApiOperation(value = "member의 role 변경하는 controller")
+    @PostMapping("/role/update")
+    public ResponseEntity<?> updateMemberRole(@ApiIgnore Authentication authentication, @RequestParam int memberId, @RequestParam int role) {
+        try {
+            int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+            adminMemberService.updateMemberRole(adminId, memberId, role);
+            return ResponseEntity.ok().body("성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

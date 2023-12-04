@@ -30,7 +30,7 @@ public class EducationLog {
     @Column(name = "last_view")
     private LocalTime lastView; //DB에선 타입이 TIME
 
-    @Column(name = "state")
+    @Column(name = "state") // 0:수강중, 1:수강완료, 2:미수강
     private int state;
 
     @Column(name = "completed_date")

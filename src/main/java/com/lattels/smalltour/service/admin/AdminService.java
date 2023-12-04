@@ -165,10 +165,10 @@ public class AdminService {
         try {
            checkAdmin(adminId);
 
-            Member member = memberRepository.findByMemberInfoId(memberId);
+            Member member = memberRepository.findByMemberId(memberId);
             Member bestGuide = memberRepository.findByMemberDetailInfoId(memberId);
-            Optional<KakaoInfo> kakaoInfo = kakaoInfoRepository.findByMemberId(member.getId());
-            String kakaoConnectStatus = kakaoInfo.isPresent() ? "카카오 계정이랑 연동" : "연동안됨";
+//            Optional<KakaoInfo> kakaoInfo = kakaoInfoRepository.findByMemberId(member.getId());
+//            String kakaoConnectStatus = kakaoInfo.isPresent() ? "카카오 계정이랑 연동" : "연동안됨";
 
             if (member == null) {
                 throw new RuntimeException("해당 멤버를 찾을 수 없습니다.");
@@ -196,7 +196,7 @@ public class AdminService {
                     .state(member.getState())
                     .role(member.getRole())
                     .bestGuide(guideStatus)
-                    .kakaoConnect(kakaoConnectStatus)
+                    //.kakaoConnect(kakaoConnectStatus)
                     .build();
 
             if(member.getProfile() != null){
