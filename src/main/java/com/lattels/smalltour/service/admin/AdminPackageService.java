@@ -153,6 +153,16 @@ public class AdminPackageService {
 
     }
 
+    public void updateApprovals(int adminId,Integer tourId, Integer approvals) {
+        checkAdmin(adminId);
+        if(tourId != null && approvals != null)
+        {
+            toursRepository.updateTourApprovals(tourId,approvals);  //0:미승인 1:승인 2:일시정지 3:삭제
+        }
+
+    }
+
+
     public void deleteTour(int adminId, int tourId) {
         checkAdmin(adminId);
         toursRepository.deleteTourById(tourId);
