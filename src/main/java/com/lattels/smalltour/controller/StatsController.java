@@ -1,5 +1,6 @@
 package com.lattels.smalltour.controller;
 
+import com.lattels.smalltour.dto.stats.SearchSalesResponseDTO;
 import com.lattels.smalltour.dto.stats.SiteProfitDTO;
 import com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO;
 import com.lattels.smalltour.dto.stats.StatsDTO;
@@ -137,6 +138,23 @@ public class StatsController {
 
         try {
             StatsDTO.SearchGuideSalesResponseDTO responseDTO = statsService.searchGuideSales(authentication, requestDTO);
+            return ResponseEntity.ok().body(responseDTO);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseMessageException(ErrorCode.INVALID_PARAMETER);
+        }
+
+    }
+
+    /*
+    * 가이드 통계 검색
+    */
+    @PostMapping(value = "/search/total-sales")
+    @ApiOperation(value = "전체 통계 검색")
+    public ResponseEntity<SearchSalesResponseDTO> searchTotalSales(@ApiIgnore Authentication authentication, @RequestBody StatsDTO.DateRequestDTO dateRequestDTO) {
+
+        try {
+            SearchSalesResponseDTO responseDTO = statsService.searchTotalSales(authentication, dateRequestDTO);
             return ResponseEntity.ok().body(responseDTO);
         } catch (Exception e) {
             e.printStackTrace();

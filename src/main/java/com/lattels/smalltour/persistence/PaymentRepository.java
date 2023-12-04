@@ -2,6 +2,7 @@ package com.lattels.smalltour.persistence;
 
 import com.lattels.smalltour.dto.admin.payment.AdminInterfacePaymentDetail;
 import com.lattels.smalltour.dto.admin.payment.AdminInterfacePaymentTourList;
+import com.lattels.smalltour.dto.stats.SearchSalesResponseDTO;
 import com.lattels.smalltour.dto.stats.TotalVolumePercentageDTO;
 import com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO;
 import com.lattels.smalltour.model.Payment;
@@ -152,10 +153,10 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer>, Paym
     /*
      * 1년간의 월별 예약 수 가져오기
      */
-    @Query(value = "SELECT new com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO(p.paymentDay, count(p)) " +
+    @Query(value = "SELECT new com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO(FUNCTION('YEAR', p.paymentDay), FUNCTION('MONTH', p.paymentDay), count(p)) " +
             "FROM Payment p " +
             "WHERE p.paymentDay >= :date AND p.state = 1 " +
-            "GROUP BY p.paymentDay ")
+            "GROUP BY FUNCTION('YEAR', p.paymentDay), FUNCTION('MONTH', p.paymentDay) ")
     List<TotalCntPerMonthDTO> countPaymentPerMonth(@Param("date") LocalDateTime date);
 
     /*
@@ -270,5 +271,21 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer>, Paym
             "WHERE p.id = :paymentId", nativeQuery = true)
     Optional<AdminInterfacePaymentDetail> findByPaymentDetail(@Param("paymentId") int paymentId);
 
-//    List<Object[]> searchSalesByConditions(LocalDate startDay, LocalDate endDay, Long sales, Integer state, String toursTitle);
+    @Query(value = "SELECT COUNT(p) " +
+            "FROM Payment p " +
+            "WHERE p.paymentDay BETWEEN :startDay AND :endDay " +
+            "AND p.state = :state")
+    long searchSalesVolumeByDate(@Param("startDay") LocalDateTime startDay, @Param("endDay") LocalDateTime endDay, @Param("state") int state);
+
+    @Query(value = "SELECT SUM(p.price) " +
+            "FROM Payment p " +
+            "WHERE p.paymentDay BETWEEN :startDay AND :endDay " +
+            "AND p.state = :state")
+    String searchSalesByDate(@Param("startDay") LocalDateTime startDay, @Param("endDay") LocalDateTime endDay, @Param("state") int state);
+
+    @Query(value = "SELECT COUNT(p), SUM(p.price), COUNT(t), COUNT(gr), AVG(gr.rating), COUNT(r), AVG(r.rating) " +
+            "FROM Payment p, Reviews r, GuideReview gr, Tours t " +
+            "WHERE t.approvals = :approvals AND p.state = :state")
+    Object[] searchTotalSales(@Param("approvals") int approvals, @Param("state") int state);
+
 }

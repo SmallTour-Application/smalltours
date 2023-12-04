@@ -58,11 +58,16 @@ public class EducationLogDTO {
         // 교육 완료
         public static final int COMPLETED = 1;
 
-        // 교육 완료
+        // 지각
         public static final int LATE = 2;
 
-        // 교육 전 ( DB에는 저장되지 않음)
-        public static final int DO_NOT = 3;
+        // 교육 가능 ( DB에는 저장되지 않음)
+        public static final int POSSIBLE = 3;
+
+        // 불가능 (시작 날짜)
+        public static final int IMPOSSIBLE = 4;
+
 
     }
+
 }

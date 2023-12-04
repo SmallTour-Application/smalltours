@@ -3,10 +3,9 @@ package com.lattels.smalltour.service;
 import com.google.common.base.Preconditions;
 import com.google.common.math.Stats;
 import com.lattels.smalltour.dto.MemberDTO;
-import com.lattels.smalltour.dto.stats.SiteProfitDTO;
-import com.lattels.smalltour.dto.stats.StatsDTO;
-import com.lattels.smalltour.dto.stats.TotalCntPerMonthDTO;
-import com.lattels.smalltour.dto.stats.TotalVolumePercentageDTO;
+import com.lattels.smalltour.dto.ToursDTO;
+import com.lattels.smalltour.dto.payment.PaymentDTO;
+import com.lattels.smalltour.dto.stats.*;
 import com.lattels.smalltour.exception.ErrorCode;
 import com.lattels.smalltour.exception.ResponseMessageException;
 import com.lattels.smalltour.model.Member;
@@ -24,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 @Slf4j
 @Service
@@ -63,7 +63,7 @@ public class StatsService {
         Preconditions.checkNotNull(member, "등록된 회원이 아닙니다. (회원 ID : %s)", memberId);
 
         // 가이드 회원인지 검사
-        Preconditions.checkArgument(member.getRole() == MemberDTO.MemberRole.GUIDE, "가이드 회원이 아닙니다. (회원 ID : %s)", memberId);
+//        Preconditions.checkArgument(member.getRole() == MemberDTO.MemberRole.GUIDE, "가이드 회원이 아닙니다. (회원 ID : %s)", memberId);
 
         // 받아온 날짜 할당
         LocalDateTime startDate = dateRequestDTO.getStartDate().atStartOfDay();
@@ -184,7 +184,8 @@ public class StatsService {
 
         LocalDate currentDate = LocalDate.now();
         LocalDate startDate = currentDate.minusYears(1);
-        List<TotalCntPerMonthDTO> responseDTOList = paymentRepository.countPaymentPerMonth(startDate.atStartOfDay());
+        startDate = startDate.plusMonths(1);
+        List<TotalCntPerMonthDTO> responseDTOList = paymentRepository.countPaymentPerMonth(startDate.plusMonths(1).atStartOfDay());
 
         int i = -1;
         boolean isMatch = false;
@@ -329,9 +330,9 @@ public class StatsService {
         if (member == null) {
             throw new ResponseMessageException(ErrorCode.USER_UNREGISTERED);
         }
-        // 관리자 회원인지 검사
-        if (member.getRole() != MemberDTO.MemberRole.ADMIN) {
-            throw new ResponseMessageException(ErrorCode.ADMIN_INVALID_PERMISSION);
+        // 관리자이거나 가이드인지 검사
+        if (member.getRole() != MemberDTO.MemberRole.ADMIN || member.getRole() != MemberDTO.MemberRole.GUIDE) {
+            throw new ResponseMessageException(ErrorCode.INVALID_PERMISSION);
         }
 
         List<Object[]> objects = paymentRepository.searchSalesByConditions(requestDTO.getStartDate(), requestDTO.getEndDate(), requestDTO.getSales(), requestDTO.getState(), requestDTO.getToursTitle());
@@ -352,4 +353,55 @@ public class StatsService {
 
     }
 
+    public SearchSalesResponseDTO searchTotalSales(Authentication authentication, StatsDTO.DateRequestDTO dateRequestDTO) {
+
+        int memberId = Integer.parseInt(authentication.getPrincipal().toString());
+        Member member = memberRepository.findByMemberId(memberId);
+        // 등록된 회원인지 검사
+        if (member == null) {
+            throw new ResponseMessageException(ErrorCode.USER_UNREGISTERED);
+        }
+        // 관리자 회원인지 검사
+        if (member.getRole() != MemberDTO.MemberRole.ADMIN) {
+            throw new ResponseMessageException(ErrorCode.ADMIN_INVALID_PERMISSION);
+        }
+
+        if (dateRequestDTO.getStartDate() == null || dateRequestDTO.getEndDate() == null) {
+            Object[] objects = paymentRepository.searchTotalSales(ToursDTO.ToursApprovals.APPROVAL, 1);
+            return new SearchSalesResponseDTO((Object[]) objects[0]);
+        }
+        else {
+            LocalDateTime startDate = dateRequestDTO.getStartDate().atStartOfDay();
+            LocalDateTime endDate = dateRequestDTO.getEndDate().atStartOfDay();
+
+            int totalSalesVolume = (int) paymentRepository.searchSalesVolumeByDate(startDate, endDate, 1);
+
+            String totalSales = paymentRepository.searchSalesByDate(startDate, endDate, 1);
+            if (totalSales == null) totalSales = "0";
+
+            int totalPackageCnt = (int) toursRepository.searchTotalCntByDate(startDate, endDate, ToursDTO.ToursApprovals.APPROVAL);
+
+            int totalGuideReviewCnt = (int) guideReviewRepository.searchTotalCntByDate(startDate, endDate);
+
+            String totalGuideRating = guideReviewRepository.searchTotalRatingByDate(startDate, endDate);
+            if (totalGuideRating == null) totalGuideRating = "0";
+
+            int totalPackageReviewCnt = (int) reviewsRepository.searchTotalCntByDate(startDate, endDate);
+
+            String totalPackageReviewRating = reviewsRepository.searchTotalRatingByDate(startDate, endDate);
+            if (totalPackageReviewRating == null) totalPackageReviewRating = "0";
+
+            return new SearchSalesResponseDTO(
+                    totalSalesVolume,
+                    Integer.parseInt(totalSales),
+                    totalPackageCnt,
+                    totalGuideReviewCnt,
+                    Double.parseDouble(totalGuideRating),
+                    totalPackageReviewCnt,
+                    Double.parseDouble(totalPackageReviewRating)
+            );
+
+        }
+
+    }
 }
