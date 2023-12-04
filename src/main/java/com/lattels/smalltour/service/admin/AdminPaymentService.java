@@ -268,9 +268,9 @@ public class AdminPaymentService {
                     .guideId((Integer) result[6])
                     .guideName((String) result[7])
                     .price(Integer.parseInt(String.valueOf(result[8])))
-                    .paymentDay(result[9] != null ? LocalDate.parse(String.valueOf(result[9])) : null)
-                    .startDay(result[10] != null ? LocalDate.parse(String.valueOf(result[10])) : null) // java.sql.Date -> LocalDate
-                    .endDay(result[11] != null ? LocalDate.parse(String.valueOf(result[11])) : null) // java.sql.Date -> LocalDate
+                    .paymentDay(result[9] != null ? LocalDate.parse(String.valueOf(result[9]).split(" ")[0]) : null)
+                    //.startDay(result[10] != null ? LocalDate.parse(String.valueOf(result[10]).split(" ")[0]) : null) // java.sql.Date -> LocalDate
+                    //.endDay(result[11] != null ? LocalDate.parse(String.valueOf(result[11])) : null) // java.sql.Date -> LocalDate
                     .state(status)
                     .toursTitle((String) result[13])
                     .toursId((Integer) result[14])

@@ -87,7 +87,7 @@ public class AdminVideoController {
     @PostMapping("/education/detail")
     public ResponseEntity<?> getEducationDetail(@ApiIgnore Authentication authentication, @RequestParam() Integer educationId) {
         int adminId = Integer.parseInt(authentication.getPrincipal().toString());
-        EducationDetailDTO educationDetailDTO = adminVideoService.getEducationDetail(adminId, educationId);
+        EducationDetailDTO.EducationDTO educationDetailDTO = adminVideoService.getEducationDetailwithEducationId(adminId, educationId);
         return ResponseEntity.ok(educationDetailDTO);
     }
     

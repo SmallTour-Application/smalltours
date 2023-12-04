@@ -347,4 +347,33 @@ public class AdminVideoService {
                 .educationDTO(educationDTOS)
                 .build();
     }
+
+    /**
+     * 교육 상세 정보
+     * */
+    public EducationDetailDTO.EducationDTO getEducationDetailwithEducationId(int adminId, int educationId) {
+        try {
+            checkAdmin(adminId);
+            Education education = educationRepository.findById(educationId);
+            if (education == null) {
+                throw new RuntimeException("해당 강좌를 찾을 수 없습니다.");
+            }
+            // EducationDetailDTO로 변환
+            EducationDetailDTO.EducationDTO educationDTO = EducationDetailDTO.EducationDTO.builder()
+                    .id(education.getId())
+                    .videoPath(education.getVideoPath())
+                    .startDay(education.getStartDay())
+                    .endDay(education.getEndDay())
+                    .playTime(education.getPlayTime())
+                    .title(education.getTitle())
+                    .uploadDay(education.getUploadDay())
+                    .educationState(education.getState())
+                    .build();
+
+            return educationDTO;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
