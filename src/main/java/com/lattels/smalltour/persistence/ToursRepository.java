@@ -203,6 +203,13 @@ public interface ToursRepository extends JpaRepository<Tours, Integer>, JpaSpeci
     void deleteTourById(@Param("id") int id);
 
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE Tours t SET t.approvals = :approvals WHERE t.id = :id")
+    void updateTourApprovals(@Param("id") int id, @Param("approvals") int approvals);
+
+
+
     @Query(value = "SELECT t.id, t.title,t.guide_id,m.name, AVG(r.rating) AS average_rating, t.duration, t.price, t.max_group_size," +
             "CASE WHEN EXISTS (SELECT * " +
             "FROM guide_lock gl " +

@@ -55,7 +55,15 @@ public class AdminPackageController {
         adminPackageService.updateTour(adminId, tourId,title,subTitle,description,meetingPoint,maxGroupSize,minGroupSize);
         return ResponseEntity.ok().build();
     }
-
+    @ApiOperation(" 패키지 승인 수정")
+    @PostMapping("/update/approval")
+    public ResponseEntity<?> updateApproval(@ApiIgnore Authentication authentication,
+                                           @RequestParam(required = false) Integer tourId,
+                                           @RequestParam(required = false) Integer approvals) {
+        int adminId = Integer.parseInt(authentication.getPrincipal().toString());
+        adminPackageService.updateApprovals(adminId, tourId,approvals);
+        return ResponseEntity.ok().build();
+    }
 
     @ApiOperation(" 패키지 삭제")
     @PostMapping("/delete")
