@@ -205,7 +205,7 @@ public class MemberGuideService {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
             String current_date = now.format(dateTimeFormatter);
 
-            String absolutePath = "C:" + File.separator + "smallTour" + File.separator + dirName;
+            String absolutePath = filePathRP;
             String path = absolutePath;
             File file = new File(path);
 

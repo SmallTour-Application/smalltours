@@ -37,6 +37,8 @@ public class UnauthGuiderService {
 
     @Value("${file.path}")
     private String filePath;
+    @Value("${file.path.resumePortfolio}")
+    private String resumePortfolioPath;
 
     @Transactional
     public MemberAndGuideProfileDTO addGuide(MemberAndGuideProfileDTO.SignUp memberAndGuideProfileDTO) throws IOException {
@@ -135,7 +137,7 @@ public class UnauthGuiderService {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
             String current_date = now.format(dateTimeFormatter);
 
-            String absolutePath = "C:" + File.separator + "smallTour" + File.separator + dirName;
+            String absolutePath = resumePortfolioPath + File.separator + dirName;
             String path = absolutePath;
             File file = new File(path);
 
@@ -176,7 +178,7 @@ public class UnauthGuiderService {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
             String current_date = now.format(dateTimeFormatter);
 
-            String absolutePath = "C:" + File.separator + "smallTour" + File.separator + dirName;
+            String absolutePath = filePath;
             String path = absolutePath;
             File file = new File(path);
 
