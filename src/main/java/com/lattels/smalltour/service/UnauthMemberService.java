@@ -79,7 +79,7 @@ public class UnauthMemberService {
 
 
                     //String absolutePath = filePath +File.separator + "member";
-                    String absolutePath = "C:" +File.separator + "smallTour" + File.separator + "member";
+                    String absolutePath = filePath;
                     String path = absolutePath;
                     File file = new File(path);
 
