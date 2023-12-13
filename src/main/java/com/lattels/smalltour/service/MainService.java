@@ -138,7 +138,7 @@ public class MainService {
             if (averageRating == null) continue; //평점이 없는경우, 해당 상품에 대해 리뷰가 없다고 판단 ,그냥넘어감
 
             PopularTourDTO.TourInfo tourInfo = PopularTourDTO.TourInfo.builder()
-                    .thumb(domain + port  +"/img/main/tour/" + tour.getThumb())
+                    .thumb(domain + port  +"/img/tours/" + tour.getThumb())
                     .title(tour.getTitle())
                     .subTitle(tour.getSubTitle())
                     .price(tour.getPrice())

@@ -346,7 +346,8 @@ public class PaymentService {
 
         List<PaymentDTO> paymentDTOS = payments.stream()
                 .map(payment -> {
-                    String thumbUrl = domain + port + "/img/payment/tourThumb/" + payment.getTours().getThumb();
+                    //String thumbUrl = domain + port + "/img/payment/tourThumb/" + payment.getTours().getThumb();
+                    String thumbUrl = domain + port + "/img/tours/" + payment.getTours().getThumb();
                     return new PaymentDTO(payment, thumbUrl, canReview(payment), canGuideReview(payment));
                 })
                 .collect(Collectors.toList());

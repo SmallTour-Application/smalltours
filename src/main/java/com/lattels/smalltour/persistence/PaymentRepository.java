@@ -96,6 +96,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer>, Paym
      */
     List<Payment> findAllByMemberIdAndToursTitleContainsAndPaymentDayBetweenOrderByPaymentDayDesc(int memberId, String toursTitle, LocalDateTime startPaymentDay, LocalDateTime endPaymentDay, Pageable pageable);
 
+
+
     /**
      * 해당 회원과 날짜에 맞는 결제 내역을 가이드명으로 검색하고 최근순으로 불러옵니다.
      */
