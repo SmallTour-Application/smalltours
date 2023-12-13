@@ -71,10 +71,9 @@ public class MemberController {
     }
 
 
-
     // 닉네임 변경
     @PostMapping("/updatenickname")
-    public ResponseEntity<?> updateNickName(@ApiIgnore Authentication authentication,@RequestBody MemberDTO.UpdateNickName updateNickName) {
+    public ResponseEntity<?> updateNickName(@ApiIgnore Authentication authentication, @RequestBody MemberDTO.UpdateNickName updateNickName) {
 
         try {
             String nickname = memberService.updateNickName(Integer.parseInt(authentication.getPrincipal().toString()), updateNickName.getNickname());
@@ -97,7 +96,7 @@ public class MemberController {
     @PostMapping("/updatepw")
     public ResponseEntity<?> chgPw(@ApiIgnore Authentication authentication, @RequestBody MemberDTO.UpdatePw updatePw) {
         try {
-            if (memberService.updatePw(Integer.parseInt(authentication.getPrincipal().toString()), updatePw.getCurPw(),updatePw.getChgPw(), passwordEncoder)) {
+            if (memberService.updatePw(Integer.parseInt(authentication.getPrincipal().toString()), updatePw.getCurPw(), updatePw.getChgPw(), passwordEncoder)) {
                 ResponseDTO responseDTO = ResponseDTO.builder().error("성공").build();
                 return ResponseEntity.ok().body(responseDTO);
             } else {
@@ -109,7 +108,6 @@ public class MemberController {
             return ResponseEntity.badRequest().body(responseDTO);
         }
     }
-
 
 
     // 프로필 이미지 변경
@@ -162,10 +160,16 @@ public class MemberController {
 
     // 좋아요 추가
     @PostMapping("/heart/add")
-    public ResponseEntity<?> addFavoriteGuide(@ApiIgnore Authentication authentication,  @RequestParam int guideId) {
-        int memberId = Integer.parseInt(authentication.getPrincipal().toString());
-        memberFavoriteStatusService.addFavoriteGuide(memberId, guideId);
-        return ResponseEntity.ok().body("좋아요 눌렀습니다.");
+    public ResponseEntity<?> addFavoriteGuide(@ApiIgnore Authentication authentication, @RequestParam int guideId) {
+        try {
+            int memberId = Integer.parseInt(authentication.getPrincipal().toString());
+            memberFavoriteStatusService.addFavoriteGuide(memberId, guideId);
+            return ResponseEntity.ok().body("좋아요 눌렀습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
+            return ResponseEntity.badRequest().body(responseDTO);
+        }
     }
 
     @PostMapping("/heart/cancel")

@@ -339,7 +339,7 @@ public class MemberService {
             favoriteGuideDTO guideDTO = favoriteGuideDTO.builder()
                     .guideId(guide.getId())
                     .guideName(guide.getName())
-                    .guideImg(guide.getProfile())
+                    .guideImg(domain + port + "/img/member/" + guide.getProfile())
                     .favorite((int)favoriteCount) //내가 좋아요 누른 가이드에 좋아요 수(다른사람도 누른)
                     .build();
 
@@ -377,7 +377,7 @@ public class MemberService {
                 FavoriteTourDTO tourDTO = FavoriteTourDTO.builder()
                         .tourId(tour.getId())
                         .tourName(tour.getTitle())
-                        .tourThumb(tour.getThumb())
+                        .tourThumb(domain + port + "/img/tours/" + tour.getThumb())
                         .favorite((int)countByTourId)
                         .build();
 
