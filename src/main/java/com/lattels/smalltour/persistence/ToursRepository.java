@@ -46,9 +46,9 @@ public interface ToursRepository extends JpaRepository<Tours, Integer>, JpaSpeci
     long countAllByGuideId(int guideId);
 
 
-    @Query(value = "SELECT distinct t.* FROM Tours t JOIN Locations l ON t.id = l.tour_id LEFT JOIN Guide_Lock g ON t.guide_id = g.guide_id WHERE (l.location_name LIKE %:location% OR l.country LIKE %:location% OR l.region LIKE %:location%) AND t.min_group_size <= :people AND t.max_group_size >= :people AND" +
+    @Query(value = "SELECT distinct t.* FROM Tours t  LEFT JOIN Guide_Lock g ON t.guide_id = g.guide_id WHERE (t.title LIKE %:title% ) AND t.min_group_size <= :people AND t.max_group_size >= :people OR" +
             "((g.guide_id IS NULL AND (DATEDIFF(:end, :start) + 1 = t.duration)) OR (g.guide_id IS NOT NULL AND ((DATEDIFF(:end, :start) + 1 = t.duration) AND (:start > g.end_day OR :end < g.start_day)))) AND t.approvals = 1", nativeQuery = true)
-    Page<Tours> findToursBySearchParameters(@Param("location") String location, @Param("people") int people, @Param("start") LocalDate start, @Param("end") LocalDate end, Pageable pageable);
+    Page<Tours> findToursBySearchParameters(@Param("title") String title, @Param("people") int people, @Param("start") LocalDate start, @Param("end") LocalDate end, Pageable pageable);
 
 
 
@@ -108,7 +108,8 @@ public interface ToursRepository extends JpaRepository<Tours, Integer>, JpaSpeci
 
 
 
-    @Query(value = "SELECT t.id,t.title,t.created_day,t.update_day,t.approvals FROM tours t " +
+    @Query(value = "SELECT t.id,t.title,t.created_day,t.update_day,t.approvals,t.price,t.max_group_size,t.min_group_size,t.duration,m.name FROM tours t " +
+            "JOIN member m ON m.id = t.guide_id " +
             "WHERE (:month IS NULL OR MONTH(t.created_day) = :month) " +
             "AND (:year IS NULL OR YEAR(t.created_day) = :year) " +
             "AND (:tourId IS NULL OR t.id = :tourId) " +

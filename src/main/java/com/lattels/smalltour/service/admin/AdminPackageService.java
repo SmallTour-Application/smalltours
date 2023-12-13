@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,13 +103,26 @@ public class AdminPackageService {
                     break;
             }
 
+            LocalDateTime updateDay = null;
+            if (tours[3] != null) {
+                updateDay = ((Timestamp) tours[3]).toLocalDateTime();
+            }
+            String formattedUpdateDay = updateDay == null ? "0000-00-00 00:00:00" : updateDay.toString();
+
             AdminPackageDTO.AdminToursList adminToursList = AdminPackageDTO.AdminToursList.builder()
                     .tourId(Integer.parseInt(String.valueOf(tours[0])))
                     .tourName(String.valueOf(tours[1]))
                     .createdDay(((Timestamp) tours[2]).toLocalDateTime())
-                    .updateDay(((Timestamp) tours[3]).toLocalDateTime())
+                    .updateDay(formattedUpdateDay)
                     .approval(approvalStatus)
+                    .price(Integer.parseInt(String.valueOf(tours[5])))
+                    .maxPeople(Integer.parseInt(String.valueOf(tours[6])))
+                    .minPeople(Integer.parseInt(String.valueOf(tours[7])))
+                    .duration(Integer.parseInt(String.valueOf(tours[8])))
+                    .guideName(String.valueOf(tours[9]))
                     .build();
+
+
             adminTours.add(adminToursList);
         }
 

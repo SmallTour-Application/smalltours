@@ -97,10 +97,10 @@ public class ProfileService {
             float rating = (averageRating != null) ? averageRating : 0.0f;
 
             GuideProfileViewDTO.TourDTO tourDTO = GuideProfileViewDTO.TourDTO.builder()
-                    .thumb(domain + port + "/img/profile/tour/" +  tour.getThumb())
+                    .thumb(domain + port + "/img/tours/" +  tour.getThumb())
                     .title(tour.getTitle())
                     .guideName(tour.getGuide().getName())
-                    .guideProfileImg(domain + port + "/img/profile/member/" + tour.getGuide().getProfile())
+                    .guideProfileImg(domain + port + "/img/member/" + member.getProfile())
                     .rating(rating)
                     .price(tour.getPrice())
                     .build();
@@ -117,7 +117,7 @@ public class ProfileService {
                 .introduce(guideProfile.getIntroduce())
                 .joinDay(member.getJoinDay())
                 .gender(member.getGender())
-                .profileImg(domain + port + "/img/profile/member/" + member.getProfile())
+                .profileImg(domain + port + "/img/member/" + member.getProfile())
                 .tours(tourDTOs)
                 .favoriteCount((int)favoriteCount)
                 .build();
@@ -199,7 +199,7 @@ public class ProfileService {
 
             GuideTourRequestDTO.contents tourContent = GuideTourRequestDTO.contents.builder()
                     .tourId(tour.getId())
-                    .thumb(domain + port + "/img/profile/tour/" +  tour.getThumb())
+                    .thumb(domain + port + "/img/tours/" +  tour.getThumb())
                     .title(tour.getTitle())
                     .subTitle(tour.getSubTitle())
                     .build();

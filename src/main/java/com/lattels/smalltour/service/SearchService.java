@@ -52,6 +52,9 @@ public class SearchService {
     @Value("${file.path.tours.images}")
     private String filePathToursImages;
 
+    @Value("${file.path.tours}")
+    private String tourImg;
+
     public File getMemberDirectoryPath() {
         File file = new File(filePath);
         file.mkdirs();
@@ -69,12 +72,12 @@ public class SearchService {
 
     //type을 패키지로 해놓고 검색창에 패키지 이름으로 검색할 경우
     //해당 패키지들 결과물이 출력되어야함
-    public ResponseEntity<SearchPackageDTO> searchPackage(int type, String location, int people, LocalDate start, LocalDate end, int sort, int page) {
+    public ResponseEntity<SearchPackageDTO> searchPackage(int type, String title, int people, LocalDate start, LocalDate end, int sort, int page) {
 
 
-        if (people < 3 || people > 5) {
+     /*   if (people < 3 || people > 5) {
             throw new IllegalArgumentException("해당 상품은 최소 인원 3명에서 최대 5명 까지 돼야 이용이 가능합니다.");
-        }
+        }*/
 
         if (start.isAfter(end)) {
             throw new IllegalArgumentException("날짜에 해당하는 상품(패키지)가 없습니다.");
@@ -96,7 +99,7 @@ public class SearchService {
         page = Math.max(page - 1, 0);
 
         if (type == 0) { // 패키지를 검색하는 경우
-            Page<Tours> tours = toursRepository.findToursBySearchParameters(location, people, start, end, PageRequest.of(page, size, sortDirection));
+            Page<Tours> tours = toursRepository.findToursBySearchParameters(title, people, start, end, PageRequest.of(page, size, sortDirection));
             if (tours.isEmpty()) {
                 throw new IllegalArgumentException("해당 기간에 상품이 없습니다.");
             }
@@ -123,13 +126,20 @@ public class SearchService {
 
                     SearchPackageDTO.PackageContent packageContent = SearchPackageDTO.PackageContent.builder()
                             .tourId(tour.getId())
-                            .thumb(domain + port + "/img/search/tour/" + tour.getThumb())
+                            .thumb(domain + port + "/img/tours/" + tour.getThumb())
                             .title(tour.getTitle())
                             .guideName(guide.getName())
-                            .guideProfileImg(domain + port + "/img/search/member/" + guide.getProfile())
+                            //.guideProfileImg(domain + port + "/img/member/" + guide.getProfile())
                             .rating(rating)
                             .price(tour.getPrice())
                             .build();
+
+
+                    if (guide.getProfile() != null) {
+                        SearchPackageDTO.PackageContent.builder()
+                                .guideProfileImg(domain + port + "/img/member/" + guide.getProfile())
+                                .build();
+                    }
 
                     if (optionalUpperPayment.isPresent()) {
                         UpperPayment upperPayment = optionalUpperPayment.get();
@@ -197,6 +207,8 @@ public class SearchService {
                                 .uploadTourCount((int) tourCount)
                                 .build()
                 );
+
+
             }
         }
         // 검색 결과 개수 설정
