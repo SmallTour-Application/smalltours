@@ -24,7 +24,7 @@ public interface FavoriteGuideRepository extends JpaRepository<FavoriteGuide, Fa
     @Query("SELECT COUNT(DISTINCT fg.member.id) FROM FavoriteGuide fg WHERE fg.guide.id = :guideId AND fg.guide.role = 2 AND fg.member.role = 0")
     long countByGuideId(@Param("guideId") int guideId);
 
-    @Query("SELECT fg FROM FavoriteGuide fg WHERE fg.member = :member AND fg.guide.role = 2")
+    @Query("SELECT fg FROM FavoriteGuide fg WHERE fg.member = :member AND fg.guide.role = 2 AND fg.state = 1")
     Page<FavoriteGuide> findByMemberAndGuideRole(@Param("member")Member member, Pageable pageable);
 
 

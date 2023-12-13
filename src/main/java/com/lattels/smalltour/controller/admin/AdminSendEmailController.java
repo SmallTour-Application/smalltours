@@ -50,6 +50,7 @@ public class AdminSendEmailController {
             EmailAllSendMessageDTO emailAllMessageDTOs = emailMessageService.sendAllMemberEmailMessage(adminId,emailAllSendMessageDTO);
             return ResponseEntity.ok().body(emailAllMessageDTOs);
         } catch (Exception e) {
+            e.printStackTrace();
             ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
             return ResponseEntity.badRequest().body(responseDTO);
         }
