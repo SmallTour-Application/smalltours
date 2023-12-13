@@ -34,13 +34,13 @@ public class SearchController {
     @ApiOperation(value = "패키지 검색", notes = "검색창에 입력한 값으로 패키지를 검색합니다.")
     @GetMapping("/package")
     public ResponseEntity<?> searchPackage(@RequestParam int type,
-                                         @RequestParam String location,
+                                         @RequestParam String title,
                                          @RequestParam int people,
                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
                                          @RequestParam int sort,
                                          @RequestParam(defaultValue = "1") int page) {
-        return searchService.searchPackage(type, location, people, start, end, sort, page);
+        return searchService.searchPackage(type, title, people, start, end, sort, page);
     }
 
     @GetMapping("/guide")

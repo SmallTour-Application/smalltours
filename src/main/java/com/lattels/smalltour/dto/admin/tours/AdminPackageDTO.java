@@ -37,7 +37,7 @@ public class AdminPackageDTO {
         private LocalDateTime createdDay;
 
         @ApiParam("수정일시")
-        private LocalDateTime updateDay;
+        private String updateDay;
 
         @ApiParam("상태")
         private String approval;
